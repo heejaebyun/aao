@@ -101,7 +101,9 @@ function AnimNum({ value, dur = 1200 }) {
 
 function Ring({ score, max = 100, size = 170, color }) {
   const [a, setA] = useState(0);
-  const pct = (score / max) * 100;
+  const safeScore = Number.isFinite(Number(score)) ? Number(score) : 0;
+  const safeMax = Number.isFinite(Number(max)) && Number(max) > 0 ? Number(max) : 100;
+  const pct = (safeScore / safeMax) * 100;
   const r = (size - 16) / 2, ci = 2 * Math.PI * r;
   useEffect(() => { setTimeout(() => setA(pct), 150); }, [pct]);
   return (
@@ -113,8 +115,8 @@ function Ring({ score, max = 100, size = 170, color }) {
           style={{ transition: "stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1)", filter: `drop-shadow(0 0 8px ${color}50)` }} />
       </svg>
       <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ fontSize: size * 0.26, fontWeight: 800, color, fontFamily: "'Outfit',sans-serif", letterSpacing: "-2px" }}><AnimNum value={score} /></div>
-        <div style={{ fontSize: size * 0.1, color: C.textDim, fontFamily: "'Outfit',sans-serif" }}>/ {max}</div>
+        <div style={{ fontSize: size * 0.26, fontWeight: 800, color, fontFamily: "'Outfit',sans-serif", letterSpacing: "-2px" }}><AnimNum value={safeScore} /></div>
+        <div style={{ fontSize: size * 0.1, color: C.textDim, fontFamily: "'Outfit',sans-serif" }}>/ {safeMax}</div>
       </div>
     </div>
   );
