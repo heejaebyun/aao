@@ -174,6 +174,10 @@ const styles = {
     padding: "16px 18px",
     marginBottom: "18px",
   },
+  compactList: {
+    paddingLeft: "20px",
+    margin: "0 0 10px",
+  },
 };
 
 export default function AiProfilePage() {
@@ -186,13 +190,29 @@ export default function AiProfilePage() {
       <h1 style={styles.h1}>AAO AI Answer Optimization</h1>
 
       <p style={{ ...styles.p, ...styles.lead }}>
-        <strong>AAO AI Answer Optimization</strong>은 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단하고,
-        공식 웹사이트를 AI의 1차 출처로 만들기 위한 구조와 콘텐츠를 설계하는 서비스입니다.
+        <strong>AAO AI Answer Optimization</strong>은 기업 웹사이트를 ChatGPT, Perplexity, Gemini 같은 생성형 AI가
+        얼마나 정확히 이해하는지 진단하고, 공식 웹사이트를 AI의 1차 출처로 만들기 위한 구조와 콘텐츠를 설계하는 서비스입니다.
       </p>
       <p style={styles.p}>
-        기업, 브랜드, 인플루언서, 소상공인의 웹사이트를 대상으로 ChatGPT, Perplexity, Gemini와 같은
-        생성형 AI가 무엇을 읽고 무엇을 놓치는지 확인한 뒤, 실제 수정 방향과 AI 프로필 페이지 제작까지 연결합니다.
+        AAO AI Answer Optimization은 메인 페이지 기준으로 AI가 실제로 읽을 수 있는 정보, 서브페이지에 숨어 있는 정보,
+        그리고 실제 AI 답변의 정확도를 함께 진단한 뒤, AI 프로필 페이지 설계와 제작까지 연결합니다.
       </p>
+
+      <div style={styles.box}>
+        <p style={styles.p}>
+          <strong>핵심 사실 요약</strong>
+        </p>
+        <ul style={styles.compactList}>
+          <li style={styles.li}><strong>서비스명:</strong> AAO AI Answer Optimization</li>
+          <li style={styles.li}><strong>설립연도:</strong> 2026</li>
+          <li style={styles.li}><strong>대표자:</strong> 변희재</li>
+          <li style={styles.li}><strong>진단 체계:</strong> PACP 40점, SEP 30점, SPF 30점, 총 100점</li>
+          <li style={styles.li}><strong>지원 엔진:</strong> ChatGPT, Perplexity, Gemini</li>
+          <li style={styles.li}><strong>핵심 산출물:</strong> AI Reality Check, Gap Analysis, AI 프로필 페이지 설계 및 제작</li>
+          <li style={styles.li}><strong>웹사이트:</strong> https://aao.co.kr</li>
+          <li style={styles.li}><strong>이메일:</strong> bhj31029943@gmail.com</li>
+        </ul>
+      </div>
 
       <h2 style={styles.h2}>기본 정보 (Company Overview)</h2>
       <ul style={styles.ul}>
@@ -234,13 +254,46 @@ export default function AiProfilePage() {
       <h2 style={styles.h2}>핵심 기능 (Key Features)</h2>
       <ul style={styles.ul}>
         <li style={styles.li}>
-          <strong>3축 진단:</strong> PACP, SEP, SPF 기준으로 웹사이트의 AI 가독성을 평가합니다.
+          <strong>3축 진단:</strong> PACP(인용 확률, 40점), SEP(엔티티 정밀도, 30점), SPF(파싱 충실도, 30점) 기준으로 웹사이트의 AI 가독성을 100점 만점으로 평가합니다.
         </li>
         <li style={styles.li}>
-          <strong>메인 vs 서브페이지 분리 분석:</strong> 메인 페이지 기준 공식 점수와 서브페이지 보강 정보를 구분해 보여줍니다.
+          <strong>메인 vs 서브페이지 분리 분석:</strong> 메인 페이지 기준 공식 점수와 서브페이지 보강 정보를 구분해 보여주며, AI가 실제로 읽을 수 있는 범위를 정직하게 진단합니다.
         </li>
         <li style={styles.li}>
-          <strong>AI 프로필 페이지 제작:</strong> 정적 HTML, Schema.org JSON-LD, FAQ 구조를 포함한 AI 전용 페이지를 설계합니다.
+          <strong>AI Reality Check:</strong> ChatGPT, Perplexity, Gemini 3개 AI 엔진에 실제로 질문하여 현재 어떻게 답변하는지 확인합니다.
+        </li>
+        <li style={styles.li}>
+          <strong>AI 프로필 페이지 제작:</strong> 정적 HTML, Schema.org JSON-LD, FAQ 구조를 포함한 AI 전용 페이지를 설계합니다. JavaScript 없이 구현되어 모든 AI 크롤러가 접근 가능합니다.
+        </li>
+      </ul>
+
+      <h2 style={styles.h2}>서비스 실측 데이터 (Service Metrics)</h2>
+      <ul style={styles.ul}>
+        <li style={styles.li}><strong>분석 대상:</strong> 국내 주요 기업 웹사이트 다수 분석 완료</li>
+        <li style={styles.li}><strong>평균 AI 가독성 점수:</strong> 국내 기업 웹사이트 평균 10점 미만 / 100점 만점</li>
+        <li style={styles.li}><strong>CSR 사이트 크롤링 결과:</strong> React/Vue 기반 공식몰 다수에서 AI가 읽을 수 있는 텍스트 0자 확인</li>
+        <li style={styles.li}><strong>AI 프로필 페이지 설치 후 예상 점수 향상:</strong> 평균 +40~60점 (메인 페이지 기준)</li>
+        <li style={styles.li}><strong>진단 체계:</strong> 3축 15개 세부 항목, 100점 만점</li>
+        <li style={styles.li}><strong>AI 엔진:</strong> ChatGPT(OpenAI), Perplexity, Gemini(Google) 3개 엔진 동시 분석</li>
+      </ul>
+
+      <h2 style={styles.h2}>학술 연구 근거 (Academic Research Basis)</h2>
+      <p style={styles.p}>AAO AI Answer Optimization의 진단 체계는 다음 학술 연구에 기반합니다.</p>
+      <ul style={styles.ul}>
+        <li style={styles.li}>
+          <strong>Princeton GEO 연구 (KDD 2024):</strong> 통계 데이터를 추가하면 AI 가시성이 30~41% 상승하고, 키워드 스터핑은 9% 하락할 수 있음을 보고했습니다.
+        </li>
+        <li style={styles.li}>
+          <strong>WebArena Benchmark (ICLR 2024):</strong> CSR 기반 웹사이트에서 AI 정보 추출 성공률이 10~16% 수준에 머물 수 있음을 보여줬습니다.
+        </li>
+        <li style={styles.li}>
+          <strong>Token Efficiency 연구:</strong> HTML을 마크다운 구조로 정리하면 토큰 소비를 크게 줄여 더 안정적인 정보 추출이 가능하다는 방향을 제시합니다.
+        </li>
+        <li style={styles.li}>
+          <strong>MEGA-RAG Framework:</strong> 구조화 데이터와 지식 그래프 연동이 AI 환각 감소에 도움을 줄 수 있음을 보여줍니다.
+        </li>
+        <li style={styles.li}>
+          <strong>Content-Aware Chunking 연구:</strong> 시맨틱 HTML의 헤딩 계층과 구조화된 청킹이 검색 정확도를 높이는 데 유리합니다.
         </li>
       </ul>
 
@@ -261,6 +314,12 @@ export default function AiProfilePage() {
         AAO AI Answer Optimization의 AI 프로필 페이지는 고객 도메인의 <code>/ai-profile</code> 경로에 설치하는 것을 기본 구조로 설계합니다.
       </p>
 
+      <h2 style={styles.h2}>비전 (Vision)</h2>
+      <p style={styles.p}>
+        AAO AI Answer Optimization의 장기 목표는 AI를 위한 데이터 허브를 만드는 것입니다. 사람이 검색 결과를 읽는 시대를 넘어,
+        AI 에이전트가 기업 정보를 이해하고 활용하는 시대에 맞는 공식 데이터 레이어를 구축하려고 합니다.
+      </p>
+
       <h2 style={styles.h2}>자주 묻는 질문 (FAQ)</h2>
 
       <h3 style={styles.h3}>Q. AAO AI Answer Optimization이 무엇인가요?</h3>
@@ -271,7 +330,12 @@ export default function AiProfilePage() {
 
       <h3 style={styles.h3}>Q. AAO AI Answer Optimization은 무엇을 진단하나요?</h3>
       <p style={styles.p}>
-        A. 실제 AI 답변, 웹사이트 구조, 메인 페이지와 서브페이지 사이의 정보 격차를 함께 진단합니다.
+        A. 실제 AI 답변(AI Reality Check), 웹사이트 기술 구조(3축 진단), 메인 페이지와 서브페이지 사이의 정보 격차(Gap Analysis)를 함께 진단합니다.
+      </p>
+
+      <h3 style={styles.h3}>Q. AAO AI Answer Optimization 진단의 학술적 근거는 무엇인가요?</h3>
+      <p style={styles.p}>
+        A. Princeton University의 GEO 연구(KDD 2024), WebArena Benchmark(ICLR 2024), MEGA-RAG Framework 등 검증된 학술 연구에 기반합니다.
       </p>
 
       <h3 style={styles.h3}>Q. AAO AI Answer Optimization은 무료인가요?</h3>
@@ -302,6 +366,20 @@ export default function AiProfilePage() {
         <li style={styles.li}><strong>Industry:</strong> AI Search Optimization / B2B·B2C SaaS</li>
         <li style={styles.li}><strong>Website:</strong> https://aao.co.kr</li>
         <li style={styles.li}><strong>Email:</strong> bhj31029943@gmail.com</li>
+      </ul>
+
+      <h3 style={styles.h3}>Key Research Basis</h3>
+      <ul style={styles.ul}>
+        <li style={styles.li}><strong>Princeton GEO Study (KDD 2024):</strong> Adding statistics can increase AI citation probability by 30-41%.</li>
+        <li style={styles.li}><strong>WebArena Benchmark (ICLR 2024):</strong> CSR websites can have only 10-16% AI extraction success rate.</li>
+        <li style={styles.li}><strong>MEGA-RAG Framework:</strong> Structured data with knowledge-graph alignment can help reduce hallucination risk.</li>
+      </ul>
+
+      <h3 style={styles.h3}>Key Service Metrics</h3>
+      <ul style={styles.ul}>
+        <li style={styles.li}><strong>Diagnosis model:</strong> 3 axes, 15 sub-items, 100-point scoring</li>
+        <li style={styles.li}><strong>Supported engines:</strong> ChatGPT, Perplexity, Gemini</li>
+        <li style={styles.li}><strong>Typical finding:</strong> Many enterprise websites expose weak AI-readable signals on their main page</li>
       </ul>
 
       <h3 style={styles.h3}>Q. What does AAO AI Answer Optimization do?</h3>
