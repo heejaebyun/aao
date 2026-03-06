@@ -78,6 +78,17 @@ function friendlyError(msg) {
   return msg;
 }
 
+async function readJsonSafely(response) {
+  const text = await response.text();
+  if (!text) return {};
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { error: text };
+  }
+}
+
 function AnimNum({ value, dur = 1200 }) {
   const [d, setD] = useState(0);
   useEffect(() => {
@@ -186,12 +197,12 @@ export default function Dashboard({ initialUrl = "" }) {
       });
 
       if (!diagRes.ok) {
-        const err = await diagRes.json();
+        const err = await readJsonSafely(diagRes);
         throw new Error(err.error || "진단 실패");
       }
 
       setPhase("AI 진단 수행 중...");
-      const diagData = await diagRes.json();
+      const diagData = await readJsonSafely(diagRes);
       setDiagnosis(diagData.diagnosis);
       setExtendedDiagnosis(diagData.extendedDiagnosis);
       setCrawlData(diagData.crawl);
@@ -206,7 +217,7 @@ export default function Dashboard({ initialUrl = "" }) {
 
       if (aiRes.ok) {
         setPhase("리포트 생성 중...");
-        const aiData = await aiRes.json();
+        const aiData = await readJsonSafely(aiRes);
         setAiResults(aiData.results);
       }
 
