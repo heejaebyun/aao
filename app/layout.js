@@ -2,6 +2,7 @@ import { Outfit } from "next/font/google";
 import {
   AI_PROFILE_URL,
   CONTACT_EMAIL,
+  FOUNDING_YEAR,
   ENTITY_FULL_NAME,
   ENTITY_LABEL,
   ENTITY_SHORT_NAME,
@@ -54,7 +55,7 @@ export default function RootLayout({ children }) {
               url: SITE_ORIGIN,
               operatingSystem: "Web",
               inLanguage: ["ko", "en"],
-              datePublished: "2026",
+              datePublished: FOUNDING_YEAR,
               sameAs: [AI_PROFILE_URL],
               offers: {
                 "@type": "Offer",
@@ -75,7 +76,7 @@ export default function RootLayout({ children }) {
                   name: FOUNDER_NAME_KO,
                   alternateName: FOUNDER_NAME_EN,
                 },
-                foundingDate: "2026",
+                foundingDate: FOUNDING_YEAR,
                 knowsAbout: [
                   ENTITY_FULL_NAME,
                   "GEO (Generative Engine Optimization)",

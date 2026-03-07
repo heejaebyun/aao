@@ -1,4 +1,6 @@
+import { buildProfileRequestHref } from "@/lib/intake";
 import { getPilotCaseById, getPilotCaseLift } from "@/lib/pilot-cases";
+import { ENTITY_SHORT_NAME, SITE_DOMAIN } from "@/lib/site-identity";
 
 const styles = {
   page: {
@@ -56,6 +58,10 @@ export default function PilotCasePage({ params }) {
 
   const rootDiagnoseHref = `/diagnose?url=${encodeURIComponent(pilotCase.rootUrl)}`;
   const profileDiagnoseHref = `/diagnose?url=${encodeURIComponent(pilotCase.profileUrl)}`;
+  const requestHref = buildProfileRequestHref({
+    companyName: ENTITY_SHORT_NAME,
+    domain: SITE_DOMAIN,
+  });
   const lift = getPilotCaseLift(pilotCase);
 
   return (
@@ -150,7 +156,7 @@ export default function PilotCasePage({ params }) {
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 14 }}>
             <a href={rootDiagnoseHref} style={actionButtonStyle(true)}>메인 랜딩 다시 진단</a>
             <a href={profileDiagnoseHref} style={actionButtonStyle(false)}>/ai-profile 다시 진단</a>
-            <a href="/ai-profile/request?companyName=AAO&domain=aao.co.kr" style={actionButtonStyle(false)}>요청 페이지 열기</a>
+            <a href={requestHref} style={actionButtonStyle(false)}>요청 페이지 열기</a>
           </div>
           {pilotCase.evidence.map((item) => (
             <div key={item.label} style={{ ...styles.dim, marginBottom: 6 }}>· {item.label}: {item.value}</div>

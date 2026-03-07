@@ -1,5 +1,5 @@
 import LandingPage from "@/components/LandingPage";
-import { ROOT_META_DESCRIPTION, ROOT_META_TITLE } from "@/lib/site-identity";
+import { ROOT_META_DESCRIPTION, ROOT_META_TITLE, SITE_ORIGIN } from "@/lib/site-identity";
 
 export const metadata = {
   title: ROOT_META_TITLE,
@@ -10,7 +10,7 @@ export const metadata = {
   openGraph: {
     title: ROOT_META_TITLE,
     description: ROOT_META_DESCRIPTION,
-    url: "https://aao.co.kr",
+    url: SITE_ORIGIN,
     type: "website",
     locale: "ko_KR",
   },

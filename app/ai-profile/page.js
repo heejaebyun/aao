@@ -8,6 +8,7 @@ import {
   ENTITY_FULL_NAME,
   ENTITY_LABEL,
   ENTITY_SHORT_NAME,
+  FOUNDING_YEAR,
   FOUNDER_NAME_EN,
   FOUNDER_NAME_KO,
   SITE_ORIGIN,
@@ -40,7 +41,7 @@ const organizationSchema = {
   url: SITE_ORIGIN,
   mainEntityOfPage: AI_PROFILE_URL,
   description: AI_PROFILE_META_DESCRIPTION,
-  foundingDate: "2026",
+  foundingDate: FOUNDING_YEAR,
   founder: {
     "@type": "Person",
     name: FOUNDER_NAME_KO,
@@ -267,12 +268,12 @@ export default function AiProfilePage() {
         </p>
         <ul style={styles.compactList}>
           <li style={styles.li}><strong>서비스명:</strong> {ENTITY_LABEL}</li>
-          <li style={styles.li}><strong>설립연도:</strong> 2026</li>
+          <li style={styles.li}><strong>설립연도:</strong> {FOUNDING_YEAR}</li>
           <li style={styles.li}><strong>대표자:</strong> 변희재 (Heejae Byun)</li>
           <li style={styles.li}><strong>진단 체계:</strong> PACP 40점, SEP 30점, SPF 30점, 총 100점</li>
           <li style={styles.li}><strong>지원 엔진:</strong> ChatGPT(OpenAI), Perplexity, Gemini(Google)</li>
           <li style={styles.li}><strong>핵심 산출물:</strong> AI Reality Check, Gap Analysis, AI 프로필 페이지 설계 및 제작</li>
-          <li style={styles.li}><strong>웹사이트:</strong> https://aao.co.kr</li>
+          <li style={styles.li}><strong>웹사이트:</strong> {SITE_ORIGIN}</li>
           <li style={styles.li}><strong>이메일:</strong> {CONTACT_EMAIL}</li>
       </ul>
       </div>
@@ -315,7 +316,7 @@ export default function AiProfilePage() {
       <h2 style={styles.h2}>기본 정보 (Company Overview)</h2>
       <ul style={styles.ul}>
         <li style={styles.li}><strong>서비스명:</strong> {ENTITY_LABEL}</li>
-        <li style={styles.li}><strong>설립연도:</strong> 2026</li>
+        <li style={styles.li}><strong>설립연도:</strong> {FOUNDING_YEAR}</li>
         <li style={styles.li}><strong>대표자:</strong> {FOUNDER_NAME_KO}</li>
         <li style={styles.li}><strong>업종:</strong> AI 검색 최적화 / B2B·B2C SaaS</li>
         <li style={styles.li}><strong>서비스 유형:</strong> AI 검색 가독성 진단 + AI 프로필 페이지 설계 및 제작</li>
@@ -479,7 +480,7 @@ export default function AiProfilePage() {
       </p>
       <ul style={styles.ul}>
         <li style={styles.li}><strong>Service:</strong> {ENTITY_LABEL}</li>
-        <li style={styles.li}><strong>Founded:</strong> 2026</li>
+        <li style={styles.li}><strong>Founded:</strong> {FOUNDING_YEAR}</li>
         <li style={styles.li}><strong>Founder:</strong> {FOUNDER_NAME_EN}</li>
         <li style={styles.li}><strong>Industry:</strong> AI Search Optimization / B2B·B2C SaaS</li>
         <li style={styles.li}><strong>Website:</strong> {SITE_ORIGIN}</li>

@@ -1,4 +1,4 @@
-import { getOperationPageContent } from "@/lib/intake";
+import { buildProfileRequestHref, getOperationPageContent } from "@/lib/intake";
 
 const styles = {
   page: {
@@ -48,7 +48,10 @@ export default function AiProfileOpsPage({ channelId, searchParams = {} }) {
   const template = searchParams.template || "미지정";
   const draftId = searchParams.draftId || "미지정";
   const diagnoseHref = domain && domain !== "미지정" ? `/diagnose?url=${encodeURIComponent(`https://${domain}`)}` : "/diagnose";
-  const requestHref = `/ai-profile/request?companyName=${encodeURIComponent(companyName)}&domain=${encodeURIComponent(domain === "미지정" ? "" : domain)}`;
+  const requestHref = buildProfileRequestHref({
+    companyName: companyName === "미지정" ? "" : companyName,
+    domain: domain === "미지정" ? "" : domain,
+  });
 
   return (
     <div style={styles.page}>

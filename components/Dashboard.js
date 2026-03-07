@@ -7,7 +7,7 @@ import {
   buildDiagnosticSnapshot,
   buildProfileRequestHref,
 } from "@/lib/intake";
-import { ENTITY_LABEL } from "@/lib/site-identity";
+import { COPYRIGHT_YEAR, ENTITY_LABEL, ENTITY_SHORT_NAME } from "@/lib/site-identity";
 
 const C = {
   bg: "#07070d", surface: "#0e0e18", card: "#121220",
@@ -1722,7 +1722,7 @@ export default function Dashboard({ initialUrl = "" }) {
         <div style={{ marginTop: 44, paddingTop: 16, borderTop: `1px solid ${C.border}`, textAlign: "center" }}>
           <div style={{ fontSize: 9, color: C.textDim, lineHeight: 1.8 }}>
             {ENTITY_LABEL} | Princeton GEO Research Based<br />
-            © 2026 AAO. All rights reserved.
+            © {COPYRIGHT_YEAR} {ENTITY_SHORT_NAME}. All rights reserved.
           </div>
         </div>
       </div>
