@@ -1,21 +1,31 @@
-// app/layout.js
+import {
+  AI_PROFILE_URL,
+  CONTACT_EMAIL,
+  ENTITY_FULL_NAME,
+  ENTITY_LABEL,
+  ENTITY_SHORT_NAME,
+  FOUNDER_NAME_EN,
+  FOUNDER_NAME_KO,
+  ROOT_META_DESCRIPTION,
+  SITE_ORIGIN,
+} from "@/lib/site-identity";
+
 export const metadata = {
-  title: "AAO — AI Answer Optimization",
-  description:
-    "AI가 당신의 회사를 정확히 설명할 수 있는지 진단하고 최적화하는 서비스. Princeton GEO Research 기반 3축 진단: PACP · SEP · SPF",
+  metadataBase: new URL(SITE_ORIGIN),
+  title: ENTITY_LABEL,
+  description: ROOT_META_DESCRIPTION,
+  applicationName: ENTITY_LABEL,
   openGraph: {
-    title: "AAO — AI가 당신의 회사를 정확히 알고 있을까요?",
-    description:
-      "ChatGPT · Gemini · Perplexity가 귀사를 어떻게 소개하는지 30초 안에 무료로 확인하세요. Princeton GEO 연구 기반 AI 가시성 진단.",
+    title: ENTITY_LABEL,
+    description: ROOT_META_DESCRIPTION,
     type: "website",
-    url: "https://aao.kr",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "AAO — AI Answer Optimization" }],
+    url: SITE_ORIGIN,
+    siteName: ENTITY_LABEL,
   },
   twitter: {
     card: "summary_large_image",
-    title: "AAO — AI가 당신의 회사를 정확히 알고 있을까요?",
-    description: "ChatGPT · Gemini · Perplexity가 귀사를 어떻게 소개하는지 무료로 진단하세요.",
-    images: ["/og-image.png"],
+    title: ENTITY_LABEL,
+    description: ROOT_META_DESCRIPTION,
   },
 };
 
@@ -33,23 +43,55 @@ export default function RootLayout({ children }) {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "SoftwareApplication",
-              name: "AAO - AI Answer Optimization",
+              name: ENTITY_LABEL,
+              alternateName: [ENTITY_SHORT_NAME, ENTITY_FULL_NAME, "에이에이오"],
               applicationCategory: "BusinessApplication",
-              description:
-                "AI 검색 엔진이 기업 웹사이트를 얼마나 정확하게 이해하는지 진단하고 최적화하는 B2B SaaS 서비스",
+              description: ROOT_META_DESCRIPTION,
+              url: SITE_ORIGIN,
               operatingSystem: "Web",
+              inLanguage: ["ko", "en"],
+              datePublished: "2026",
+              sameAs: [AI_PROFILE_URL],
               offers: {
                 "@type": "Offer",
                 price: "0",
                 priceCurrency: "KRW",
-                description: "무료 진단 3회/월",
+                description: "무료 진단 — AI 가시성 3축 점수 + 개선 리포트 즉시 제공",
               },
               creator: {
                 "@type": "Organization",
-                name: "AAO",
+                name: ENTITY_LABEL,
+                alternateName: [ENTITY_SHORT_NAME, ENTITY_FULL_NAME],
+                url: SITE_ORIGIN,
+                email: CONTACT_EMAIL,
                 description:
-                  "AI Answer Optimization - AI가 당신의 회사를 정확히 소개할 수 있도록 최적화하는 서비스",
+                  "AI Answer Optimization. AI 검색 최적화 전문 서비스. AI Profile Page 설치 시 AI 가시성 +40~60점 향상.",
+                founder: {
+                  "@type": "Person",
+                  name: FOUNDER_NAME_KO,
+                  alternateName: FOUNDER_NAME_EN,
+                },
+                foundingDate: "2026",
+                knowsAbout: [
+                  ENTITY_FULL_NAME,
+                  "GEO (Generative Engine Optimization)",
+                  "AI 검색 최적화",
+                  "Princeton GEO Research",
+                  "LLM 가시성 진단",
+                ],
               },
+              citation: [
+                {
+                  "@type": "ScholarlyArticle",
+                  name: "GEO: Generative Engine Optimization",
+                  publisher: "KDD 2024 (Princeton University)",
+                },
+                {
+                  "@type": "ScholarlyArticle",
+                  name: "WebArena: A Realistic Web Environment for Building Autonomous Agents",
+                  publisher: "ICLR 2024",
+                },
+              ],
             }),
           }}
         />

@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test:ai-check-fixtures": "node --experimental-default-type=module ./scripts/ai-check-fact-check-fixtures.mjs",
+    "test:source-fixtures": "node --experimental-default-type=module ./scripts/ai-check-source-fixtures.mjs"
   },
   "dependencies": {
     "next": "^14.2.0",
