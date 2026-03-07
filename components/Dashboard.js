@@ -21,6 +21,42 @@ const ENGINES = [
   { id: "gemini", name: "Gemini", icon: "✦", color: "#4285f4" },
 ];
 
+const AI_MODES = [
+  {
+    id: "strict_recall",
+    ko: "기억 기반 인식",
+    en: "Strict Recall",
+    description: "웹 검색 없이 모델이 기존 기억만으로 회사를 설명하는지 확인합니다.",
+  },
+  {
+    id: "live_search",
+    ko: "실시간 검색 인식",
+    en: "Live Search",
+    description: "검색 도구와 인용 출처를 포함해 지금 웹에서 회사를 찾을 수 있는지 확인합니다.",
+  },
+];
+
+const AI_INTENTS = [
+  {
+    id: "awareness",
+    label: "인지",
+    shortLabel: "Awareness",
+    description: "브랜드가 무엇인지 묻는 기본 인식 질문입니다.",
+  },
+  {
+    id: "comparison",
+    label: "비교",
+    shortLabel: "Comparison",
+    description: "유사 서비스와 비교될 때 브랜드가 어떻게 설명되는지 확인합니다.",
+  },
+  {
+    id: "purchase",
+    label: "구매",
+    shortLabel: "Purchase",
+    description: "도입, 가격, 사례 같은 구매 의사결정 질문에서 보이는지 확인합니다.",
+  },
+];
+
 const AXES = [
   { id: "pacp", name: "PACP", nameKo: "위치 기반 인용 확률", max: 40, color: C.pacp, icon: "📍",
     desc: "AI가 이 페이지를 1차 출처로 인용할 확률",
@@ -82,6 +118,22 @@ function friendlyError(msg) {
 function getRecognitionMeta(result) {
   const matchStatus = result?.matchStatus || (result?.knows ? "recognized" : "unknown");
 
+  if (matchStatus === "unsupported" || result?.status === "unsupported") {
+    return {
+      label: "미지원",
+      color: C.textDim,
+      bg: C.surface,
+    };
+  }
+
+  if (matchStatus === "skipped" || result?.status === "skipped") {
+    return {
+      label: "생략",
+      color: C.info,
+      bg: C.infoBg,
+    };
+  }
+
   if (matchStatus === "recognized") {
     return {
       label: "정확히 인식",
@@ -113,6 +165,237 @@ function getRecognitionMeta(result) {
   };
 }
 
+function getAiModeMeta(mode) {
+  return AI_MODES.find((item) => item.id === mode) || AI_MODES[1];
+}
+
+function getAiIntentMeta(intent) {
+  return AI_INTENTS.find((item) => item.id === intent) || AI_INTENTS[0];
+}
+
+function formatRatioPercent(value) {
+  if (!Number.isFinite(Number(value))) return "—";
+  return `${Math.round(Number(value) * 100)}%`;
+}
+
+function getFanOutMeta(coverage) {
+  if (!coverage || coverage.status === "none") {
+    return { label: "fan-out 없음", color: C.textDim, bg: C.surface };
+  }
+
+  if (coverage.status === "strong") {
+    return { label: "fan-out 충분", color: C.success, bg: C.successBg };
+  }
+
+  if (coverage.status === "partial") {
+    return { label: "fan-out 일부", color: C.warning, bg: C.warningBg };
+  }
+
+  if (coverage.status === "opaque") {
+    return { label: "fan-out 불투명", color: C.info, bg: C.infoBg };
+  }
+
+  return { label: "fan-out 없음", color: C.textDim, bg: C.surface };
+}
+
+function getSourceMixMeta(sourceMix) {
+  if (!sourceMix || sourceMix.id === "none") {
+    return { label: "출처 없음", color: C.textDim, bg: C.surface };
+  }
+
+  if (sourceMix.id === "official_only") {
+    return { label: "공식 위주", color: C.success, bg: C.successBg };
+  }
+
+  if (sourceMix.id === "mixed") {
+    return { label: sourceMix.label || "혼합", color: C.info, bg: C.infoBg };
+  }
+
+  return { label: sourceMix.label || "제3자 위주", color: C.warning, bg: C.warningBg };
+}
+
+function getSourceAuthorityMeta(profile) {
+  const tier = profile?.dominantAuthorityTier;
+  if (tier === "high") return { label: "권위 높음", color: C.success, bg: C.successBg };
+  if (tier === "medium") return { label: "권위 보통", color: C.info, bg: C.infoBg };
+  if (tier === "low") return { label: "권위 낮음", color: C.warning, bg: C.warningBg };
+  return { label: "권위 없음", color: C.textDim, bg: C.surface };
+}
+
+function getSourceFitMeta(profile) {
+  const status = profile?.sourceFitStatus;
+  if (status === "strong") return { label: "출처 적합도 높음", color: C.success, bg: C.successBg };
+  if (status === "official_gap") return { label: "공식 출처 gap", color: C.warning, bg: C.warningBg };
+  if (status === "off_pattern") return { label: "출처 패턴 이탈", color: C.danger, bg: C.dangerBg };
+  if (status === "mixed") return { label: "출처 혼합", color: C.info, bg: C.infoBg };
+  return { label: "출처 없음", color: C.textDim, bg: C.surface };
+}
+
+function getCitationTypeMeta(detail) {
+  const typeId = detail?.sourceTypeId || "unknown";
+  if (typeId === "official") return { label: "공식", color: C.success, bg: C.successBg };
+  if (typeId === "news") return { label: "뉴스", color: C.info, bg: C.infoBg };
+  if (typeId === "wiki") return { label: "위키", color: "#8b5cf6", bg: "rgba(139,92,246,0.12)" };
+  if (typeId === "docs") return { label: "문서", color: "#22c55e", bg: "rgba(34,197,94,0.12)" };
+  if (typeId === "directory") return { label: "디렉터리", color: C.warning, bg: C.warningBg };
+  if (typeId === "community") return { label: "커뮤니티", color: "#f97316", bg: "rgba(249,115,22,0.12)" };
+  if (typeId === "social") return { label: "소셜", color: "#ec4899", bg: "rgba(236,72,153,0.12)" };
+  if (typeId === "blog") return { label: "블로그", color: "#14b8a6", bg: "rgba(20,184,166,0.12)" };
+  return { label: detail?.sourceTypeLabel || "미분류", color: C.textDim, bg: C.surface };
+}
+
+function getIndexabilityMeta(indexability) {
+  if (!indexability || indexability.status === "unknown") {
+    return { label: "미확인", color: C.textDim, bg: C.surface };
+  }
+
+  if (indexability.status === "noindex") {
+    return { label: "noindex", color: C.danger, bg: C.dangerBg };
+  }
+
+  if (indexability.status === "indexable") {
+    return { label: "index 가능", color: C.success, bg: C.successBg };
+  }
+
+  if (indexability.status === "likely_indexable") {
+    return { label: "index 가능 추정", color: C.info, bg: C.infoBg };
+  }
+
+  return { label: indexability.status, color: C.textDim, bg: C.surface };
+}
+
+function getFactCheckMeta(factCheck) {
+  const verdict = factCheck?.verdict;
+
+  if (verdict === "aligned") {
+    return { label: "fact-check 정합", color: C.success, bg: C.successBg };
+  }
+
+  if (verdict === "wrong_entity") {
+    return { label: "다른 엔티티 가능", color: C.danger, bg: C.dangerBg };
+  }
+
+  if (verdict === "domain_mismatch") {
+    return { label: "도메인 불일치", color: C.warning, bg: C.warningBg };
+  }
+
+  if (verdict === "service_mismatch") {
+    return { label: "서비스 불일치", color: "#ff9100", bg: "rgba(255,145,0,0.12)" };
+  }
+
+  if (verdict === "weak") {
+    return { label: "근거 약함", color: C.info, bg: C.infoBg };
+  }
+
+  return { label: "fact-check 없음", color: C.textDim, bg: C.surface };
+}
+
+function matchesOfficialDomain(url, officialDomain) {
+  if (!officialDomain) return false;
+
+  try {
+    const hostname = new URL(url).hostname.replace(/^www\./, "").toLowerCase();
+    return hostname === officialDomain || hostname.endsWith(`.${officialDomain}`);
+  } catch {
+    return false;
+  }
+}
+
+function normalizeAiResultsByMode(aiResults) {
+  if (Array.isArray(aiResults)) {
+    return {
+      live_search: {
+        ...getAiModeMeta("live_search"),
+        label: getAiModeMeta("live_search").ko,
+        shortLabel: getAiModeMeta("live_search").en,
+        defaultIntent: "awareness",
+        intents: AI_INTENTS,
+        intentResults: {
+          awareness: {
+            ...getAiIntentMeta("awareness"),
+            results: aiResults,
+          },
+        },
+        queryType: "entity_live_search",
+        results: aiResults,
+        budget: null,
+      },
+    };
+  }
+
+  if (!aiResults || typeof aiResults !== "object") {
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(aiResults).map(([modeId, rawMode]) => {
+      const modeMeta = getAiModeMeta(modeId);
+      const fallbackResults = Array.isArray(rawMode?.results) ? rawMode.results : [];
+      const rawIntents = Array.isArray(rawMode?.intents) && rawMode.intents.length > 0
+        ? rawMode.intents
+        : AI_INTENTS;
+      const normalizedIntents = rawIntents.map((item) => {
+        const intentId = typeof item === "string" ? item : item?.id;
+        return {
+          ...getAiIntentMeta(intentId),
+          ...(typeof item === "object" ? item : {}),
+          id: intentId || "awareness",
+        };
+      });
+      const intentResults = {};
+
+      normalizedIntents.forEach((intentMeta) => {
+        const intentId = intentMeta.id;
+        const rawIntent = rawMode?.intentResults?.[intentId];
+        intentResults[intentId] = {
+          ...getAiIntentMeta(intentId),
+          ...(rawIntent || {}),
+          id: intentId,
+          results: Array.isArray(rawIntent?.results)
+            ? rawIntent.results
+            : intentId === "awareness"
+              ? fallbackResults
+              : [],
+        };
+      });
+
+      if (!intentResults.awareness) {
+        intentResults.awareness = {
+          ...getAiIntentMeta("awareness"),
+          results: fallbackResults,
+        };
+      }
+
+      const intents = normalizedIntents.length > 0
+        ? normalizedIntents.map((intentMeta) => intentResults[intentMeta.id]).filter(Boolean)
+        : [intentResults.awareness];
+      const defaultIntent = rawMode?.defaultIntent && intentResults[rawMode.defaultIntent]
+        ? rawMode.defaultIntent
+        : intents[0]?.id || "awareness";
+
+      return [
+        modeId,
+        {
+          ...modeMeta,
+          ...(rawMode || {}),
+          id: modeId,
+          label: rawMode?.label || modeMeta.ko,
+          shortLabel: rawMode?.shortLabel || modeMeta.en,
+          description: rawMode?.description || modeMeta.description,
+          queryType: rawMode?.queryType || modeMeta.queryType,
+          defaultIntent,
+          intents,
+          intentResults,
+          results: Array.isArray(rawMode?.results)
+            ? rawMode.results
+            : intentResults[defaultIntent]?.results || [],
+          budget: rawMode?.budget || null,
+        },
+      ];
+    })
+  );
+}
+
 function getGateStatusMeta(status) {
   if (status === "pass") {
     return { label: "통과", color: C.success, bg: C.successBg };
@@ -121,6 +404,90 @@ function getGateStatusMeta(status) {
     return { label: "주의", color: C.warning, bg: C.warningBg };
   }
   return { label: "실패", color: C.danger, bg: C.dangerBg };
+}
+
+function getProvenanceMeta(source) {
+  const normalized = typeof source === "string" ? source : "";
+
+  if (normalized === "repaired" || normalized.startsWith("repaired_")) {
+    return {
+      label: "복구",
+      color: C.warning,
+      bg: C.warningBg,
+      description: "원본 JSON을 그대로 쓰지 못해 복구 단계를 거친 결과입니다.",
+    };
+  }
+
+  if (normalized === "model" || normalized.startsWith("model_")) {
+    return {
+      label: "실측",
+      color: C.success,
+      bg: C.successBg,
+      description: "크롤링 스냅샷을 기반으로 모델이 직접 구조화한 결과입니다.",
+    };
+  }
+
+  return {
+    label: "추정",
+    color: C.info,
+    bg: C.infoBg,
+    description: "fallback 규칙이나 휴리스틱으로 보완한 값입니다.",
+  };
+}
+
+function ProvenanceBadge({ source, prefix = "", compact = false }) {
+  if (!source) return null;
+
+  const meta = getProvenanceMeta(source);
+  const text = prefix ? `${prefix} ${meta.label}` : meta.label;
+
+  return (
+    <span
+      title={meta.description}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 4,
+        padding: compact ? "2px 6px" : "3px 8px",
+        borderRadius: 999,
+        fontSize: compact ? 9 : 10,
+        fontWeight: 700,
+        background: meta.bg,
+        color: meta.color,
+        lineHeight: 1.2,
+        whiteSpace: "nowrap",
+      }}
+    >
+      {text}
+    </span>
+  );
+}
+
+function ProvenanceLegend() {
+  const items = [
+    { source: "model", title: "실측", description: "모델이 스냅샷에서 직접 구조화한 값" },
+    { source: "repaired", title: "복구", description: "응답 JSON을 복구한 뒤 사용한 값" },
+    { source: "fallback_axis", title: "추정", description: "fallback 규칙이나 휴리스틱으로 보완한 값" },
+  ];
+
+  return (
+    <div style={{ background: C.card, borderRadius: 12, padding: 14, border: `1px solid ${C.border}`, marginBottom: 20 }}>
+      <div style={{ fontSize: 11, color: C.textDim, marginBottom: 10, textTransform: "uppercase", letterSpacing: "1.2px" }}>
+        Provenance
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        {items.map((item) => (
+          <div key={item.title} style={{ display: "flex", alignItems: "center", gap: 8, background: C.surface, borderRadius: 10, padding: "8px 10px", border: `1px solid ${C.border}` }}>
+            <ProvenanceBadge source={item.source} />
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: C.text }}>{item.title}</div>
+              <div style={{ fontSize: 10, color: C.textMuted, lineHeight: 1.5 }}>{item.description}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 async function readJsonSafely(response) {
@@ -180,10 +547,11 @@ function AxisCard({ axis, data, delay = 0 }) {
     }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3, flexWrap: "wrap" }}>
             <span style={{ fontSize: 16 }}>{axis.icon}</span>
             <span style={{ fontSize: 15, fontWeight: 800, color: axis.color, fontFamily: "'Outfit',sans-serif" }}>{axis.name}</span>
             <span style={{ fontSize: 10, color: C.textDim }}>{axis.nameKo}</span>
+            <ProvenanceBadge source={data?.source} compact />
           </div>
           <div style={{ fontSize: 10, color: C.textMuted }}>{axis.desc}</div>
         </div>
@@ -198,8 +566,11 @@ function AxisCard({ axis, data, delay = 0 }) {
         const finding = subscores[sub.id]?.finding || "";
         return (
           <div key={sub.id} style={{ marginBottom: 10 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
-              <span style={{ fontSize: 11, color: C.textMuted }}>{sub.name}</span>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 3 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                <span style={{ fontSize: 11, color: C.textMuted }}>{sub.name}</span>
+                <ProvenanceBadge source={subscores[sub.id]?.source} compact />
+              </div>
               <span style={{ fontSize: 11, fontWeight: 700, color: w >= 70 ? C.success : w >= 40 ? C.warning : C.danger, fontFamily: "'Outfit',sans-serif" }}>{val}/{sub.max}</span>
             </div>
             <div style={{ height: 4, background: C.border, borderRadius: 2, overflow: "hidden" }}>
@@ -221,6 +592,8 @@ export default function Dashboard({ initialUrl = "" }) {
   const [diagnosis, setDiagnosis] = useState(null);
   const [extendedDiagnosis, setExtendedDiagnosis] = useState(null);
   const [aiResults, setAiResults] = useState(null);
+  const [aiMode, setAiMode] = useState("live_search");
+  const [aiIntent, setAiIntent] = useState("awareness");
   const [tab, setTab] = useState("summary");
   const [error, setError] = useState(null);
   const [crawlData, setCrawlData] = useState(null);
@@ -234,6 +607,8 @@ export default function Dashboard({ initialUrl = "" }) {
     const target = url || initialUrl;
     if (!target.trim()) return;
     setLoading(true); setDiagnosis(null); setExtendedDiagnosis(null); setAiResults(null); setError(null); setCrawlData(null);
+    setAiMode("live_search");
+    setAiIntent("awareness");
 
     try {
       setPhase("웹페이지 분석 중...");
@@ -282,6 +657,8 @@ export default function Dashboard({ initialUrl = "" }) {
         setPhase("리포트 생성 중...");
         const aiData = await readJsonSafely(aiRes);
         setAiResults(aiData.results);
+        setAiMode(aiData.defaultMode || "live_search");
+        setAiIntent(aiData.defaultIntent || "awareness");
       }
 
       setTab("summary");
@@ -321,7 +698,40 @@ export default function Dashboard({ initialUrl = "" }) {
   const gapActions = gap?.actions || [];
   const hiddenPages = gap?.hiddenPages || [];
   const promotedSnippets = gap?.promotedSnippets || [];
-  const gateSummary = deriveGateSummary({ crawlData, diagnosis, aiResults });
+  const aiResultsByMode = normalizeAiResultsByMode(aiResults);
+  const activeAiMode = aiResultsByMode[aiMode]
+    ? aiMode
+    : aiResultsByMode.live_search
+      ? "live_search"
+      : aiResultsByMode.strict_recall
+        ? "strict_recall"
+        : "live_search";
+  const aiModeData = aiResultsByMode[activeAiMode] || null;
+  const aiModeMeta = getAiModeMeta(activeAiMode);
+  const aiIntents = Array.isArray(aiModeData?.intents) && aiModeData.intents.length > 0
+    ? aiModeData.intents
+    : AI_INTENTS;
+  const activeAiIntent = aiModeData?.intentResults?.[aiIntent]
+    ? aiIntent
+    : aiModeData?.defaultIntent && aiModeData?.intentResults?.[aiModeData.defaultIntent]
+      ? aiModeData.defaultIntent
+      : aiIntents[0]?.id || "awareness";
+  const aiIntentData = aiModeData?.intentResults?.[activeAiIntent] || null;
+  const aiIntentMeta = getAiIntentMeta(activeAiIntent);
+  const aiIntentSummary = aiIntentData?.summary || null;
+  const aiModeSummary = aiModeData?.summary || null;
+  const aiModeResults = aiIntentData?.results || aiModeData?.results || [];
+  const aiModeBudget = aiModeData?.budget || null;
+  const gateSummary = deriveGateSummary({ crawlData, diagnosis, aiResults: aiResultsByMode.live_search?.results || [] });
+  const diagnosisProvenance = diagnosis?.provenance || {};
+  const extendedProvenance = extendedDiagnosis?.provenance || {};
+  const officialDomain = (() => {
+    try {
+      return new URL(url || initialUrl).hostname.replace(/^www\./, "");
+    } catch {
+      return "";
+    }
+  })();
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg, color: C.text, fontFamily: "'Pretendard',-apple-system,sans-serif" }}>
@@ -427,6 +837,10 @@ export default function Dashboard({ initialUrl = "" }) {
                   <Ring score={diagnosis.overall_score} color={g.color} />
                   <div style={{ marginTop: 16, fontSize: 20, fontWeight: 800, color: g.color, fontFamily: "'Outfit',sans-serif" }}>{g.grade}</div>
                   {diagnosis.company_name && <div style={{ marginTop: 8, fontSize: 12, color: C.textMuted }}>{diagnosis.company_name}</div>}
+                  <div style={{ marginTop: 12, display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
+                    <ProvenanceBadge source={diagnosisProvenance.overall_score} prefix="총점" />
+                    <ProvenanceBadge source={diagnosis.customer_summary?.source || diagnosisProvenance.customer_summary} prefix="요약" />
+                  </div>
                   <div style={{ marginTop: 16, fontSize: isMobile ? 14 : 16, fontWeight: 700, color: C.text, lineHeight: 1.6 }}>
                     {diagnosis.customer_summary.headline}
                   </div>
@@ -434,6 +848,8 @@ export default function Dashboard({ initialUrl = "" }) {
                     {diagnosis.customer_summary.detail}
                   </div>
                 </div>
+
+                <ProvenanceLegend />
 
                 {gateSummary && (
                   <div style={{ background: C.card, borderRadius: 14, padding: 18, border: `1px solid ${C.border}`, marginBottom: 20 }}>
@@ -478,7 +894,10 @@ export default function Dashboard({ initialUrl = "" }) {
 
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12, marginBottom: 20 }}>
                   <div style={{ background: C.card, borderRadius: 14, padding: 18, border: `1px solid ${C.border}` }}>
-                    <div style={{ fontSize: 11, color: C.textDim, marginBottom: 8, textTransform: "uppercase", letterSpacing: "1.2px" }}>Official Score</div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
+                      <div style={{ fontSize: 11, color: C.textDim, textTransform: "uppercase", letterSpacing: "1.2px" }}>Official Score</div>
+                      <ProvenanceBadge source={diagnosisProvenance.overall_score} compact />
+                    </div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 4 }}>📊 메인 페이지 기준: {diagnosis.overall_score}점/100점</div>
                     <div style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.7 }}>
                       AI가 메인 페이지에서 직접 읽을 수 있는 정보만으로 평가한 공식 진단 점수입니다.
@@ -487,7 +906,10 @@ export default function Dashboard({ initialUrl = "" }) {
                   </div>
 
                   <div style={{ background: C.card, borderRadius: 14, padding: 18, border: `1px solid ${C.border}` }}>
-                    <div style={{ fontSize: 11, color: C.textDim, marginBottom: 8, textTransform: "uppercase", letterSpacing: "1.2px" }}>Extended Discovery</div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
+                      <div style={{ fontSize: 11, color: C.textDim, textTransform: "uppercase", letterSpacing: "1.2px" }}>Extended Discovery</div>
+                      {extendedDiagnosis && <ProvenanceBadge source={extendedProvenance.overall_score} compact />}
+                    </div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 4 }}>
                       📂 서브페이지 포함 시: {extendedDiagnosis?.overall_score ?? diagnosis.overall_score}점/100점
                     </div>
@@ -618,6 +1040,9 @@ export default function Dashboard({ initialUrl = "" }) {
                     <div style={{ marginTop: 10, fontSize: 18, fontWeight: 800, color: g.color, fontFamily: "'Outfit',sans-serif" }}>{g.grade}</div>
                     <div style={{ fontSize: 10, color: C.textMuted, marginTop: 2 }}>{g.ko}</div>
                     {diagnosis.company_name && <div style={{ marginTop: 10, padding: "5px 10px", borderRadius: 6, background: C.surface, border: `1px solid ${C.border}`, fontSize: 11, color: C.textMuted }}>{diagnosis.company_name}</div>}
+                    <div style={{ marginTop: 10 }}>
+                      <ProvenanceBadge source={diagnosisProvenance.overall_score} prefix="총점" />
+                    </div>
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 10 }}>
                     {AXES.map((axis, i) => <AxisCard key={axis.id} axis={axis} data={diagnosis[axis.id]} delay={i * 200} />)}
@@ -630,6 +1055,9 @@ export default function Dashboard({ initialUrl = "" }) {
                     <div style={{ fontSize: 10, color: C.textMuted }}>10,000개 질의 벤치마크 검증 | PACP · SEP · SPF 3축 체계</div>
                   </div>
                 </div>
+                <div style={{ marginTop: 12 }}>
+                  <ProvenanceLegend />
+                </div>
               </div>
             )}
 
@@ -638,68 +1066,434 @@ export default function Dashboard({ initialUrl = "" }) {
               <div>
                 {aiResults ? (
                   <>
-                    <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 8, marginBottom: 16 }}>
-                      {aiResults.map(r => {
-                        const eng = ENGINES.find(e => e.id === r.engineId) || ENGINES[0];
-                        const meta = getRecognitionMeta(r);
-                        return (
-                          <div key={r.engineId} style={{ background: C.card, borderRadius: 10, padding: 12, textAlign: "center", border: `1px solid ${meta.color}25` }}>
-                            <div style={{ fontSize: 18, marginBottom: 3 }}>{eng.icon}</div>
-                            <div style={{ fontSize: 10, color: C.textMuted }}>{eng.name}</div>
-                            <div style={{ fontSize: 15, fontWeight: 800, fontFamily: "'Outfit',sans-serif", color: meta.color }}>{r.accuracy}%</div>
-                            <div style={{ fontSize: 9, color: meta.color }}>{meta.label}</div>
-                          </div>
-                        );
-                      })}
+                    <div style={{ display: "flex", gap: 3, marginBottom: 12, background: C.surface, borderRadius: 10, padding: 3, border: `1px solid ${C.border}`, overflowX: "auto" }}>
+                      {AI_MODES.map((mode) => (
+                        <button key={mode.id} onClick={() => setAiMode(mode.id)} style={{
+                          flex: isMobile ? "0 0 auto" : 1,
+                          padding: isMobile ? "8px 10px" : "8px 12px",
+                          borderRadius: 8,
+                          border: "none",
+                          cursor: "pointer",
+                          background: activeAiMode === mode.id ? `linear-gradient(135deg,${C.g1}15,${C.g2}15)` : "transparent",
+                          color: activeAiMode === mode.id ? C.text : C.textDim,
+                          fontSize: isMobile ? 11 : 12,
+                          fontWeight: 600,
+                          whiteSpace: "nowrap",
+                        }}>
+                          {mode.ko}
+                          {!isMobile && <span style={{ display: "block", fontSize: 9, opacity: 0.55, marginTop: 1, fontFamily: "'Outfit',sans-serif" }}>{mode.en}</span>}
+                        </button>
+                      ))}
                     </div>
-                    {aiResults.map(r => {
-                      const eng = ENGINES.find(e => e.id === r.engineId) || ENGINES[0];
-                      const meta = getRecognitionMeta(r);
-                      const mp = r.mentionPosition;
-                      const isRecognized = r.matchStatus === "recognized";
-                      const mpLabel = mp?.bucket === "top" ? "상위 언급" : mp?.bucket === "middle" ? "중간 언급" : mp?.bucket === "bottom" ? "하위 언급" : "언급 없음";
-                      const mpColor = mp?.bucket === "top" ? C.success : mp?.bucket === "middle" ? C.warning : C.danger;
-                      const officialDomain = (() => { try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return ""; } })();
-                      const hasOfficialCitation = r.citations?.some(c => c.includes(officialDomain));
-                      return (
-                        <div key={r.engineId} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 10, padding: 12, marginBottom: 8 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-                            <span style={{ width: 24, height: 24, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", background: `${eng.color}18`, color: eng.color, fontWeight: 700, fontSize: 12 }}>{eng.icon}</span>
-                            <span style={{ fontWeight: 600, color: C.text, fontSize: 12 }}>{eng.name}</span>
-                            <span style={{ marginLeft: "auto", padding: "2px 8px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: meta.bg, color: meta.color }}>{meta.label}</span>
-                            {mp?.found && (
-                              <span style={{ padding: "2px 7px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: `${mpColor}18`, color: isRecognized ? mpColor : C.textDim }}>
-                                {isRecognized ? mpLabel : `${mpLabel} (참고)`}
-                              </span>
-                            )}
+
+                    {aiModeData && (
+                      <div style={{ background: C.card, borderRadius: 12, padding: 14, border: `1px solid ${C.border}`, marginBottom: 16 }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 6, flexWrap: "wrap" }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{aiModeData.label || aiModeMeta.ko}</div>
+                          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
+                            <span style={{ fontSize: 10, color: C.textDim, fontFamily: "'Outfit',sans-serif" }}>{aiModeData.queryType || "entity_check"}</span>
+                            <span style={{ fontSize: 10, color: C.textDim, fontFamily: "'Outfit',sans-serif" }}>
+                              {aiIntentData?.shortLabel || aiIntentMeta.shortLabel}
+                            </span>
                           </div>
-                          {r.reason && (
-                            <div style={{ fontSize: 11, color: meta.color, marginBottom: 8, lineHeight: 1.6 }}>
-                              {r.reason}
-                            </div>
-                          )}
-                          <div style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.6, padding: 10, background: C.surface, borderRadius: 6, border: `1px solid ${C.border}`, maxHeight: 200, overflow: "auto", whiteSpace: "pre-wrap" }}>
-                            {r.response}
-                          </div>
-                          {r.engineId === "perplexity" && r.citations?.length > 0 && (
-                            <div style={{ marginTop: 8 }}>
-                              <div style={{ fontSize: 10, color: C.textDim, marginBottom: 4 }}>
-                                실제 인용 출처 {hasOfficialCitation && <span style={{ color: C.success, fontWeight: 700 }}>· 공식 사이트 인용 ✓</span>}
-                              </div>
-                              {r.citations.slice(0, 5).map((c, i) => {
-                                const isOfficial = officialDomain && c.includes(officialDomain);
-                                return (
-                                  <div key={i} style={{ fontSize: 10, color: isOfficial ? C.success : C.textDim, padding: "3px 0", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", gap: 4 }}>
-                                    {isOfficial && <span>✓</span>}
-                                    <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c}</span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )}
                         </div>
-                      );
-                    })}
+                        <div style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.7 }}>
+                          {aiModeData.description || aiModeMeta.description}
+                        </div>
+                        <div style={{ display: "flex", gap: 3, marginTop: 12, background: C.surface, borderRadius: 10, padding: 3, border: `1px solid ${C.border}`, overflowX: "auto" }}>
+                          {aiIntents.map((intent) => (
+                            <button key={intent.id} onClick={() => setAiIntent(intent.id)} style={{
+                              flex: isMobile ? "0 0 auto" : 1,
+                              padding: isMobile ? "8px 10px" : "8px 12px",
+                              borderRadius: 8,
+                              border: "none",
+                              cursor: "pointer",
+                              background: activeAiIntent === intent.id ? `linear-gradient(135deg,${C.g1}15,${C.g2}15)` : "transparent",
+                              color: activeAiIntent === intent.id ? C.text : C.textDim,
+                              fontSize: isMobile ? 11 : 12,
+                              fontWeight: 600,
+                              whiteSpace: "nowrap",
+                            }}>
+                              {intent.label}
+                              {!isMobile && (
+                                <span style={{ display: "block", fontSize: 9, opacity: 0.55, marginTop: 1, fontFamily: "'Outfit',sans-serif" }}>
+                                  {intent.shortLabel}
+                                </span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                        <div style={{ fontSize: 11, color: C.textMuted, lineHeight: 1.7, marginTop: 10 }}>
+                          {aiIntentData?.description || aiIntentMeta.description}
+                        </div>
+                        {aiModeBudget && (
+                          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(5, 1fr)", gap: 8, marginTop: 12 }}>
+                            {[
+                              { label: "실행", value: aiModeBudget.executed, color: C.text },
+                              { label: "캐시", value: aiModeBudget.cached, color: C.success },
+                              { label: "생략", value: aiModeBudget.skipped, color: C.info },
+                              { label: "미지원", value: aiModeBudget.unsupported, color: C.textDim },
+                              { label: "전역 예산", value: aiModeBudget.maxTasks, color: C.warning },
+                            ].map((item) => (
+                              <div key={item.label} style={{ background: C.surface, borderRadius: 8, padding: "8px 10px", border: `1px solid ${C.border}` }}>
+                                <div style={{ fontSize: 9, color: C.textDim, marginBottom: 4 }}>{item.label}</div>
+                                <div style={{ fontSize: 14, fontWeight: 800, color: item.color, fontFamily: "'Outfit',sans-serif" }}>{item.value ?? 0}</div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {activeAiMode === "live_search" && aiIntentSummary && (
+                          <div style={{ background: `${C.info}08`, borderRadius: 10, padding: 12, border: `1px solid ${C.info}20`, marginTop: 12 }}>
+                            <div style={{ fontSize: 11, color: C.textDim, marginBottom: 8, textTransform: "uppercase", letterSpacing: "1.2px" }}>
+                              Grounding Summary
+                            </div>
+                            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(7, 1fr)", gap: 8, marginBottom: (aiIntentSummary.searchQueriesUsed?.length > 0 || aiIntentSummary.plannedSearchQueries?.length > 0 || aiIntentSummary.querySlotLabels?.length > 0) ? 10 : 0 }}>
+                              {[
+                                {
+                                  label: "Grounded 엔진",
+                                  value: `${aiIntentSummary.groundedCount || 0}/${aiIntentSummary.supportedCount || 0}`,
+                                  tone: C.text,
+                                },
+                                {
+                                  label: "공식 citation",
+                                  value: `${aiIntentSummary.officialCitations || 0}/${aiIntentSummary.totalCitations || 0}`,
+                                  tone: C.success,
+                                },
+                                {
+                                  label: "공식 비율",
+                                  value: formatRatioPercent(aiIntentSummary.officialCitationRatio),
+                                  tone: C.success,
+                                },
+                                {
+                                  label: "query 메타",
+                                  value: `${aiIntentSummary.searchQueryCount || 0}개`,
+                                  tone: C.info,
+                                },
+                                {
+                                  label: "설계 slot",
+                                  value: `${aiIntentSummary.querySlotCount || 0}개`,
+                                  tone: C.warning,
+                                },
+                                {
+                                  label: "fan-out 관측",
+                                  value: `${aiIntentSummary.fanOutObservedCount || 0}/${aiIntentSummary.supportedCount || 0}`,
+                                  tone: C.info,
+                                },
+                                {
+                                  label: "주요 source",
+                                  value: aiIntentSummary.dominantSourceTypeLabel || "—",
+                                  tone: C.warning,
+                                },
+                              ].map((item) => (
+                                <div key={item.label} style={{ background: C.surface, borderRadius: 8, padding: "8px 10px", border: `1px solid ${C.border}` }}>
+                                  <div style={{ fontSize: 9, color: C.textDim, marginBottom: 4 }}>{item.label}</div>
+                                  <div style={{ fontSize: 13, fontWeight: 800, color: item.tone, fontFamily: "'Outfit',sans-serif" }}>{item.value}</div>
+                                </div>
+                              ))}
+                            </div>
+                            {aiModeSummary && aiModeSummary !== aiIntentSummary && (
+                              <div style={{ fontSize: 10, color: C.textDim, marginBottom: aiIntentSummary.searchQueriesUsed?.length > 0 ? 10 : 0 }}>
+                                모드 전체 기준 공식 citation 비율: {formatRatioPercent(aiModeSummary.officialCitationRatio)} · query 메타 {aiModeSummary.searchQueryCount || 0}개 · fan-out 평균 {formatRatioPercent(aiModeSummary.fanOutCompletenessAverage)} · source mix {aiModeSummary.sourceMixDominantLabel || "—"}
+                                {(aiModeSummary.factAlignedCount || aiModeSummary.factWrongEntityCount || aiModeSummary.factDomainMismatchCount || aiModeSummary.factServiceMismatchCount)
+                                  ? ` · fact-check 정합 ${aiModeSummary.factAlignedCount || 0} / 다른 엔티티 ${aiModeSummary.factWrongEntityCount || 0}`
+                                  : ""}
+                                {aiModeSummary.dominantSourceFitLabel ? ` · source fit ${aiModeSummary.dominantSourceFitLabel}` : ""}
+                              </div>
+                            )}
+                            {aiIntentSummary.searchQueriesUsed?.length > 0 && (
+                              <>
+                                <div style={{ fontSize: 10, color: C.textDim, marginBottom: 6 }}>엔진이 노출한 search query</div>
+                                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                                  {aiIntentSummary.searchQueriesUsed.slice(0, 8).map((queryText) => (
+                                    <span key={queryText} style={{ padding: "4px 8px", borderRadius: 999, background: C.surface, border: `1px solid ${C.border}`, fontSize: 10, color: C.textMuted }}>
+                                      {queryText}
+                                    </span>
+                                  ))}
+                                </div>
+                              </>
+                            )}
+                            {aiIntentSummary.querySlotLabels?.length > 0 && (
+                              <div style={{ marginTop: aiIntentSummary.searchQueriesUsed?.length > 0 ? 10 : 0 }}>
+                                <div style={{ fontSize: 10, color: C.textDim, marginBottom: 6 }}>설계된 query slot</div>
+                                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                                  {aiIntentSummary.querySlotLabels.slice(0, 8).map((slotLabel) => (
+                                    <span key={slotLabel} style={{ padding: "4px 8px", borderRadius: 999, background: `${C.warning}12`, border: `1px solid ${C.warning}25`, fontSize: 10, color: C.warning }}>
+                                      {slotLabel}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {aiIntentSummary.plannedSearchQueries?.length > 0 && (
+                              <div style={{ marginTop: 10 }}>
+                                <div style={{ fontSize: 10, color: C.textDim, marginBottom: 6 }}>설계된 query angle</div>
+                                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                                  {aiIntentSummary.plannedSearchQueries.slice(0, 8).map((queryText) => (
+                                    <span key={queryText} style={{ padding: "4px 8px", borderRadius: 999, background: C.surface, border: `1px dashed ${C.warning}55`, fontSize: 10, color: C.textMuted }}>
+                                      {queryText}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {(aiIntentSummary.fanOutCompletenessAverage !== null || aiIntentSummary.sourceMixDominantLabel) && (
+                              <div style={{ fontSize: 10, color: C.textDim, marginTop: 10 }}>
+                                fan-out 평균 {formatRatioPercent(aiIntentSummary.fanOutCompletenessAverage)} · 관측 불투명 {aiIntentSummary.fanOutOpaqueCount || 0}개 · source mix {aiIntentSummary.sourceMixDominantLabel || "출처 없음"} · 권위도 {aiIntentSummary.dominantAuthorityLabel || "—"} · source fit {aiIntentSummary.dominantSourceFitLabel || "—"} · archetype {aiIntentSummary.dominantArchetypeLabel || "—"}
+                              </div>
+                            )}
+                            {(aiIntentSummary.factAlignedCount || aiIntentSummary.factWrongEntityCount || aiIntentSummary.factDomainMismatchCount || aiIntentSummary.factServiceMismatchCount) ? (
+                              <div style={{ fontSize: 10, color: C.textDim, marginTop: 6 }}>
+                                fact-check 정합 {aiIntentSummary.factAlignedCount || 0}개 · 다른 엔티티 {aiIntentSummary.factWrongEntityCount || 0}개 · 도메인 불일치 {aiIntentSummary.factDomainMismatchCount || 0}개 · 서비스 불일치 {aiIntentSummary.factServiceMismatchCount || 0}개
+                              </div>
+                            ) : null}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {aiModeResults.length > 0 ? (
+                      <>
+                        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 8, marginBottom: 16 }}>
+                          {aiModeResults.map((r) => {
+                            const eng = ENGINES.find((e) => e.id === r.engineId) || ENGINES[0];
+                            const meta = getRecognitionMeta(r);
+                            return (
+                              <div key={`${r.engineId}-${r.intent}`} style={{ background: C.card, borderRadius: 10, padding: 12, textAlign: "center", border: `1px solid ${meta.color}25` }}>
+                                <div style={{ fontSize: 18, marginBottom: 3 }}>{eng.icon}</div>
+                                <div style={{ fontSize: 10, color: C.textMuted }}>{eng.name}</div>
+                                <div style={{ fontSize: 15, fontWeight: 800, fontFamily: "'Outfit',sans-serif", color: meta.color }}>
+                                  {typeof r.accuracy === "number" && Number.isFinite(r.accuracy) ? `${r.accuracy}%` : "—"}
+                                </div>
+                                <div style={{ fontSize: 9, color: meta.color }}>{meta.label}</div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        {aiModeResults.map((r) => {
+                          const eng = ENGINES.find((e) => e.id === r.engineId) || ENGINES[0];
+                          const meta = getRecognitionMeta(r);
+                          const fanOutMeta = getFanOutMeta(r.queryPlanCoverage);
+                          const sourceMixMeta = getSourceMixMeta(r.sourceMix);
+                          const sourceAuthorityMeta = getSourceAuthorityMeta(r.sourceProfile);
+                          const sourceFitMeta = getSourceFitMeta(r.sourceProfile);
+                          const factCheckMeta = getFactCheckMeta(r.factCheck);
+                          const mp = r.mentionPosition;
+                          const isRecognized = r.matchStatus === "recognized";
+                          const mpLabel = mp?.bucket === "top" ? "상위 언급" : mp?.bucket === "middle" ? "중간 언급" : mp?.bucket === "bottom" ? "하위 언급" : "언급 없음";
+                          const mpColor = mp?.bucket === "top" ? C.success : mp?.bucket === "middle" ? C.warning : C.danger;
+                          const hasOfficialCitation = Boolean(r.citationMetrics?.hasOfficialCitation);
+                          return (
+                            <div key={`${r.engineId}-${r.intent}-detail`} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 10, padding: 12, marginBottom: 8 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
+                                <span style={{ width: 24, height: 24, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", background: `${eng.color}18`, color: eng.color, fontWeight: 700, fontSize: 12 }}>{eng.icon}</span>
+                                <span style={{ fontWeight: 600, color: C.text, fontSize: 12 }}>{eng.name}</span>
+                                <span style={{ marginLeft: "auto", padding: "2px 8px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: meta.bg, color: meta.color }}>{meta.label}</span>
+                                {mp?.found && (
+                                  <span style={{ padding: "2px 7px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: `${mpColor}18`, color: isRecognized ? mpColor : C.textDim }}>
+                                    {isRecognized ? mpLabel : `${mpLabel} (참고)`}
+                                  </span>
+                                )}
+                              </div>
+                              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+                                <span style={{ padding: "2px 7px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: C.surface, color: C.textDim }}>
+                                  {r.intentLabel || aiIntentMeta.label}
+                                </span>
+                                <span style={{ padding: "2px 7px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: C.surface, color: C.textDim }}>
+                                  {r.queryType || "entity_check"}
+                                </span>
+                                {typeof r.latencyMs === "number" && Number.isFinite(r.latencyMs) && (
+                                  <span style={{ padding: "2px 7px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: C.surface, color: C.textDim }}>
+                                    {r.latencyMs}ms
+                                  </span>
+                                )}
+                                {r.tokenUsage?.total && (
+                                  <span style={{ padding: "2px 7px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: C.surface, color: C.textDim }}>
+                                    {r.tokenUsage.total} tokens
+                                  </span>
+                                )}
+                                {r.citationMetrics?.total > 0 && (
+                                  <span style={{ padding: "2px 7px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: C.surface, color: r.citationMetrics?.hasOfficialCitation ? C.success : C.textDim }}>
+                                    공식 citation {r.citationMetrics.official}/{r.citationMetrics.total}
+                                  </span>
+                                )}
+                                {r.searchQueriesUsed?.length > 0 && (
+                                  <span style={{ padding: "2px 7px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: C.surface, color: C.info }}>
+                                    search query {r.searchQueriesUsed.length}개
+                                  </span>
+                                )}
+                                {r.queryPlan?.slotCount > 0 && (
+                                  <span style={{ padding: "2px 7px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: C.surface, color: C.warning }}>
+                                    query slot {r.queryPlan.slotCount}개
+                                  </span>
+                                )}
+                                {r.queryPlanCoverage?.plannedCount > 0 && (
+                                  <span style={{ padding: "2px 7px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: fanOutMeta.bg, color: fanOutMeta.color }}>
+                                    {fanOutMeta.label} {r.queryPlanCoverage.observedCount}/{r.queryPlanCoverage.plannedCount}
+                                  </span>
+                                )}
+                                {r.sourceMix?.id && r.sourceMix.id !== "none" && (
+                                  <span style={{ padding: "2px 7px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: sourceMixMeta.bg, color: sourceMixMeta.color }}>
+                                    {sourceMixMeta.label}
+                                  </span>
+                                )}
+                                {r.sourceProfile?.dominantAuthorityTier && r.sourceProfile.dominantAuthorityTier !== "none" && (
+                                  <span style={{ padding: "2px 7px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: sourceAuthorityMeta.bg, color: sourceAuthorityMeta.color }}>
+                                    {sourceAuthorityMeta.label}
+                                  </span>
+                                )}
+                                {r.sourceProfile?.sourceFitStatus && r.sourceProfile.sourceFitStatus !== "none" && (
+                                  <span style={{ padding: "2px 7px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: sourceFitMeta.bg, color: sourceFitMeta.color }}>
+                                    {sourceFitMeta.label}
+                                  </span>
+                                )}
+                                {r.factCheck?.verdict && (
+                                  <span style={{ padding: "2px 7px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: factCheckMeta.bg, color: factCheckMeta.color }}>
+                                    {factCheckMeta.label}
+                                  </span>
+                                )}
+                                {r.groundingMetadata?.toolCallCount && (
+                                  <span style={{ padding: "2px 7px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: C.surface, color: C.textDim }}>
+                                    search call {r.groundingMetadata.toolCallCount}
+                                  </span>
+                                )}
+                                {r.groundingMetadata?.searchResultCount && (
+                                  <span style={{ padding: "2px 7px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: C.surface, color: C.textDim }}>
+                                    search result {r.groundingMetadata.searchResultCount}
+                                  </span>
+                                )}
+                                {r.groundingMetadata?.supportCount && (
+                                  <span style={{ padding: "2px 7px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: C.surface, color: C.textDim }}>
+                                    grounding support {r.groundingMetadata.supportCount}
+                                  </span>
+                                )}
+                              </div>
+                              {r.query && (
+                                <div style={{ fontSize: 10, color: C.textDim, marginBottom: 8, lineHeight: 1.6 }}>
+                                  질의: {r.query.split("\n")[0]}
+                                </div>
+                              )}
+                              {r.reason && (
+                                <div style={{ fontSize: 11, color: meta.color, marginBottom: 8, lineHeight: 1.6 }}>
+                                  {r.reason}
+                                </div>
+                              )}
+                              {r.factCheck?.reasons?.length > 0 && (
+                                <div style={{ fontSize: 10, color: factCheckMeta.color, marginBottom: 8, lineHeight: 1.6 }}>
+                                  {r.factCheck.reasons.slice(0, 2).join(" · ")}
+                                </div>
+                              )}
+                              {r.searchQueriesUsed?.length > 0 && (
+                                <div style={{ marginBottom: 8 }}>
+                                  <div style={{ fontSize: 10, color: C.textDim, marginBottom: 4 }}>searchQueriesUsed</div>
+                                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                                    {r.searchQueriesUsed.slice(0, 6).map((queryText) => (
+                                      <span key={`${r.engineId}-${queryText}`} style={{ padding: "4px 8px", borderRadius: 999, background: C.surface, border: `1px solid ${C.border}`, fontSize: 10, color: C.textMuted }}>
+                                        {queryText}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                              {r.queryPlan?.slots?.length > 0 && (
+                                <div style={{ marginBottom: 8 }}>
+                                  <div style={{ fontSize: 10, color: C.textDim, marginBottom: 4 }}>
+                                    query plan
+                                    {r.queryPlanCoverage?.plannedCount > 0 && (
+                                      <span style={{ color: fanOutMeta.color }}>
+                                        {` · ${fanOutMeta.label} ${r.queryPlanCoverage.observedCount}/${r.queryPlanCoverage.plannedCount}`}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div style={{ display: "grid", gap: 6 }}>
+                                    {r.queryPlan.slots.map((slot) => (
+                                      <div key={`${r.engineId}-${slot.id}`} style={{ padding: 8, borderRadius: 8, background: C.surface, border: `1px solid ${C.border}` }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4, flexWrap: "wrap" }}>
+                                          <span style={{ fontSize: 10, fontWeight: 700, color: C.warning }}>{slot.label}</span>
+                                          {slot.goal && <span style={{ fontSize: 10, color: C.textDim }}>{slot.goal}</span>}
+                                        </div>
+                                        {slot.queries?.length > 0 && (
+                                          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                                            {slot.queries.slice(0, 4).map((queryText) => (
+                                              <span key={`${slot.id}-${queryText}`} style={{ padding: "3px 7px", borderRadius: 999, background: `${C.warning}10`, border: `1px dashed ${C.warning}40`, fontSize: 10, color: C.textMuted }}>
+                                                {queryText}
+                                              </span>
+                                            ))}
+                                          </div>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                              {r.sourceProfile?.total > 0 && (
+                                <div style={{ marginBottom: 8, fontSize: 10, color: C.textDim }}>
+                                  source profile · archetype {r.sourceProfile.archetypeLabel || "—"} · 주요 유형 {r.sourceProfile.dominantTypeLabel || "—"} · 권위 {r.sourceProfile.dominantAuthorityLabel || "—"} · source fit {r.sourceProfile.sourceFitLabel || "—"} · high-authority {formatRatioPercent(r.sourceProfile.highAuthorityRatio)}
+                                </div>
+                              )}
+                              {r.payloadDiagnostics && (
+                                <details style={{ marginBottom: 8 }}>
+                                  <summary style={{ cursor: "pointer", fontSize: 10, color: C.textDim }}>
+                                    payload diagnostics
+                                  </summary>
+                                  <pre style={{ marginTop: 6, fontSize: 10, color: C.textDim, lineHeight: 1.6, padding: 10, background: C.surface, borderRadius: 6, border: `1px solid ${C.border}`, overflow: "auto", whiteSpace: "pre-wrap", wordBreak: "break-word", fontFamily: "'Menlo','Monaco',monospace" }}>
+                                    {JSON.stringify(r.payloadDiagnostics, null, 2)}
+                                  </pre>
+                                </details>
+                              )}
+                              <div style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.6, padding: 10, background: C.surface, borderRadius: 6, border: `1px solid ${C.border}`, maxHeight: 400, overflow: "auto", whiteSpace: "pre-wrap" }}>
+                                {r.response}
+                              </div>
+                              {r.citations?.length > 0 && (
+                                <div style={{ marginTop: 8 }}>
+                                  <div style={{ fontSize: 10, color: C.textDim, marginBottom: 4 }}>
+                                    실제 인용 출처
+                                    {hasOfficialCitation && <span style={{ color: C.success, fontWeight: 700 }}> · 공식 사이트 인용 ✓</span>}
+                                    {r.sourceMix?.id && r.sourceMix.id !== "none" && (
+                                      <span style={{ color: sourceMixMeta.color }}>
+                                        {` · ${sourceMixMeta.label}`}
+                                      </span>
+                                    )}
+                                    {r.citationMetrics?.officialRatio !== null && (
+                                      <span style={{ color: hasOfficialCitation ? C.success : C.textDim }}>
+                                        {` · 공식 비율 ${formatRatioPercent(r.citationMetrics.officialRatio)}`}
+                                      </span>
+                                    )}
+                                  </div>
+                                  {(r.citationDetails?.length > 0 ? r.citationDetails : r.citations.map((citation) => ({ url: citation }))).slice(0, 5).map((detail, index) => {
+                                    const citation = detail?.url || "";
+                                    const isOfficial = detail?.isOfficial ?? matchesOfficialDomain(citation, officialDomain);
+                                    const citationTypeMeta = getCitationTypeMeta(detail);
+                                    const citationAuthorityMeta = getSourceAuthorityMeta({
+                                      dominantAuthorityTier: detail?.authorityTier,
+                                    });
+                                    return (
+                                      <div key={`${r.engineId}-${index}`} style={{ fontSize: 10, color: isOfficial ? C.success : C.textDim, padding: "3px 0", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", gap: 6 }}>
+                                        {isOfficial && <span>✓</span>}
+                                        <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{citation}</span>
+                                        {detail?.sourceTypeId && (
+                                          <span style={{ padding: "2px 6px", borderRadius: 999, background: citationTypeMeta.bg, color: citationTypeMeta.color, fontSize: 9, fontWeight: 700 }}>
+                                            {citationTypeMeta.label}
+                                          </span>
+                                        )}
+                                        {detail?.authorityTier && (
+                                          <span style={{ padding: "2px 6px", borderRadius: 999, background: citationAuthorityMeta.bg, color: citationAuthorityMeta.color, fontSize: 9, fontWeight: 700 }}>
+                                            {detail.authorityLabel || citationAuthorityMeta.label}
+                                          </span>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </>
+                    ) : (
+                      <div style={{ textAlign: "center", padding: 40, color: C.textDim }}>
+                        현재 선택한 모드의 AI 결과가 없습니다.
+                      </div>
+                    )}
                   </>
                 ) : (
                   <div style={{ textAlign: "center", padding: 40, color: C.textDim }}>
@@ -722,6 +1516,12 @@ export default function Dashboard({ initialUrl = "" }) {
                   </div>
                 )}
 
+                {improvements.length === 0 && (
+                  <div style={{ padding: 32, textAlign: "center", color: C.textMuted, fontSize: 13 }}>
+                    개선 항목을 불러오지 못했습니다. 다시 진단해 주세요.
+                  </div>
+                )}
+
                 {improvements.map((item, i) => {
                   const pc = { critical: { bg: C.dangerBg, color: C.danger, label: "CRITICAL" }, important: { bg: C.warningBg, color: C.warning, label: "IMPORTANT" }, nice: { bg: C.infoBg, color: C.info, label: "NICE" } };
                   const p = pc[item.priority] || pc.nice;
@@ -731,9 +1531,7 @@ export default function Dashboard({ initialUrl = "" }) {
                       <summary style={{ padding: "10px 12px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, listStyle: "none" }}>
                         <span style={{ padding: "2px 6px", borderRadius: 4, fontSize: 9, fontWeight: 700, background: p.bg, color: p.color }}>{p.label}</span>
                         <span style={{ padding: "2px 6px", borderRadius: 4, fontSize: 9, fontWeight: 600, background: axisColor + "15", color: axisColor }}>{item.axis}</span>
-                        {item.source === "fallback_axis_based" && (
-                          <span style={{ padding: "2px 6px", borderRadius: 4, fontSize: 9, fontWeight: 600, background: C.infoBg, color: C.info }}>자동 생성</span>
-                        )}
+                        <ProvenanceBadge source={item.source} compact />
                         <span style={{ fontSize: 12, color: C.text, flex: 1 }}>{item.issue}</span>
                         <span style={{ fontSize: 11, color: C.success, fontWeight: 600, fontFamily: "'Outfit',sans-serif" }}>{item.expected_impact}</span>
                       </summary>
@@ -757,9 +1555,9 @@ export default function Dashboard({ initialUrl = "" }) {
             {tab === "rawdata" && (
               <div>
                 <div style={{ background: C.card, borderRadius: 12, padding: 16, border: `1px solid ${C.border}`, marginBottom: 16 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>AI가 이 페이지에서 읽은 전부입니다</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>AI가 이 페이지에서 읽은 신호 요약입니다</div>
                   <div style={{ fontSize: 11, color: C.textMuted, marginBottom: 12 }}>
-                    아래 내용이 AI 검색 엔진이 실제로 볼 수 있는 데이터의 전부입니다. 여기에 없는 정보는 AI가 알 수 없습니다.
+                    아래는 메타 정보와 본문 미리보기입니다. 보안상 전체 본문 대신 핵심 신호만 표시하며, 여기에 없는 정보는 AI가 알기 어렵습니다.
                   </div>
 
                   {crawlData && (
@@ -767,8 +1565,40 @@ export default function Dashboard({ initialUrl = "" }) {
                       <div style={{ marginBottom: 16 }}>
                         <div style={{ fontSize: 10, color: C.textDim, textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 8 }}>페이지 메타 정보</div>
                         <div style={{ background: C.surface, borderRadius: 8, padding: 12, border: `1px solid ${C.border}` }}>
+                          {(() => {
+                            const indexability = crawlData.metadata?.indexability;
+                            const indexabilityMeta = getIndexabilityMeta(indexability);
+                            const canonicalMatchesUrl = crawlData.metadata?.canonicalMatchesUrl;
+                            const canonicalSameOrigin = crawlData.metadata?.canonicalSameOrigin;
+
+                            return (
+                              <>
                           <div style={{ fontSize: 12, marginBottom: 6 }}><strong style={{ color: C.pacp }}>Title:</strong> <span style={{ color: C.textMuted }}>{crawlData.title || "(없음)"}</span></div>
                           <div style={{ fontSize: 12, marginBottom: 6 }}><strong style={{ color: C.pacp }}>Description:</strong> <span style={{ color: C.textMuted }}>{crawlData.description || "(없음)"}</span></div>
+                          <div style={{ fontSize: 12, marginBottom: 6 }}><strong style={{ color: C.pacp }}>Canonical:</strong> <span style={{ color: crawlData.metadata?.canonicalUrl ? C.textMuted : C.textDim }}>{crawlData.metadata?.canonicalUrl || "(없음)"}</span></div>
+                          <div style={{ fontSize: 12, marginBottom: 6 }}>
+                            <strong style={{ color: C.pacp }}>Indexability:</strong>{" "}
+                            <span style={{ display: "inline-flex", alignItems: "center", padding: "3px 8px", borderRadius: 999, fontSize: 10, fontWeight: 700, background: indexabilityMeta.bg, color: indexabilityMeta.color, marginRight: 8 }}>
+                              {indexabilityMeta.label}
+                            </span>
+                            <span style={{ color: C.textMuted }}>
+                              {canonicalMatchesUrl === true
+                                ? "self-canonical"
+                                : canonicalMatchesUrl === false
+                                  ? "canonical mismatch"
+                                  : "canonical 미확인"}
+                              {canonicalSameOrigin === false ? " · cross-origin canonical" : ""}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: 12, marginBottom: 6 }}>
+                            <strong style={{ color: C.pacp }}>Indexability 근거:</strong>{" "}
+                            <span style={{ color: C.textMuted }}>
+                              {(indexability?.reasons || []).join(" · ") || "(없음)"}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: 12, marginBottom: 6 }}><strong style={{ color: C.pacp }}>Meta Robots:</strong> <span style={{ color: crawlData.metadata?.robotsMeta ? C.textMuted : C.textDim }}>{crawlData.metadata?.robotsMeta || "(없음)"}</span></div>
+                          <div style={{ fontSize: 12, marginBottom: 6 }}><strong style={{ color: C.pacp }}>Googlebot Meta:</strong> <span style={{ color: crawlData.metadata?.googlebotRobotsMeta ? C.textMuted : C.textDim }}>{crawlData.metadata?.googlebotRobotsMeta || "(없음)"}</span></div>
+                          <div style={{ fontSize: 12, marginBottom: 6 }}><strong style={{ color: C.pacp }}>X-Robots-Tag:</strong> <span style={{ color: crawlData.metadata?.xRobotsTag ? C.textMuted : C.textDim }}>{crawlData.metadata?.xRobotsTag || "(없음)"}</span></div>
                           <div style={{ fontSize: 12, marginBottom: 6 }}><strong style={{ color: C.sep }}>H1 태그:</strong> <span style={{ color: crawlData.metadata?.headingStructure?.h1Count > 0 ? C.success : C.danger }}>{crawlData.metadata?.headingStructure?.h1Count || 0}개 — {crawlData.metadata?.headingStructure?.h1Texts?.join(", ") || "(없음)"}</span></div>
                           <div style={{ fontSize: 12, marginBottom: 6 }}><strong style={{ color: C.sep }}>H2 태그:</strong> <span style={{ color: C.textMuted }}>{crawlData.metadata?.headingStructure?.h2Count || 0}개</span></div>
                           <div style={{ fontSize: 12, marginBottom: 6 }}><strong style={{ color: C.spf }}>JSON-LD:</strong> <span style={{ color: crawlData.metadata?.hasJsonLd ? C.success : C.danger }}>{crawlData.metadata?.hasJsonLd ? "✅ 감지됨" : "❌ 없음"}</span></div>
@@ -776,6 +1606,9 @@ export default function Dashboard({ initialUrl = "" }) {
                           <div style={{ fontSize: 12, marginBottom: 6 }}><strong style={{ color: C.spf }}>이미지:</strong> <span style={{ color: C.textMuted }}>{crawlData.metadata?.imageCount || 0}개 (Alt 없음: {crawlData.metadata?.imagesWithoutAlt || 0}개)</span></div>
                           <div style={{ fontSize: 12, marginBottom: 6 }}><strong style={{ color: C.spf }}>총 단어 수:</strong> <span style={{ color: C.textMuted }}>{crawlData.metadata?.totalWordCount || 0}</span></div>
                           <div style={{ fontSize: 12 }}><strong style={{ color: C.spf }}>긴 텍스트 블록 (&gt;512토큰):</strong> <span style={{ color: (crawlData.metadata?.longTextBlocks || 0) > 0 ? C.warning : C.success }}>{crawlData.metadata?.longTextBlocks || 0}개</span></div>
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
 
@@ -802,16 +1635,26 @@ export default function Dashboard({ initialUrl = "" }) {
                                 ? <span style={{ color: C.success }}>llms.txt ✓</span>
                                 : <span style={{ color: C.textDim }}>llms.txt 없음 (권고)</span>}
                             </div>
+                            <div style={{ fontSize: 11, color: C.textMuted, marginTop: 6 }}>
+                              {!crawlData.discoverySignals.sitemap?.fetched
+                                ? "sitemap.xml 확인 불가"
+                                : crawlData.discoverySignals.sitemap.exists
+                                  ? `sitemap.xml 확인 완료 · ${crawlData.discoverySignals.sitemap.format} · loc ${crawlData.discoverySignals.sitemap.locCount ?? crawlData.discoverySignals.sitemap.urlCount ?? 0}개`
+                                  : "sitemap.xml 미확인"}
+                              {crawlData.discoverySignals.sitemap?.exists
+                                ? ` · ${crawlData.discoverySignals.sitemap.containsRequestedUrl || crawlData.discoverySignals.sitemap.containsRequestedPath ? "요청 URL/경로 포함" : "요청 URL/경로 미포함"}`
+                                : ""}
+                            </div>
                           </div>
                         </div>
                       )}
 
                       <div>
                         <div style={{ fontSize: 10, color: C.textDim, textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 8 }}>
-                          크롤링 원문 ({crawlData.contentLength?.toLocaleString() || 0}자 중 최대 10,000자 표시)
+                          크롤링 미리보기 ({crawlData.contentLength?.toLocaleString() || 0}자 중 최대 1,600자 표시)
                         </div>
                         <pre style={{ background: C.surface, borderRadius: 8, padding: 14, border: `1px solid ${C.border}`, fontSize: 11, color: C.textMuted, lineHeight: 1.6, whiteSpace: "pre-wrap", wordBreak: "break-all", maxHeight: 500, overflow: "auto", fontFamily: "'Menlo','Monaco',monospace" }}>
-                          {crawlData.rawContent || "(크롤링된 콘텐츠 없음 — CSR 사이트일 경우 AI 크롤러가 빈 페이지만 수집합니다)"}
+                          {crawlData.contentPreview || "(크롤링된 콘텐츠 미리보기 없음 — CSR 사이트일 경우 AI 크롤러가 빈 페이지만 수집합니다)"}
                         </pre>
                       </div>
                     </>
