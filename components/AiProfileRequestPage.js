@@ -112,9 +112,7 @@ export default function AiProfileRequestPage({ initialQuery = {} }) {
   const previewAfterScore =
     snapshot.targetScore !== null && snapshot.targetScore !== undefined
       ? snapshot.targetScore
-      : previewBeforeScore !== null && previewBeforeScore !== undefined
-        ? Math.min(previewBeforeScore + Math.max(selectedPlan.targetLift, selectedTemplate.targetLift || 0), 100)
-        : null;
+      : null;
   const previewPilotSla = PILOT_SLA_BY_PLAN[selectedPlan.id] || PILOT_SLA_BY_PLAN.basic;
   const previewStageFlow = getPreviewPilotStages();
   const previewCaseStudy = getPreviewCaseStudy({
@@ -255,7 +253,7 @@ export default function AiProfileRequestPage({ initialQuery = {} }) {
               <div style={{ marginTop: 12, padding: 14, borderRadius: 12, background: C.surface, border: `1px solid ${C.border}` }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{selectedTemplate.label}</div>
-                  <div style={{ fontSize: 11, color: C.warning, fontWeight: 700 }}>목표 +{selectedTemplate.targetLift}점</div>
+                  <div style={{ fontSize: 11, color: C.warning, fontWeight: 700 }}>템플릿 가이드 +{selectedTemplate.targetLift}점</div>
                 </div>
                 <div style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.8, marginBottom: 10 }}>{selectedTemplate.summary}</div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 10 }}>
@@ -424,7 +422,7 @@ export default function AiProfileRequestPage({ initialQuery = {} }) {
                 ))}
               </div>
               <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px solid ${C.border}`, fontSize: 11, color: C.textDim, lineHeight: 1.7 }}>
-                예상 개선 폭: +{selectedPlan.targetLift}점 기준 · 납기 {selectedPlan.turnaroundLabel}
+                플랜 가이드 uplift: +{selectedPlan.targetLift}점 기준 · 납기 {selectedPlan.turnaroundLabel}
               </div>
             </div>
 

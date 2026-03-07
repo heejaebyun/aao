@@ -179,25 +179,15 @@ function getAiIntentMeta(intent) {
   return AI_INTENTS.find((item) => item.id === intent) || AI_INTENTS[0];
 }
 
-function extractExpectedImpactPoints(value) {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return Math.max(0, Math.round(value));
+function getProjectedScore(currentScore, expectedScoreAfter) {
+  const current = Number(currentScore);
+  const projected = Number(expectedScoreAfter);
+
+  if (!Number.isFinite(current) || !Number.isFinite(projected) || projected <= current) {
+    return null;
   }
 
-  const text = String(value || "").trim();
-  if (!text) return 0;
-
-  const explicitMatch = text.match(/([+-]?\d+)\s*점/);
-  if (explicitMatch) {
-    return Math.max(0, Math.abs(Number(explicitMatch[1])) || 0);
-  }
-
-  const fallbackMatch = text.match(/([+-]?\d+)/);
-  if (fallbackMatch) {
-    return Math.max(0, Math.abs(Number(fallbackMatch[1])) || 0);
-  }
-
-  return 0;
+  return Math.round(projected);
 }
 
 function formatRatioPercent(value) {
@@ -718,7 +708,14 @@ export default function Dashboard({ initialUrl = "" }) {
   const g = diagnosis ? getGrade(diagnosis.overall_score) : null;
   const extendedGrade = extendedDiagnosis ? getGrade(extendedDiagnosis.overall_score) : null;
   const improvements = diagnosis?.improvements || [];
-  const potentialGain = improvements.reduce((sum, item) => sum + extractExpectedImpactPoints(item.expected_impact), 0);
+  const projectedScore = getProjectedScore(
+    diagnosis?.overall_score,
+    diagnosis?.customer_summary?.expected_score_after
+  );
+  const projectedGain =
+    diagnosis && projectedScore !== null
+      ? Math.max(projectedScore - diagnosis.overall_score, 0)
+      : null;
   const gap = crawlData?.gap || null;
   const extras = crawlData?.extras || [];
   const gapScore = diagnosis && extendedDiagnosis ? Math.max(0, extendedDiagnosis.overall_score - diagnosis.overall_score) : 0;
@@ -766,7 +763,7 @@ export default function Dashboard({ initialUrl = "" }) {
         domain: officialDomain,
         grade: g?.grade,
         currentScore: diagnosis.overall_score,
-        targetScore: diagnosis.customer_summary?.expected_score_after ?? Math.min(diagnosis.overall_score + potentialGain, 100),
+        targetScore: projectedScore,
         gapScore,
         pacpScore: diagnosis.pacp?.score,
         sepScore: diagnosis.sep?.score,
@@ -1057,11 +1054,17 @@ export default function Dashboard({ initialUrl = "" }) {
                   ))}
                 </div>
 
-                <div style={{ background: `linear-gradient(135deg,${C.success}08,${C.info}08)`, borderRadius: 14, padding: 20, border: `1px solid ${C.success}20`, marginBottom: 20 }}>
+                <div style={{ background: projectedScore !== null ? `linear-gradient(135deg,${C.success}08,${C.info}08)` : `linear-gradient(135deg,${C.info}08,${C.warning}08)`, borderRadius: 14, padding: 20, border: `1px solid ${projectedScore !== null ? `${C.success}20` : `${C.info}20`}`, marginBottom: 20 }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 4 }}>
-                    ✅ 이렇게 고치면 {diagnosis.customer_summary.expected_score_after}점까지 올릴 수 있습니다
+                    {projectedScore !== null
+                      ? `✅ 이렇게 고치면 ${projectedScore}점까지 올릴 수 있습니다`
+                      : "ℹ️ 예상 점수는 아직 신뢰 가능한 수치로 산출되지 않았습니다"}
                   </div>
-                  <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 12 }}>현재 {diagnosis.overall_score}점 → 예상 {diagnosis.customer_summary.expected_score_after}점</div>
+                  <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 12 }}>
+                    {projectedScore !== null
+                      ? `현재 ${diagnosis.overall_score}점 → 예상 ${projectedScore}점`
+                      : "개선 방향은 정리됐지만, 반영 후 점수는 재측정 또는 유효한 모델 추정이 필요합니다."}
+                  </div>
                   {diagnosis.customer_summary.actions.map((action, i) => (
                     <div key={i} style={{ fontSize: 13, color: C.text, marginBottom: 8, paddingLeft: 4 }}>
                       <strong style={{ color: C.success }}>{i + 1}.</strong> {action}
@@ -1574,10 +1577,18 @@ export default function Dashboard({ initialUrl = "" }) {
                 {improvements.length > 0 && (
                   <div style={{ background: `linear-gradient(135deg,${C.accent}0a,${C.g2}0a)`, borderRadius: 12, padding: 16, marginBottom: 16, border: `1px solid ${C.accent}18`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <div>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: C.text }}>모든 개선사항 적용 시 예상 점수</div>
-                      <div style={{ fontSize: 11, color: C.textMuted }}>현재 {diagnosis.overall_score}점 → 예상 {Math.min(diagnosis.overall_score + potentialGain, 100)}점</div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: C.text }}>
+                        {projectedScore !== null ? "모든 개선사항 적용 시 예상 점수" : "예상 점수 미산출"}
+                      </div>
+                      <div style={{ fontSize: 11, color: C.textMuted }}>
+                        {projectedScore !== null
+                          ? `현재 ${diagnosis.overall_score}점 → 예상 ${projectedScore}점`
+                          : "카드별 impact 문구를 합산해 점수를 임의 계산하지 않습니다."}
+                      </div>
                     </div>
-                    <div style={{ fontSize: 26, fontWeight: 800, fontFamily: "'Outfit',sans-serif", background: `linear-gradient(135deg,${C.g1},${C.g2})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>+{potentialGain}</div>
+                    <div style={{ fontSize: projectedScore !== null ? 26 : 13, fontWeight: 800, fontFamily: "'Outfit',sans-serif", background: `linear-gradient(135deg,${C.g1},${C.g2})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                      {projectedScore !== null ? `+${projectedGain}` : "재측정 후 확정"}
+                    </div>
                   </div>
                 )}
 
