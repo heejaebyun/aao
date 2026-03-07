@@ -85,9 +85,9 @@
 
 - [x] 첫 파일럿 케이스 실측
   - `AAO self-rollout`
-  - 메인 랜딩 `50점`
+  - 메인 랜딩 `54점`
   - `/ai-profile` `57점`
-  - 실측 uplift `+7점`
+  - 실측 uplift `+3점`
 
 - [ ] `Phase 1.5` pilot ops v4
   - 실제 결제 링크 / 상태 추적 링크 연결

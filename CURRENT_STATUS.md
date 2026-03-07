@@ -97,9 +97,9 @@
   - request 화면에서 pilot 운영 보드와 case-study draft 노출
 - 첫 파일럿 케이스 실측 반영
   - `AAO self-rollout` 케이스 추가
-  - 메인 랜딩 `50점`
+  - 메인 랜딩 `54점`
   - `/ai-profile` `57점`
-  - 실측 uplift `+7점`
+  - 실측 uplift `+3점`
   - 측정 source `live /api/diagnose snapshot · fallback_diagnosis`
 - 내부 운영 채널 fallback 반영
   - `/ai-profile/ops/payment`
@@ -118,7 +118,7 @@
 
 ## 지금 실측 해석
 
-- 2026-03-07 실측 기준 `https://aao.co.kr` 메인 랜딩은 `50/100`, `https://aao.co.kr/ai-profile`는 `57/100`이다.
+- 2026-03-08 실측 기준 `https://aao.co.kr` 메인 랜딩은 `54/100`, `https://aao.co.kr/ai-profile`는 `57/100`이다.
 - `Gap 0`은 이번 실행에서 서브페이지가 메인보다 의미 있게 풍부하다고 잡히지 않았다는 뜻이다.
 - Perplexity, Gemini는 아직 `AAO`를 다른 엔티티와 혼동하고 있다.
 - ChatGPT 호출 스펙 오류는 수정되었고, 이제 핵심 이슈는 엔티티 강도와 공식 출처성이다.
@@ -130,7 +130,7 @@
 - 메인 랜딩 페이지는 여전히 마케팅 카피 비중이 높아서 PACP/SEP가 낮게 나온다.
 - `/ai-profile`는 앞으로 Before/After 실험용 기준 페이지로 써야 한다.
 - 측정 결과에서 제작 요청으로 넘어가는 첫 상업화 퍼널은 이제 앱 안에서 바로 열 수 있다.
-- 첫 파일럿 케이스도 앱 안에 고정되어 있고, `50 -> 57` 실측값까지 공개용으로 바로 보여줄 수 있다.
+- 첫 파일럿 케이스도 앱 안에 고정되어 있고, `54 -> 57` 실측값까지 공개용으로 바로 보여줄 수 있다.
 
 ## 바로 다음 액션
 
@@ -140,7 +140,7 @@
    - canonical / robots / sitemap / llms 반영 확인
 2. 첫 파일럿 케이스 공개 패키지를 완성한다.
   - 공개용 스크린샷 확보
-  - `50 -> 57` 실측 케이스 문구 정리
+  - `54 -> 57` 실측 케이스 문구 정리
   - 재측정 후 delta 업데이트
 3. Phase 1.5를 실제 파일럿 운영으로 전환한다.
   - 업종별 실제 납품 템플릿 3~5개 정제
@@ -164,7 +164,7 @@
 - Phase 1.5는 제품 안에서 초안 생성까지 되지만, 실제 결제 링크/상태 링크는 env를 채워야 완성된다.
 - 외부 링크가 없어도 앱 내부 fallback 채널은 동작하지만, 실제 결제/일정/상태 채널로는 아직 이어지지 않는다.
 - Phase 1.5는 pilot 보드와 case-study draft까지 생성하지만, 아직 실제 CRM 저장이나 실고객 이력 축적은 없다.
-- 첫 파일럿 케이스는 `50 -> 57` 실측이 들어갔지만, 진단 provenance는 아직 `fallback_diagnosis`라서 더 강한 공식 출처 신호 보강이 필요하다.
+- 첫 파일럿 케이스는 `54 -> 57` 실측이 들어갔지만, 진단 provenance는 아직 `fallback_diagnosis`라서 더 강한 공식 출처 신호 보강이 필요하다.
 - Discovery는 `sitemap / canonical / indexability`까지 보지만 Search Console의 실제 색인 상태는 아직 모른다.
 - Answer 레이어는 comparison intent 오탐을 줄였고 고정 fixture도 생겼지만, 엔진별 정답셋 기반 fact-check와 산업군별 서비스 정의 규칙은 아직 없다.
 - AI Check는 기본 예산과 cache가 생겼지만, 트래픽 증가 시 샘플링 정책과 Redis 계열 캐시가 필요하다.
