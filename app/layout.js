@@ -1,3 +1,4 @@
+import { Outfit } from "next/font/google";
 import {
   AI_PROFILE_URL,
   CONTACT_EMAIL,
@@ -9,6 +10,13 @@ import {
   ROOT_META_DESCRIPTION,
   SITE_ORIGIN,
 } from "@/lib/site-identity";
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
+  variable: "--font-outfit",
+});
 
 export const metadata = {
   metadataBase: new URL(SITE_ORIGIN),
@@ -31,12 +39,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="ko">
+    <html lang="ko" className={outfit.variable}>
       <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
-          rel="stylesheet"
-        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -96,7 +100,7 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-      <body style={{ margin: 0, padding: 0 }}>{children}</body>
+      <body style={{ margin: 0, padding: 0, fontFamily: "var(--font-outfit), -apple-system, sans-serif" }}>{children}</body>
     </html>
   );
 }

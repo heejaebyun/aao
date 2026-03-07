@@ -779,10 +779,9 @@ export default function Dashboard({ initialUrl = "" }) {
       <div style={{ borderBottom: `1px solid ${C.border}`, background: C.surface, padding: "14px 20px" }}>
         <div style={{ maxWidth: 1000, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <div style={{ width: 30, height: 30, borderRadius: 8, background: `linear-gradient(135deg,${C.g1},${C.g2})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: "#fff" }}>A</div>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ fontFamily: "'Outfit',sans-serif", fontWeight: 800, fontSize: 15, background: `linear-gradient(135deg,${C.g1},${C.g2})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>AAO</span>
-              <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 4, background: `${C.warning}20`, color: C.warning, fontWeight: 700, letterSpacing: "0.5px" }}>BETA</span>
+              <span style={{ fontFamily: "'Outfit',sans-serif", fontWeight: 800, fontSize: 22, letterSpacing: -1, background: "linear-gradient(90deg,#6c63ff,#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>AAO</span>
+              <span style={{ fontSize: 11, background: "#6c63ff22", color: "#a78bfa", border: "1px solid #6c63ff44", borderRadius: 4, padding: "2px 7px", fontWeight: 700, letterSpacing: "1px" }}>BETA</span>
               {!isMobile && <span style={{ fontSize: 9, color: C.textDim, letterSpacing: "1px" }}>AI Answer Optimization</span>}
             </div>
           </a>
@@ -1389,6 +1388,11 @@ export default function Dashboard({ initialUrl = "" }) {
                                 {r.factCheck?.verdict && (
                                   <span style={{ padding: "2px 7px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: factCheckMeta.bg, color: factCheckMeta.color }}>
                                     {factCheckMeta.label}
+                                  </span>
+                                )}
+                                {r.recognitionSource === "ai_fallback" && (
+                                  <span style={{ padding: "2px 7px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: `${C.info}18`, color: C.info }}>
+                                    AI 재분류
                                   </span>
                                 )}
                                 {r.groundingMetadata?.toolCallCount && (
