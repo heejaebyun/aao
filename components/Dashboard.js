@@ -1,6 +1,7 @@
 // components/Dashboard.js
 "use client";
 import { useState, useEffect } from "react";
+import { deriveGateSummary } from "@/lib/gate-analysis";
 
 const C = {
   bg: "#07070d", surface: "#0e0e18", card: "#121220",
@@ -76,6 +77,50 @@ function friendlyError(msg) {
   if (msg.includes("parse") || msg.includes("JSON")) return "진단 결과를 생성하지 못했습니다. 다시 시도해주세요.";
   if (msg.includes("OpenAI") || msg.includes("400")) return "AI 진단 중 오류가 발생했습니다. 다시 시도해주세요.";
   return msg;
+}
+
+function getRecognitionMeta(result) {
+  const matchStatus = result?.matchStatus || (result?.knows ? "recognized" : "unknown");
+
+  if (matchStatus === "recognized") {
+    return {
+      label: "정확히 인식",
+      color: C.success,
+      bg: C.successBg,
+    };
+  }
+
+  if (matchStatus === "misidentified") {
+    return {
+      label: "오인식",
+      color: C.warning,
+      bg: C.warningBg,
+    };
+  }
+
+  if (matchStatus === "error") {
+    return {
+      label: "오류",
+      color: C.danger,
+      bg: C.dangerBg,
+    };
+  }
+
+  return {
+    label: "미인식",
+    color: C.danger,
+    bg: C.dangerBg,
+  };
+}
+
+function getGateStatusMeta(status) {
+  if (status === "pass") {
+    return { label: "통과", color: C.success, bg: C.successBg };
+  }
+  if (status === "warn") {
+    return { label: "주의", color: C.warning, bg: C.warningBg };
+  }
+  return { label: "실패", color: C.danger, bg: C.dangerBg };
 }
 
 async function readJsonSafely(response) {
@@ -210,11 +255,27 @@ export default function Dashboard({ initialUrl = "" }) {
       setCrawlData(diagData.crawl);
       setPhase("AI 엔진 답변 확인 중...");
 
-      const companyName = diagData.diagnosis?.company_name || target.replace(/https?:\/\//, "").split(".")[0];
+      const parsedTarget = new URL(target);
+      const domain = parsedTarget.hostname.replace(/^www\./, "");
+      const companyName = diagData.diagnosis?.company_name || diagData.crawl?.title || domain.split(".")[0];
+      const aliases = Array.from(
+        new Set([
+          diagData.diagnosis?.company_name,
+          diagData.crawl?.title,
+          diagData.crawl?.description,
+        ].filter(Boolean))
+      );
+
       const aiRes = await fetch("/api/ai-check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ companyName }),
+        body: JSON.stringify({
+          companyName,
+          domain,
+          officialTitle: diagData.crawl?.title || "",
+          officialDescription: diagData.crawl?.description || "",
+          aliases,
+        }),
       });
 
       if (aiRes.ok) {
@@ -259,6 +320,8 @@ export default function Dashboard({ initialUrl = "" }) {
   const gapScore = diagnosis && extendedDiagnosis ? Math.max(0, extendedDiagnosis.overall_score - diagnosis.overall_score) : 0;
   const gapActions = gap?.actions || [];
   const hiddenPages = gap?.hiddenPages || [];
+  const promotedSnippets = gap?.promotedSnippets || [];
+  const gateSummary = deriveGateSummary({ crawlData, diagnosis, aiResults });
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg, color: C.text, fontFamily: "'Pretendard',-apple-system,sans-serif" }}>
@@ -372,6 +435,47 @@ export default function Dashboard({ initialUrl = "" }) {
                   </div>
                 </div>
 
+                {gateSummary && (
+                  <div style={{ background: C.card, borderRadius: 14, padding: 18, border: `1px solid ${C.border}`, marginBottom: 20 }}>
+                    <div style={{ fontSize: 11, color: C.textDim, marginBottom: 8, textTransform: "uppercase", letterSpacing: "1.2px" }}>Frontline Gates</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: C.text, marginBottom: 6 }}>{gateSummary.headline}</div>
+                    <div style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.7, marginBottom: 14 }}>
+                      AI가 브랜드를 선택하기 전에 거치는 앞단 레이어를 현재 진단 데이터 기준으로 요약한 결과입니다.
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(5, 1fr)", gap: 10, marginBottom: 12 }}>
+                      {gateSummary.gates.map((gate) => {
+                        const meta = getGateStatusMeta(gate.status);
+                        return (
+                          <div key={gate.id} style={{ background: C.surface, borderRadius: 10, padding: 12, border: `1px solid ${meta.color}25` }}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
+                              <div>
+                                <div style={{ fontSize: 10, color: C.textDim, fontFamily: "'Outfit',sans-serif" }}>{gate.label}</div>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{gate.title}</div>
+                              </div>
+                              <span style={{ padding: "2px 8px", borderRadius: 999, fontSize: 9, fontWeight: 700, background: meta.bg, color: meta.color }}>
+                                {meta.label}
+                              </span>
+                            </div>
+                            <div style={{ fontSize: 11, color: C.textMuted, lineHeight: 1.6, marginBottom: 8 }}>
+                              {gate.reason}
+                            </div>
+                            <div style={{ display: "grid", gap: 4 }}>
+                              {gate.evidence.map((item) => (
+                                <div key={item} style={{ fontSize: 10, color: C.textDim }}>
+                                  · {item}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div style={{ fontSize: 11, color: C.textDim, lineHeight: 1.6 }}>
+                      {gateSummary.note}
+                    </div>
+                  </div>
+                )}
+
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12, marginBottom: 20 }}>
                   <div style={{ background: C.card, borderRadius: 14, padding: 18, border: `1px solid ${C.border}` }}>
                     <div style={{ fontSize: 11, color: C.textDim, marginBottom: 8, textTransform: "uppercase", letterSpacing: "1.2px" }}>Official Score</div>
@@ -441,6 +545,19 @@ export default function Dashboard({ initialUrl = "" }) {
                         {gapActions.map((action, i) => (
                           <div key={i} style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.7, marginBottom: i === gapActions.length - 1 ? 0 : 6 }}>
                             {action}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {promotedSnippets.length > 0 && (
+                      <div style={{ background: `${C.success}08`, borderRadius: 10, padding: 14, border: `1px solid ${C.success}20`, marginTop: 12 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 8 }}>✍️ 메인 페이지에 심을 추천 문장</div>
+                        {promotedSnippets.map((snippet, i) => (
+                          <div key={`${snippet.sourceUrl}-${i}`} style={{ background: C.surface, borderRadius: 8, padding: "10px 12px", border: `1px solid ${C.border}`, marginBottom: i === promotedSnippets.length - 1 ? 0 : 8 }}>
+                            <div style={{ fontSize: 12, color: C.text, lineHeight: 1.7 }}>{snippet.text}</div>
+                            <div style={{ fontSize: 10, color: C.textDim, marginTop: 6 }}>
+                              출처: {snippet.sourcePath}
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -524,28 +641,62 @@ export default function Dashboard({ initialUrl = "" }) {
                     <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 8, marginBottom: 16 }}>
                       {aiResults.map(r => {
                         const eng = ENGINES.find(e => e.id === r.engineId) || ENGINES[0];
+                        const meta = getRecognitionMeta(r);
                         return (
-                          <div key={r.engineId} style={{ background: C.card, borderRadius: 10, padding: 12, textAlign: "center", border: `1px solid ${r.knows ? C.success + "25" : C.danger + "25"}` }}>
+                          <div key={r.engineId} style={{ background: C.card, borderRadius: 10, padding: 12, textAlign: "center", border: `1px solid ${meta.color}25` }}>
                             <div style={{ fontSize: 18, marginBottom: 3 }}>{eng.icon}</div>
                             <div style={{ fontSize: 10, color: C.textMuted }}>{eng.name}</div>
-                            <div style={{ fontSize: 15, fontWeight: 800, fontFamily: "'Outfit',sans-serif", color: r.knows ? C.success : C.danger }}>{r.accuracy}%</div>
-                            <div style={{ fontSize: 9, color: r.knows ? C.success : C.danger }}>{r.knows ? "인식됨" : "미인식"}</div>
+                            <div style={{ fontSize: 15, fontWeight: 800, fontFamily: "'Outfit',sans-serif", color: meta.color }}>{r.accuracy}%</div>
+                            <div style={{ fontSize: 9, color: meta.color }}>{meta.label}</div>
                           </div>
                         );
                       })}
                     </div>
                     {aiResults.map(r => {
                       const eng = ENGINES.find(e => e.id === r.engineId) || ENGINES[0];
+                      const meta = getRecognitionMeta(r);
+                      const mp = r.mentionPosition;
+                      const isRecognized = r.matchStatus === "recognized";
+                      const mpLabel = mp?.bucket === "top" ? "상위 언급" : mp?.bucket === "middle" ? "중간 언급" : mp?.bucket === "bottom" ? "하위 언급" : "언급 없음";
+                      const mpColor = mp?.bucket === "top" ? C.success : mp?.bucket === "middle" ? C.warning : C.danger;
+                      const officialDomain = (() => { try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return ""; } })();
+                      const hasOfficialCitation = r.citations?.some(c => c.includes(officialDomain));
                       return (
                         <div key={r.engineId} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 10, padding: 12, marginBottom: 8 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
                             <span style={{ width: 24, height: 24, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", background: `${eng.color}18`, color: eng.color, fontWeight: 700, fontSize: 12 }}>{eng.icon}</span>
                             <span style={{ fontWeight: 600, color: C.text, fontSize: 12 }}>{eng.name}</span>
-                            <span style={{ marginLeft: "auto", padding: "2px 8px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: r.knows ? C.successBg : C.dangerBg, color: r.knows ? C.success : C.danger }}>{r.knows ? "인식됨" : "미인식"}</span>
+                            <span style={{ marginLeft: "auto", padding: "2px 8px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: meta.bg, color: meta.color }}>{meta.label}</span>
+                            {mp?.found && (
+                              <span style={{ padding: "2px 7px", borderRadius: 10, fontSize: 9, fontWeight: 600, background: `${mpColor}18`, color: isRecognized ? mpColor : C.textDim }}>
+                                {isRecognized ? mpLabel : `${mpLabel} (참고)`}
+                              </span>
+                            )}
                           </div>
-                          <div style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.6, padding: 10, background: C.surface, borderRadius: 6, border: `1px solid ${C.border}`, maxHeight: 120, overflow: "auto" }}>
-                            {r.response.substring(0, 500)}{r.response.length > 500 ? "..." : ""}
+                          {r.reason && (
+                            <div style={{ fontSize: 11, color: meta.color, marginBottom: 8, lineHeight: 1.6 }}>
+                              {r.reason}
+                            </div>
+                          )}
+                          <div style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.6, padding: 10, background: C.surface, borderRadius: 6, border: `1px solid ${C.border}`, maxHeight: 200, overflow: "auto", whiteSpace: "pre-wrap" }}>
+                            {r.response}
                           </div>
+                          {r.engineId === "perplexity" && r.citations?.length > 0 && (
+                            <div style={{ marginTop: 8 }}>
+                              <div style={{ fontSize: 10, color: C.textDim, marginBottom: 4 }}>
+                                실제 인용 출처 {hasOfficialCitation && <span style={{ color: C.success, fontWeight: 700 }}>· 공식 사이트 인용 ✓</span>}
+                              </div>
+                              {r.citations.slice(0, 5).map((c, i) => {
+                                const isOfficial = officialDomain && c.includes(officialDomain);
+                                return (
+                                  <div key={i} style={{ fontSize: 10, color: isOfficial ? C.success : C.textDim, padding: "3px 0", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", gap: 4 }}>
+                                    {isOfficial && <span>✓</span>}
+                                    <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c}</span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
                       );
                     })}
@@ -580,6 +731,9 @@ export default function Dashboard({ initialUrl = "" }) {
                       <summary style={{ padding: "10px 12px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, listStyle: "none" }}>
                         <span style={{ padding: "2px 6px", borderRadius: 4, fontSize: 9, fontWeight: 700, background: p.bg, color: p.color }}>{p.label}</span>
                         <span style={{ padding: "2px 6px", borderRadius: 4, fontSize: 9, fontWeight: 600, background: axisColor + "15", color: axisColor }}>{item.axis}</span>
+                        {item.source === "fallback_axis_based" && (
+                          <span style={{ padding: "2px 6px", borderRadius: 4, fontSize: 9, fontWeight: 600, background: C.infoBg, color: C.info }}>자동 생성</span>
+                        )}
                         <span style={{ fontSize: 12, color: C.text, flex: 1 }}>{item.issue}</span>
                         <span style={{ fontSize: 11, color: C.success, fontWeight: 600, fontFamily: "'Outfit',sans-serif" }}>{item.expected_impact}</span>
                       </summary>
@@ -624,6 +778,33 @@ export default function Dashboard({ initialUrl = "" }) {
                           <div style={{ fontSize: 12 }}><strong style={{ color: C.spf }}>긴 텍스트 블록 (&gt;512토큰):</strong> <span style={{ color: (crawlData.metadata?.longTextBlocks || 0) > 0 ? C.warning : C.success }}>{crawlData.metadata?.longTextBlocks || 0}개</span></div>
                         </div>
                       </div>
+
+                      {crawlData.discoverySignals && (
+                        <div style={{ marginBottom: 16 }}>
+                          <div style={{ fontSize: 10, color: C.textDim, textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 8 }}>LLM 봇 접근 신호</div>
+                          <div style={{ background: C.surface, borderRadius: 8, padding: 12, border: `1px solid ${C.border}` }}>
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 6, marginBottom: 10 }}>
+                              {crawlData.discoverySignals.robots?.bots && Object.entries(crawlData.discoverySignals.robots.bots).map(([bot, status]) => (
+                                <div key={bot} style={{ fontSize: 10, display: "flex", alignItems: "center", gap: 4 }}>
+                                  <span style={{ color: status === "allow" ? C.success : status === "disallow" ? C.danger : C.textDim }}>
+                                    {status === "allow" ? "✓" : status === "disallow" ? "✗" : "?"}
+                                  </span>
+                                  <span style={{ color: status === "allow" ? C.text : status === "disallow" ? C.danger : C.textDim }}>{bot}</span>
+                                </div>
+                              ))}
+                            </div>
+                            <div style={{ fontSize: 11, color: C.textMuted }}>
+                              {!crawlData.discoverySignals.robots?.fetched
+                                ? "robots.txt 확인 불가"
+                                : `robots.txt 확인 완료 · 허용 ${crawlData.discoverySignals.robots.summary?.allowedCount ?? "-"}/6 · 차단 ${crawlData.discoverySignals.robots.summary?.deniedCount ?? "-"}/6`}
+                              {" · "}
+                              {crawlData.discoverySignals.llmsTxt?.exists
+                                ? <span style={{ color: C.success }}>llms.txt ✓</span>
+                                : <span style={{ color: C.textDim }}>llms.txt 없음 (권고)</span>}
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
                       <div>
                         <div style={{ fontSize: 10, color: C.textDim, textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 8 }}>
