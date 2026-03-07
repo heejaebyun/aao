@@ -179,6 +179,27 @@ function getAiIntentMeta(intent) {
   return AI_INTENTS.find((item) => item.id === intent) || AI_INTENTS[0];
 }
 
+function extractExpectedImpactPoints(value) {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return Math.max(0, Math.round(value));
+  }
+
+  const text = String(value || "").trim();
+  if (!text) return 0;
+
+  const explicitMatch = text.match(/([+-]?\d+)\s*점/);
+  if (explicitMatch) {
+    return Math.max(0, Math.abs(Number(explicitMatch[1])) || 0);
+  }
+
+  const fallbackMatch = text.match(/([+-]?\d+)/);
+  if (fallbackMatch) {
+    return Math.max(0, Math.abs(Number(fallbackMatch[1])) || 0);
+  }
+
+  return 0;
+}
+
 function formatRatioPercent(value) {
   if (!Number.isFinite(Number(value))) return "—";
   return `${Math.round(Number(value) * 100)}%`;
@@ -697,7 +718,7 @@ export default function Dashboard({ initialUrl = "" }) {
   const g = diagnosis ? getGrade(diagnosis.overall_score) : null;
   const extendedGrade = extendedDiagnosis ? getGrade(extendedDiagnosis.overall_score) : null;
   const improvements = diagnosis?.improvements || [];
-  const potentialGain = improvements.reduce((s, i) => s + (parseInt(i.expected_impact) || 0), 0);
+  const potentialGain = improvements.reduce((sum, item) => sum + extractExpectedImpactPoints(item.expected_impact), 0);
   const gap = crawlData?.gap || null;
   const extras = crawlData?.extras || [];
   const gapScore = diagnosis && extendedDiagnosis ? Math.max(0, extendedDiagnosis.overall_score - diagnosis.overall_score) : 0;
