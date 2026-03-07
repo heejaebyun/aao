@@ -2,6 +2,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import { deriveGateSummary } from "@/lib/gate-analysis";
+import {
+  PROFILE_REQUEST_SNAPSHOT_KEY,
+  buildDiagnosticSnapshot,
+  buildProfileRequestHref,
+} from "@/lib/intake";
+import { ENTITY_LABEL } from "@/lib/site-identity";
 
 const C = {
   bg: "#07070d", surface: "#0e0e18", card: "#121220",
@@ -732,6 +738,40 @@ export default function Dashboard({ initialUrl = "" }) {
       return "";
     }
   })();
+  const profileRequestSnapshot = diagnosis
+    ? buildDiagnosticSnapshot({
+        url: url || initialUrl,
+        companyName: diagnosis.company_name,
+        domain: officialDomain,
+        grade: g?.grade,
+        currentScore: diagnosis.overall_score,
+        targetScore: diagnosis.customer_summary?.expected_score_after ?? Math.min(diagnosis.overall_score + potentialGain, 100),
+        gapScore,
+        pacpScore: diagnosis.pacp?.score,
+        sepScore: diagnosis.sep?.score,
+        spfScore: diagnosis.spf?.score,
+        headline: diagnosis.customer_summary?.headline,
+        detail: diagnosis.customer_summary?.detail,
+        improvements: improvements.map((item) => item.issue).slice(0, 5),
+        hiddenPages: hiddenPages.map((page) => {
+          try {
+            return new URL(page).pathname || "/";
+          } catch {
+            return page;
+          }
+        }),
+      })
+    : buildDiagnosticSnapshot();
+  const profileRequestHref = buildProfileRequestHref(profileRequestSnapshot);
+
+  const handleProfileRequest = () => {
+    try {
+      window.sessionStorage.setItem(PROFILE_REQUEST_SNAPSHOT_KEY, JSON.stringify(profileRequestSnapshot));
+    } catch {
+      // Ignore storage errors and fall back to query params.
+    }
+    window.location.href = profileRequestHref;
+  };
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg, color: C.text, fontFamily: "'Pretendard',-apple-system,sans-serif" }}>
@@ -1010,10 +1050,10 @@ export default function Dashboard({ initialUrl = "" }) {
                 </div>
 
                 <div style={{ background: C.card, borderRadius: 14, padding: 20, border: `1px solid ${C.border}`, textAlign: "center" }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 6 }}>AI 프로필 페이지가 필요하신가요?</div>
-                  <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 14 }}>귀사 도메인에 AI가 완벽하게 읽을 수 있는 페이지를 제작해 드립니다.</div>
-                  <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-                    <button style={{ padding: "10px 24px", borderRadius: 10, border: "none", cursor: "pointer", background: `linear-gradient(135deg,${C.g1},${C.g2})`, color: "#fff", fontSize: 13, fontWeight: 700, fontFamily: "'Outfit',sans-serif" }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, marginBottom: 6 }}>AI 프로필 페이지가 필요하신가요?</div>
+                    <div style={{ fontSize: 12, color: C.textMuted, marginBottom: 14 }}>귀사 도메인에 AI가 완벽하게 읽을 수 있는 페이지를 제작해 드립니다.</div>
+                    <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+                    <button onClick={handleProfileRequest} style={{ padding: "10px 24px", borderRadius: 10, border: "none", cursor: "pointer", background: `linear-gradient(135deg,${C.g1},${C.g2})`, color: "#fff", fontSize: 13, fontWeight: 700, fontFamily: "'Outfit',sans-serif" }}>
                       AI 프로필 페이지 제작 문의 →
                     </button>
                     <button onClick={handleShare} style={{ padding: "10px 20px", borderRadius: 10, cursor: "pointer", background: "transparent", border: `1px solid ${C.border}`, color: C.textMuted, fontSize: 13, fontWeight: 600 }}>
@@ -1546,7 +1586,7 @@ export default function Dashboard({ initialUrl = "" }) {
                 <div style={{ marginTop: 18, background: C.card, borderRadius: 12, padding: 18, border: `1px solid ${C.border}`, textAlign: "center" }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 4 }}>AI 프로필 페이지가 필요하신가요?</div>
                   <div style={{ fontSize: 11, color: C.textMuted, marginBottom: 12 }}>토큰 효율성 95% 향상 · Schema.org 완벽 적용 · 정적 HTML</div>
-                  <button style={{ padding: "9px 24px", borderRadius: 9, border: "none", cursor: "pointer", background: `linear-gradient(135deg,${C.g1},${C.g2})`, color: "#fff", fontSize: 12, fontWeight: 700, fontFamily: "'Outfit',sans-serif" }}>AI 프로필 페이지 제작 문의 →</button>
+                  <button onClick={handleProfileRequest} style={{ padding: "9px 24px", borderRadius: 9, border: "none", cursor: "pointer", background: `linear-gradient(135deg,${C.g1},${C.g2})`, color: "#fff", fontSize: 12, fontWeight: 700, fontFamily: "'Outfit',sans-serif" }}>AI 프로필 페이지 제작 문의 →</button>
                 </div>
               </div>
             )}
@@ -1677,7 +1717,7 @@ export default function Dashboard({ initialUrl = "" }) {
         {/* Footer */}
         <div style={{ marginTop: 44, paddingTop: 16, borderTop: `1px solid ${C.border}`, textAlign: "center" }}>
           <div style={{ fontSize: 9, color: C.textDim, lineHeight: 1.8 }}>
-            AAO — AI Answer Optimization | Princeton GEO Research Based<br />
+            {ENTITY_LABEL} | Princeton GEO Research Based<br />
             © 2026 AAO. All rights reserved.
           </div>
         </div>
