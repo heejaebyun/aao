@@ -1,7 +1,8 @@
 // app/api/diagnose/route.js — Main AAO diagnostic endpoint
 import { NextResponse } from "next/server";
 import { crawlSite } from "@/lib/jina";
-import { runDiagnosis } from "@/lib/diagnose";
+import { buildAaoLintReport } from "@/lib/aao-lint";
+import { resolveOfficialGroundTruth } from "@/lib/ai-check";
 import { buildRateLimitHeaders, rateLimit } from "@/lib/rate-limit";
 import { isPublicUrlValidationError } from "@/lib/url-safety";
 
@@ -42,15 +43,14 @@ export async function POST(request) {
       );
     }
 
-    // Step 3: Run diagnosis via Claude on the main page only
-    console.log(`[AAO] Running main diagnosis for: ${crawlBundle.main.title}`);
-    const diagnosis = await runDiagnosis(crawlBundle.main);
+    // Step 3: Lint report + ground truth extraction (no AI call)
+    console.log(`[AAO] Building lint report for: ${crawlBundle.main.title}`);
+    const lintReport = buildAaoLintReport({
+      snapshot: crawlBundle.main,
+      discoverySignals: crawlBundle.discoverySignals,
+    });
 
-    let extendedDiagnosis = null;
-    if (crawlBundle.gap.hasMeaningfulExtraContent) {
-      console.log(`[AAO] Running extended diagnosis for: ${crawlBundle.combined.title}`);
-      extendedDiagnosis = await runDiagnosis(crawlBundle.combined);
-    }
+    const groundTruth = resolveOfficialGroundTruth(crawlBundle.main);
 
     return NextResponse.json({
       success: true,
@@ -59,6 +59,7 @@ export async function POST(request) {
         title: crawlBundle.main.title,
         description: crawlBundle.main.description,
         metadata: crawlBundle.main.metadata,
+        jsonLdBlocks: crawlBundle.main.jsonLdBlocks?.slice(0, 2) || [],
         contentPreview: buildContentPreview(crawlBundle.main.content),
         contentLength: crawlBundle.main.content.length,
         crawledPages: crawlBundle.main.crawledPages,
@@ -74,17 +75,15 @@ export async function POST(request) {
           crawlSource: page.crawlSource,
           crawlConfidence: page.crawlConfidence,
         })),
-        combined: {
-          metadata: crawlBundle.combined.metadata,
-          contentLength: crawlBundle.combined.content.length,
-          crawledPages: crawlBundle.combined.crawledPages,
-          crawlSource: crawlBundle.combined.crawlSource,
-          crawlConfidence: crawlBundle.combined.crawlConfidence,
-        },
         gap: crawlBundle.gap,
       },
-      diagnosis,
-      extendedDiagnosis,
+      lintReport,
+      groundTruth: {
+        declaredFields: groundTruth.declaredFields,
+        faqPairs: groundTruth.faqPairs,
+        fieldCount: groundTruth.fieldCount,
+        alternateNames: groundTruth.alternateNames,
+      },
     }, {
       headers: buildRateLimitHeaders(limit, 10),
     });

@@ -1,0 +1,79 @@
+# AAO experiment candidate set
+# Purpose: GT preflight candidates for AI-native companies + customer-company comparison set
+
+# -------------------------------------------------------------------
+# Korean AI / GEO / LLM companies
+# -------------------------------------------------------------------
+
+https://www.upstage.ai
+https://www.twelvelabs.io
+https://riiid.com
+https://www.scatterlab.co.kr
+https://www.voyagerx.com
+https://www.returnzero.com
+https://www.makinarocks.ai
+https://www.lablup.com
+https://www.saltlux.com
+https://www.alcherainc.com
+https://www.tunib.ai
+https://www.cognet9.com
+https://www.42maru.ai
+https://www.deepbrain.io
+https://www.selectstar.ai
+
+# -------------------------------------------------------------------
+# ChainShift publicly mentioned customer / project entities
+# Note: HSAD and Kearney are closer to project participants / partners
+# than clearly disclosed paying customers, but useful as comparison targets.
+# -------------------------------------------------------------------
+
+https://www.apgroup.com/int/en/
+https://www.dalbaglobal.com/
+https://www.hsad.co.kr/
+https://www.kearney.com/
+
+# -------------------------------------------------------------------
+# Global SaaS / platform customer-company candidates from official
+# vendor customer pages (Salesforce, Twilio, Datadog, Zendesk,
+# Atlassian, MongoDB)
+# -------------------------------------------------------------------
+
+https://www.pandora.net
+https://www.pearson.com
+https://www.fedex.com
+https://www.pepsico.com
+https://www.opentable.com
+https://www.redditinc.com
+https://www.telepass.com
+https://www.volkswagen-group.com
+
+https://www.toyotaconnected.com
+https://resy.com
+https://www.duolingo.com
+https://www.vacasa.com
+https://www.lyft.com
+
+https://www.samsung.com
+https://www.shell.com
+https://www.wholefoodsmarket.com
+https://www.sofi.com
+https://www.maersk.com
+https://www.hashicorp.com
+https://www.paypal.com
+https://plaid.com
+https://www.dreamworks.com
+
+https://www.bestegg.com
+https://www.britbox.com
+https://www.docebo.com
+https://dunlopsports.com
+https://www.stanleyblackanddecker.com
+https://www.grove.co
+https://www.libertylondon.com
+
+https://corp.roblox.com
+https://www.royalcaribbean.com
+https://group.mercedes-benz.com
+https://www.mettle.co.uk
+
+https://www.bazaarvoice.com

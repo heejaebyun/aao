@@ -1,0 +1,54 @@
+# Global customer-company candidates verified from official vendor customer pages
+# Purpose: preflight these customer homepages and find GT-positive delivery candidates
+
+# Salesforce customers
+# Source: https://www.salesforce.com/customer-stories/
+https://www.pandora.net
+https://www.pearson.com
+https://www.fedex.com
+https://www.pepsico.com
+https://www.opentable.com
+https://www.redditinc.com
+https://www.telepass.com
+https://www.volkswagen-group.com
+
+# Twilio customers
+# Source: https://customers.twilio.com/en-us
+https://www.toyotaconnected.com
+https://resy.com
+https://www.duolingo.com
+https://www.vacasa.com
+https://www.lyft.com
+
+# Datadog customers
+# Source: https://www.datadoghq.com/customers/
+https://www.samsung.com
+https://www.shell.com
+https://www.wholefoodsmarket.com
+https://www.sofi.com
+https://www.maersk.com
+https://www.hashicorp.com
+https://www.paypal.com
+https://plaid.com
+https://www.dreamworks.com
+
+# Zendesk customers
+# Source: https://www.zendesk.com/why-zendesk/customers/
+https://www.bestegg.com
+https://www.britbox.com
+https://www.docebo.com
+https://dunlopsports.com
+https://www.stanleyblackanddecker.com
+https://www.grove.co
+https://www.libertylondon.com
+
+# Atlassian customers
+# Source: https://www.atlassian.com/customers
+https://corp.roblox.com
+https://www.royalcaribbean.com
+https://group.mercedes-benz.com
+https://www.mettle.co.uk
+
+# MongoDB customers
+# Source: https://www.mongodb.com/customers/bazaarvoice
+https://www.bazaarvoice.com

@@ -1,0 +1,21 @@
+# 추가 GT 후보 — JSON-LD Organization 확률 높은 사이트
+# 글로벌 SaaS/테크 + 한국 대형 테크
+
+# 글로벌 SaaS (SEO 강한 회사들)
+https://www.zendesk.com
+https://www.atlassian.com
+https://www.notion.so
+https://www.figma.com
+https://www.canva.com
+https://www.datadog.com
+https://www.cloudflare.com
+https://www.twilio.com
+
+# 한국 테크/스타트업 (규모 큰 곳)
+https://www.toss.im
+https://www.baemin.com
+https://www.coupang.com
+https://www.karrot.ai
+https://www.musinsa.com
+https://www.yanolja.com
+https://www.socar.kr

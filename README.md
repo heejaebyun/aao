@@ -98,3 +98,53 @@ Claude, 네이버 큐는 향후 추가 예정
 - 마크다운 변환 시 토큰 **80~95% 절감** (Token Efficiency)
 - 구조화 청킹 시 검색 정확도 **+40~60%** (Pinecone)
 - 지식 그래프 연동 시 환각 **-40%** (MEGA-RAG)
+
+## 🧪 Wikipedia Benchmark Pilot (100 pages / batch 10)
+
+AAO 점수 체계 검증용으로 위키피디아 기업 페이지 100개 파일럿 파이프라인이 포함되어 있습니다. 기본 흐름은 `수집 -> 크롤링 -> 3엔진 추출 -> 분석 -> 수정 대상 선정 -> Step A~D 수정 실험`이고, 각 단계는 중간 저장 및 resume를 지원합니다.
+
+생성 결과물은 `artifacts/wiki-benchmark/pilot-100` 아래에 저장됩니다.
+
+### 실행 순서
+```bash
+npm run wiki:collect
+npm run wiki:crawl
+npm run wiki:extract:gpt
+npm run wiki:extract:gemini
+npm run wiki:extract:perplexity
+npm run wiki:analyze
+npm run wiki:blockage-catalog
+npm run wiki:select-mods
+npm run wiki:modify
+```
+
+한 번에 돌리려면:
+```bash
+npm run wiki:pilot
+```
+
+### 주요 출력 파일
+
+- `urls_100.json` — 수집된 URL 100개
+- `crawl_results_100.json` — HTML/텍스트/인포박스/링크/구조 특성
+- `extraction_results_gpt.json`
+- `extraction_results_gemini.json`
+- `extraction_results_perplexity.json`
+- `classification_results.json` — A/B/C 그룹 분류
+- `feature_impact_ranking.json` — 구조 특성 상관도 순위
+- `engine_consistency.json` — 엔진 간 일관성
+- `field_difficulty.json` — 필드별 추출 난이도
+- `blockage_catalog_v1.json` — 엔진별 막힘 카탈로그 초안
+- `blockage_catalog_summary.json` — 엔진별 상위 막힘 요약
+- `modification_targets_30.json` — 수정 실험 대상 30개
+- `modification_results.json` — Step A~D 단계별 추출 결과
+- `step_effectiveness.json` — 단계별 평균 개선 폭
+- `page_progression.json` — 페이지별 단계별 변화
+- `calibration_data.json` — 가중치 교정용 기초 데이터
+
+### 참고
+
+- 현재 파일럿은 100개 고정, 배치 크기 10 기준입니다.
+- 위키피디아 API는 초당 1회로 제한합니다.
+- 추출 단계는 엔진별 순차 실행입니다.
+- `wiki:modify -- --dryRun`으로 텍스트 변형만 먼저 확인할 수 있습니다.

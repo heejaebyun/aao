@@ -42,20 +42,32 @@ export default function LandingPage() {
 
       <section style={{ maxWidth: 720, margin: "0 auto", padding: "80px 24px 40px", textAlign: "center" }}>
         <div style={{ display: "inline-block", background: "#6c63ff18", border: "1px solid #6c63ff44", borderRadius: 20, padding: "6px 16px", fontSize: 13, color: "#a78bfa", marginBottom: 28, fontWeight: 500 }}>
-          {ENTITY_LABEL} · Princeton GEO Research 기반 AI 가시성 진단
+          {ENTITY_LABEL} · 구조 검증(린트) + AI 전달 확인
         </div>
         <h1 style={{ fontSize: "clamp(32px, 6vw, 56px)", fontWeight: 900, lineHeight: 1.1, margin: "0 0 20px", letterSpacing: -1.5 }}>
           AI가 당신의 회사를<br />
           <span style={{ background: "linear-gradient(90deg,#6c63ff,#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>정확히 알고 있을까요?</span>
         </h1>
         <p style={{ fontSize: "clamp(15px, 2.5vw, 19px)", color: "#9999bb", lineHeight: 1.7, margin: "0 0 20px", fontWeight: 400 }}>
-          ChatGPT · Gemini · Perplexity가 귀사를 어떻게 소개하는지 지금 바로 확인하세요.<br />
-          AI 검색 시대, 보이지 않으면 존재하지 않는 것입니다.
+          ChatGPT · Gemini · Perplexity가 당신 회사의 공식 사실을 실제로 어떻게 읽는지 지금 바로 확인하세요.<br />
+          AI가 메인 페이지를 읽고, 놓치고, 잘못 이해하는 지점을 진단합니다.
         </p>
         <p style={{ fontSize: 14, color: "#7f7fa6", lineHeight: 1.75, margin: "0 0 48px" }}>
           <strong style={{ color: "#d8d8f4" }}>{ENTITY_LABEL}</strong>는 공식 웹사이트와 <code style={inlineCodeStyle()}>/ai-profile</code> 페이지를
-          AI의 1차 출처로 만들기 위해, 메인 페이지 구조와 실제 AI 답변을 함께 진단하는 서비스입니다.
+          AI의 1차 출처로 만들기 위해, 메인 페이지 구조와 실제 AI 전달 결과를 함께 진단하는 서비스입니다.
         </p>
+
+        <div style={{ maxWidth: 620, margin: "0 auto 28px", background: "#0f0f1e", border: "1px solid #1a1a2e", borderRadius: 14, padding: "18px 20px", textAlign: "left" }}>
+          <div style={{ fontSize: 13, color: "#a78bfa", fontWeight: 700, marginBottom: 10 }}>공식 사실 요약</div>
+          <div style={{ fontSize: 14, color: "#d8d8f4", lineHeight: 1.8 }}>
+            <div><strong>서비스명:</strong> {ENTITY_LABEL}</div>
+            <div><strong>설명:</strong> {ENTITY_LABEL}는 기업 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단하고, 공식 웹사이트를 AI의 1차 출처로 만들기 위한 AI 검색 최적화 서비스입니다.</div>
+            <div><strong>업종:</strong> AI 검색 최적화 / AI 프로필 페이지 제작 SaaS</div>
+            <div><strong>설립연도:</strong> 2026</div>
+            <div><strong>대표이사:</strong> 변희재 (Heejae Byun)</div>
+            <div><strong>주요 서비스:</strong> AI 전달 진단, 구조 검증 리포트, AI 프로필 페이지 설계 및 제작</div>
+          </div>
+        </div>
 
         <div id="diagnose-start" style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 560, margin: "0 auto" }}>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -100,7 +112,7 @@ export default function LandingPage() {
             </button>
           </div>
           {error && <div style={{ color: "#ff6b6b", fontSize: 13, textAlign: "left" }}>{error}</div>}
-          <div style={{ fontSize: 12, color: "#555577", textAlign: "center" }}>무료 · 회원가입 불필요 · 30초 소요</div>
+          <div style={{ fontSize: 12, color: "#555577", textAlign: "center" }}>무료 · 회원가입 불필요 · 구조 검증과 AI 전달 확인 동시 실행</div>
           <div style={{ fontSize: 12, color: "#7f7fa6", textAlign: "center" }}>
             공식 구조 설명이 필요하면 <a href={AI_PROFILE_PATH} style={inlineLinkStyle()}>AI Profile Page</a>를 바로 확인할 수 있습니다.
           </div>
@@ -111,8 +123,8 @@ export default function LandingPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, textAlign: "center" }}>
           {[
             { num: "3개", label: "AI 엔진 동시 검증" },
-            { num: "100점", label: "GEO 진단 점수" },
-            { num: "30초", label: "진단 소요 시간" },
+            { num: "6개", label: "공식 facts 선언" },
+            { num: "/ai-profile", label: "공식 허브 경로" },
           ].map((item) => (
             <div key={item.label} style={{ background: "#0f0f1e", border: "1px solid #1a1a2e", borderRadius: 12, padding: "24px 12px" }}>
               <div style={{ fontSize: 28, fontWeight: 800, background: "linear-gradient(90deg,#6c63ff,#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{item.num}</div>
@@ -123,15 +135,15 @@ export default function LandingPage() {
       </section>
 
       <section style={{ maxWidth: 720, margin: "0 auto 80px", padding: "0 24px" }}>
-        <h2 style={{ textAlign: "center", fontSize: 22, fontWeight: 700, marginBottom: 20, color: "#ccccee" }}>{ENTITY_LABEL}가 진단하는 것</h2>
+          <h2 style={{ textAlign: "center", fontSize: 22, fontWeight: 700, marginBottom: 20, color: "#ccccee" }}>{ENTITY_LABEL}가 확인하는 것</h2>
         <p style={{ textAlign: "center", fontSize: 14, color: "#7f7fa6", lineHeight: 1.75, margin: "0 auto 32px", maxWidth: 640 }}>
-          메인 페이지만 읽었을 때의 공식성, 실제 AI 답변의 엔티티 정합성, 그리고 <code style={inlineCodeStyle()}>/ai-profile</code>로 보강했을 때의 차이를 함께 봅니다.
+          메인 페이지가 선언한 사실을 AI가 실제로 전달하는지, 서브페이지까지 도달하는지, 그리고 <code style={inlineCodeStyle()}>/ai-profile</code> 허브를 추가했을 때 무엇이 개선되는지 함께 봅니다.
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
           {[
-            { icon: "🤖", title: "AI 답변 확인", desc: "ChatGPT · Gemini · Perplexity가 귀사를 실제로 어떻게 소개하는지 직접 확인합니다." },
-            { icon: "📊", title: "3축 GEO 진단", desc: "Princeton 연구 기반 PACP · SEP · SPF 3개 축으로 AI 가시성을 정밀 측정합니다." },
-            { icon: "🔧", title: "개선 리포트", desc: "점수를 높이기 위한 구체적인 액션 아이템을 우선순위와 함께 제공합니다." },
+            { icon: "🤖", title: "AI 전달 확인", desc: "ChatGPT · Gemini · Perplexity가 회사명, 업종, 설명, 주요 서비스 같은 공식 사실을 실제로 가져오는지 확인합니다." },
+            { icon: "🧱", title: "구조 검증", desc: "첫 문장 정의, facts block, JSON-LD, FAQ, 서브페이지 허브 구조를 린트로 먼저 검사합니다." },
+            { icon: "🛠", title: "AI Profile 실행", desc: "놓친 사실을 평문 facts block과 정적 AI Profile 구조로 다시 선언해 공식 출처 허브를 만듭니다." },
           ].map((feature) => (
             <div key={feature.title} style={{ background: "#0f0f1e", border: "1px solid #1a1a2e", borderRadius: 14, padding: "28px 20px" }}>
               <div style={{ fontSize: 32, marginBottom: 14 }}>{feature.icon}</div>
@@ -143,7 +155,7 @@ export default function LandingPage() {
       </section>
 
       <section style={{ textAlign: "center", padding: "48px 24px 80px", borderTop: "1px solid #1a1a2e" }}>
-        <p style={{ color: "#666688", fontSize: 15, marginBottom: 20 }}>AI 시대에 뒤처지지 마세요. 지금 바로 무료로 진단해보세요.</p>
+        <p style={{ color: "#666688", fontSize: 15, marginBottom: 20 }}>공식 사실이 AI에 어떻게 전달되는지 지금 바로 확인해보세요.</p>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
           <button
             onClick={() => {
@@ -170,7 +182,7 @@ export default function LandingPage() {
       </section>
 
       <footer style={{ textAlign: "center", padding: "24px", borderTop: "1px solid #1a1a2e", color: "#4f4f72", fontSize: 12 }}>
-        <div style={{ marginBottom: 8 }}>{ENTITY_LABEL} · Based on Princeton GEO Research (KDD 2024)</div>
+        <div style={{ marginBottom: 8 }}>{ENTITY_LABEL} · 구조 검증(린트) + AI 전달 확인 리포트</div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14, flexWrap: "wrap" }}>
           <a href="/" style={footerLinkStyle()}>홈</a>
           <a href={AI_PROFILE_PATH} style={footerLinkStyle()}>AI Profile Page</a>

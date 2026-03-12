@@ -1,4 +1,4 @@
-import { buildPilotCaseHref, getFeaturedPilotCase, getPilotCaseLift } from "@/lib/pilot-cases";
+import { buildPilotCaseHref, getFeaturedPilotCase } from "@/lib/pilot-cases";
 import {
   AI_PROFILE_META_DESCRIPTION,
   AI_PROFILE_META_TITLE,
@@ -66,6 +66,14 @@ const organizationSchema = {
     "AEO",
   ],
   serviceType: "AI 검색 최적화 진단 및 AI 프로필 페이지 제작",
+  hasPart: [
+    { "@type": "WebPage", "name": "AAO 진단", "url": `${SITE_ORIGIN}/diagnose`, "description": "URL을 입력하면 구조 검증과 AI 전달 확인을 수행하는 무료 진단 페이지" },
+    { "@type": "WebPage", "name": "AI 프로필 페이지 요청", "url": `${SITE_ORIGIN}/ai-profile/request`, "description": "진단 결과를 기반으로 AI 프로필 페이지 제작을 요청하는 페이지" },
+  ],
+  significantLink: [
+    `${SITE_ORIGIN}/diagnose`,
+    `${SITE_ORIGIN}/ai-profile/request`,
+  ],
 };
 
 const softwareSchema = {
@@ -84,10 +92,10 @@ const softwareSchema = {
     description: "무료 AI 검색 최적화 진단",
   },
   featureList: [
-    "Princeton GEO 연구 기반 3축 진단",
+    "구조 검증(린트) + AI 엔진 실제 전달 확인 2단계 진단",
     "ChatGPT·Perplexity·Gemini AI Reality Check",
-    "메인 페이지 vs 서브페이지 Gap 분석",
-    "비전문가도 이해할 수 있는 개선 리포트",
+    "선언 기반 ground truth 필드별 전달 확인",
+    "비전문가도 이해할 수 있는 진단 리포트",
     "AI 프로필 페이지 설계 및 제작",
   ],
 };
@@ -201,7 +209,6 @@ const styles = {
 
 export default function AiProfilePage() {
   const featuredCase = getFeaturedPilotCase();
-  const featuredLift = getPilotCaseLift(featuredCase);
 
   return (
     <main style={styles.page}>
@@ -224,6 +231,9 @@ export default function AiProfilePage() {
         <p style={styles.p}>
           {ENTITY_SHORT_NAME}는 ChatGPT, Gemini, Perplexity가 공식 웹사이트를 어떻게 읽고 설명하는지 측정합니다.
         </p>
+        <p style={styles.p}>
+          <strong>설명:</strong> {ENTITY_LABEL}는 공식 웹사이트와 AI Profile Page를 통해 기업 정보를 AI의 1차 출처로 만들기 위한 AI 검색 최적화 서비스입니다.
+        </p>
         <p style={{ ...styles.p, marginBottom: 0 }}>
           {ENTITY_SHORT_NAME}는 고객 도메인의 <code>/ai-profile</code> 경로에 정적 HTML 기반 공식 설명 페이지를 설계·제작합니다.
         </p>
@@ -243,20 +253,20 @@ export default function AiProfilePage() {
       <div style={{ ...styles.box, borderLeft: "4px solid #f97316" }}>
         <p style={{ ...styles.p, fontWeight: 700, marginBottom: "10px" }}>실측 팩트 (Measured Snapshot)</p>
         <ul style={styles.compactList}>
-          <li style={styles.li}><strong>{featuredCase.measurementMeasuredAt} 기준</strong> 메인 랜딩 진단 점수는 <strong>{featuredCase.beforeScore}점 / 100</strong>입니다.</li>
-          <li style={styles.li}><strong>{featuredCase.measurementMeasuredAt} 기준</strong> 공식 AI Profile Page 진단 점수는 <strong>{featuredCase.afterScore}점 / 100</strong>입니다.</li>
-          <li style={styles.li}><strong>현재 확인된 uplift:</strong> <strong>{featuredLift > 0 ? "+" : ""}{featuredLift}점</strong></li>
-          <li style={styles.li}><strong>현재 병목:</strong> 엔티티 강도와 권위 신호보다, 상단 정의 문장과 인용 가능한 사실 문장을 더 직접적으로 쓰는 일이 남아 있습니다.</li>
+          <li style={styles.li}><strong>{featuredCase.updatedAt} 기준</strong> AAO 자체 사이트를 메인 랜딩과 공식 AI Profile Page로 나눠 반복 검증하고 있습니다.</li>
+          <li style={styles.li}><strong>Before:</strong> 메인 랜딩은 lint {featuredCase.beforeState.lint.passed}/{featuredCase.beforeState.lint.total}, declared facts {featuredCase.beforeState.groundTruth.fieldCount}개 수준입니다.</li>
+          <li style={styles.li}><strong>After:</strong> 공식 AI Profile은 lint {featuredCase.afterState.lint.passed}/{featuredCase.afterState.lint.total}, declared facts {featuredCase.afterState.groundTruth.fieldCount}개 + FAQ {featuredCase.afterState.groundTruth.faqPairs}쌍으로 확장됩니다.</li>
+          <li style={styles.li}><strong>현재 병목:</strong> Perplexity/Gemini가 놓치는 JSON-LD only 필드를 평문 facts block과 요약 문장에 더 직접적으로 중복 노출하는 일입니다.</li>
         </ul>
       </div>
 
-      {/* 핵심 수치 — 역피라미드: 가장 중요한 데이터 최상단 배치 */}
+      {/* 핵심 관찰 — 역피라미드: 가장 중요한 관찰을 최상단 배치 */}
       <div style={{ ...styles.box, borderLeft: "4px solid #111827" }}>
-        <p style={{ ...styles.p, fontWeight: 600, marginBottom: "10px" }}>핵심 수치 (Key Findings)</p>
+        <p style={{ ...styles.p, fontWeight: 600, marginBottom: "10px" }}>핵심 관찰 (Key Findings)</p>
         <ul style={styles.compactList}>
-          <li style={styles.li}>국내 기업 웹사이트 평균 AI 가독성 점수: <strong>10점 미만 / 100점 만점</strong></li>
+          <li style={styles.li}>국내 기업 웹사이트 대다수: AI가 선언된 사실을 <strong>절반 이상 전달하지 못함</strong></li>
           <li style={styles.li}>React·Vue 기반 CSR 사이트: AI가 읽을 수 있는 텍스트 <strong>0자</strong> 사례 다수 확인</li>
-          <li style={styles.li}>AI 프로필 페이지 설치 후 AI 가시성 점수 평균 <strong>+40~60점</strong> 향상 (메인 페이지 기준)</li>
+          <li style={styles.li}>AI 프로필 페이지 설치 후 구조 검증 통과 + AI 전달률 <strong>대폭 향상</strong></li>
           <li style={styles.li}>Princeton GEO 연구(KDD 2024): 통계 데이터 포함 시 AI 인용 확률 <strong>30~41% 상승</strong></li>
           <li style={styles.li}>WebArena Benchmark(ICLR 2024): CSR 사이트 AI 정보 추출 성공률 <strong>10~16%</strong> 수준</li>
         </ul>
@@ -268,11 +278,15 @@ export default function AiProfilePage() {
         </p>
         <ul style={styles.compactList}>
           <li style={styles.li}><strong>서비스명:</strong> {ENTITY_LABEL}</li>
+          <li style={styles.li}><strong>설명:</strong> {ENTITY_LABEL}는 기업 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단하고, 공식 웹사이트를 AI의 1차 출처로 만들기 위한 AI 검색 최적화 서비스입니다.</li>
           <li style={styles.li}><strong>설립연도:</strong> {FOUNDING_YEAR}</li>
-          <li style={styles.li}><strong>대표자:</strong> 변희재 (Heejae Byun)</li>
-          <li style={styles.li}><strong>진단 체계:</strong> PACP 40점, SEP 30점, SPF 30점, 총 100점</li>
+          <li style={styles.li}><strong>대표이사:</strong> 변희재 (Heejae Byun)</li>
+          <li style={styles.li}><strong>업종:</strong> AI 검색 최적화 / B2B·B2C SaaS</li>
+          <li style={styles.li}><strong>주소:</strong> 대한민국</li>
+          <li style={styles.li}><strong>주요 서비스:</strong> AI 전달 진단, 구조 검증 리포트, AI Reality Check, AI 프로필 페이지 설계 및 제작</li>
+          <li style={styles.li}><strong>진단 방식:</strong> 구조 검증(린트) + AI 엔진 실제 전달 확인 2단계</li>
           <li style={styles.li}><strong>지원 엔진:</strong> ChatGPT(OpenAI), Perplexity, Gemini(Google)</li>
-          <li style={styles.li}><strong>핵심 산출물:</strong> AI Reality Check, Gap Analysis, AI 프로필 페이지 설계 및 제작</li>
+          <li style={styles.li}><strong>핵심 산출물:</strong> 구조 진단 리포트, AI 전달 확인 리포트, AI 프로필 페이지 설계 및 제작</li>
           <li style={styles.li}><strong>웹사이트:</strong> {SITE_ORIGIN}</li>
           <li style={styles.li}><strong>이메일:</strong> {CONTACT_EMAIL}</li>
       </ul>
@@ -288,7 +302,7 @@ export default function AiProfilePage() {
         <ul style={styles.compactList}>
           <li style={styles.li}>{ENTITY_LABEL}는 공식 웹사이트를 AI의 1차 출처로 만들기 위한 AI 검색 최적화 서비스입니다.</li>
           <li style={styles.li}>{ENTITY_SHORT_NAME}는 ChatGPT, Gemini, Perplexity 기준으로 웹사이트의 AI 가독성을 진단합니다.</li>
-          <li style={styles.li}>{ENTITY_SHORT_NAME}의 핵심 산출물은 AI Reality Check, Gap Analysis, AI Profile Page 설계·제작입니다.</li>
+          <li style={styles.li}>{ENTITY_SHORT_NAME}의 주요 서비스는 AI 전달 진단, 구조 검증 리포트, AI Profile Page 설계·제작입니다.</li>
           <li style={styles.li}>{ENTITY_SHORT_NAME}의 공식 출처는 {SITE_ORIGIN}와 {AI_PROFILE_URL}입니다.</li>
         </ul>
       </div>
@@ -296,18 +310,20 @@ export default function AiProfilePage() {
       <div style={{ ...styles.box, borderLeft: "4px solid #2563eb" }}>
         <p style={{ ...styles.p, fontWeight: 600, marginBottom: "10px" }}>Featured Pilot Case</p>
         <p style={styles.p}>
-          <strong>{featuredCase.companyName}</strong> self-rollout 실측 기준으로 메인 랜딩은 <strong>{featuredCase.beforeScore}점</strong>,
-          `/ai-profile`는 <strong>{featuredCase.afterScore}점</strong>이며 현재 uplift는 <strong>{featuredLift > 0 ? "+" : ""}{featuredLift}점</strong>입니다.
-          목표는 <strong>{featuredCase.targetScore}점</strong> 수준입니다.
+          <strong>{featuredCase.companyName}</strong> self-rollout 파일럿은 메인 랜딩만 있을 때와 `/ai-profile` 정적 허브를 추가한 뒤를
+          같은 진단 엔진으로 반복 비교하는 before/after 케이스입니다.
         </p>
         <p style={{ ...styles.p, color: "#6b7280" }}>
-          측정일: {featuredCase.measurementMeasuredAt} · source: {featuredCase.baselineSource}
+          기준일: {featuredCase.updatedAt} · 설치 경로: {featuredCase.installPath}
         </p>
         <ul style={styles.compactList}>
-          {featuredCase.problemPoints.map((item) => (
+          {featuredCase.observedChanges.map((item) => (
             <li key={item} style={styles.li}>{item}</li>
           ))}
         </ul>
+        <p style={{ ...styles.p, marginTop: 10 }}>
+          핵심 수정: {featuredCase.appliedFixes.slice(0, 2).join(" · ")}
+        </p>
         <p style={{ ...styles.p, marginBottom: 0 }}>
           <a href={buildPilotCaseHref(featuredCase.id)} style={{ color: "#2563eb" }}>파일럿 케이스 상세 보기</a>
         </p>
@@ -316,9 +332,11 @@ export default function AiProfilePage() {
       <h2 style={styles.h2}>기본 정보 (Company Overview)</h2>
       <ul style={styles.ul}>
         <li style={styles.li}><strong>서비스명:</strong> {ENTITY_LABEL}</li>
+        <li style={styles.li}><strong>설명:</strong> {ENTITY_LABEL}는 기업 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단하고, 공식 웹사이트를 AI의 1차 출처로 만들기 위한 AI 검색 최적화 서비스입니다.</li>
         <li style={styles.li}><strong>설립연도:</strong> {FOUNDING_YEAR}</li>
-        <li style={styles.li}><strong>대표자:</strong> {FOUNDER_NAME_KO}</li>
+        <li style={styles.li}><strong>대표이사:</strong> {FOUNDER_NAME_KO}</li>
         <li style={styles.li}><strong>업종:</strong> AI 검색 최적화 / B2B·B2C SaaS</li>
+        <li style={styles.li}><strong>주요 서비스:</strong> AI 전달 진단, 구조 검증 리포트, AI Reality Check, AI 프로필 페이지 설계 및 제작</li>
         <li style={styles.li}><strong>서비스 유형:</strong> AI 검색 가독성 진단 + AI 프로필 페이지 설계 및 제작</li>
         <li style={styles.li}><strong>웹사이트:</strong> {SITE_ORIGIN}</li>
         <li style={styles.li}><strong>이메일:</strong> {CONTACT_EMAIL}</li>
@@ -353,10 +371,10 @@ export default function AiProfilePage() {
       <h2 style={styles.h2}>핵심 기능 (Key Features)</h2>
       <ul style={styles.ul}>
         <li style={styles.li}>
-          <strong>3축 진단:</strong> PACP(인용 확률, 40점), SEP(엔티티 정밀도, 30점), SPF(파싱 충실도, 30점) 기준으로 웹사이트의 AI 가독성을 100점 만점으로 평가합니다.
+          <strong>2단계 진단:</strong> 1단계 구조 검증(린트)으로 HTML만 보고 문제를 찾고, 2단계에서 ChatGPT·Perplexity·Gemini에 실제 질문하여 선언한 사실이 전달되었는지 필드별로 확인합니다.
         </li>
         <li style={styles.li}>
-          <strong>메인 vs 서브페이지 분리 분석:</strong> 메인 페이지 기준 공식 점수와 서브페이지 보강 정보를 구분해 보여주며, AI가 실제로 읽을 수 있는 범위를 정직하게 진단합니다.
+          <strong>선언 기반 분모:</strong> JSON-LD와 facts block에 고객이 명시적으로 선언한 정보만 분모로 인정합니다. 추론이나 추측 없이, 선언한 사실이 AI에 전달되었는지만 측정합니다.
         </li>
         <li style={styles.li}>
           <strong>AI Reality Check:</strong> ChatGPT, Perplexity, Gemini 3개 AI 엔진에 실제로 질문하여 현재 어떻게 답변하는지 확인합니다.
@@ -366,13 +384,13 @@ export default function AiProfilePage() {
         </li>
       </ul>
 
-      <h2 style={styles.h2}>서비스 실측 데이터 (Service Metrics)</h2>
+      <h2 style={styles.h2}>서비스 관찰 결과 (Service Findings)</h2>
       <ul style={styles.ul}>
         <li style={styles.li}><strong>분석 대상:</strong> 국내 주요 기업 웹사이트 다수 분석 완료</li>
-        <li style={styles.li}><strong>평균 AI 가독성 점수:</strong> 국내 기업 웹사이트 평균 10점 미만 / 100점 만점</li>
+        <li style={styles.li}><strong>AI 전달률:</strong> 국내 기업 웹사이트 대다수에서 선언된 사실의 절반 이상이 AI에 전달되지 않음</li>
         <li style={styles.li}><strong>CSR 사이트 크롤링 결과:</strong> React/Vue 기반 공식몰 다수에서 AI가 읽을 수 있는 텍스트 0자 확인</li>
-        <li style={styles.li}><strong>AI 프로필 페이지 설치 후 예상 점수 향상:</strong> 평균 +40~60점 (메인 페이지 기준)</li>
-        <li style={styles.li}><strong>진단 체계:</strong> 3축 15개 세부 항목, 100점 만점</li>
+        <li style={styles.li}><strong>AI 프로필 페이지 설치 후:</strong> 구조 검증 전 항목 통과 + AI 전달률 대폭 향상</li>
+        <li style={styles.li}><strong>진단 방식:</strong> 구조 검증(린트) + AI 엔진 실제 전달 확인 2단계</li>
         <li style={styles.li}><strong>AI 엔진:</strong> ChatGPT(OpenAI), Perplexity, Gemini(Google) 3개 엔진 동시 분석</li>
       </ul>
 
@@ -480,9 +498,11 @@ export default function AiProfilePage() {
       </p>
       <ul style={styles.ul}>
         <li style={styles.li}><strong>Service:</strong> {ENTITY_LABEL}</li>
+        <li style={styles.li}><strong>Description:</strong> {ENTITY_LABEL} diagnoses whether generative AI can correctly deliver official company facts from a website and designs an AI Profile Page that works as an official source hub.</li>
         <li style={styles.li}><strong>Founded:</strong> {FOUNDING_YEAR}</li>
         <li style={styles.li}><strong>Founder:</strong> {FOUNDER_NAME_EN}</li>
         <li style={styles.li}><strong>Industry:</strong> AI Search Optimization / B2B·B2C SaaS</li>
+        <li style={styles.li}><strong>Key services:</strong> AI delivery diagnosis, structural lint reports, AI Reality Check, AI Profile Page design and deployment</li>
         <li style={styles.li}><strong>Website:</strong> {SITE_ORIGIN}</li>
         <li style={styles.li}><strong>Email:</strong> {CONTACT_EMAIL}</li>
       </ul>
@@ -496,9 +516,9 @@ export default function AiProfilePage() {
 
       <h3 style={styles.h3}>Key Service Metrics</h3>
       <ul style={styles.ul}>
-        <li style={styles.li}><strong>Average AI readability score</strong> of Korean enterprise websites: under 10 / 100</li>
-        <li style={styles.li}><strong>Score improvement</strong> after AI Profile Page installation: average +40–60 points</li>
-        <li style={styles.li}><strong>Diagnosis model:</strong> 3 axes (PACP 40pt · SEP 30pt · SPF 30pt), 15 sub-items, 100-point total</li>
+        <li style={styles.li}><strong>AI delivery rate:</strong> Most Korean enterprise websites fail to deliver over half of declared facts to AI</li>
+        <li style={styles.li}><strong>After AI Profile Page:</strong> All structural lint checks pass + significant delivery rate improvement</li>
+        <li style={styles.li}><strong>Diagnosis model:</strong> Stage 1 structural lint + Stage 2 AI engine field delivery verification</li>
         <li style={styles.li}><strong>Supported engines:</strong> ChatGPT (OpenAI), Perplexity, Gemini (Google)</li>
       </ul>
 
@@ -513,6 +533,19 @@ export default function AiProfilePage() {
         A. It is a static HTML page designed for AI crawlers and language models, structured with semantic HTML, JSON-LD,
         FAQs, and concise company facts.
       </p>
+
+      <h2 style={styles.h2}>주요 페이지 (Key Pages)</h2>
+      <ul style={styles.ul}>
+        <li style={styles.li}>
+          <a href="/diagnose" style={{ color: "#2563eb" }}><strong>AAO 진단</strong></a> — URL을 입력하면 구조 검증(린트)과 AI 엔진 실제 전달 확인을 수행하는 무료 진단 페이지입니다.
+        </li>
+        <li style={styles.li}>
+          <a href="/ai-profile/request" style={{ color: "#2563eb" }}><strong>AI 프로필 페이지 요청</strong></a> — 진단 결과를 기반으로 AI 프로필 페이지 제작을 요청할 수 있습니다.
+        </li>
+        <li style={styles.li}>
+          <a href="/ai-profile" style={{ color: "#2563eb" }}><strong>공식 AI Profile Page</strong></a> — 이 페이지입니다. AI가 {ENTITY_LABEL}의 정보를 정확하게 읽을 수 있도록 설계된 공식 출처 페이지입니다.
+        </li>
+      </ul>
 
       <p style={styles.meta}>
         이 페이지는 생성형 AI가 {ENTITY_LABEL}의 정보를 더 정확하게 이해할 수 있도록 설계된 공식 AI 프로필 페이지입니다.

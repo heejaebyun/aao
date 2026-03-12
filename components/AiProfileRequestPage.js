@@ -15,7 +15,7 @@ import {
   getInstallationSop,
   resolveIndustryTemplateId,
 } from "@/lib/intake";
-import { buildPilotCaseHref, getFeaturedPilotCase, getPilotCaseLift } from "@/lib/pilot-cases";
+import { buildPilotCaseHref, getFeaturedPilotCase } from "@/lib/pilot-cases";
 
 const C = {
   bg: "#07070d",
@@ -58,8 +58,6 @@ const EMPTY_FORM = {
 
 export default function AiProfileRequestPage({ initialQuery = {} }) {
   const featuredCase = getFeaturedPilotCase();
-  const featuredLift = getPilotCaseLift(featuredCase);
-  const featuredMeasuredAt = featuredCase.measurementMeasuredAt || featuredCase.baselineMeasuredAt;
   const [snapshot, setSnapshot] = useState(() => buildDiagnosticSnapshot());
   const [form, setForm] = useState(EMPTY_FORM);
   const [fieldErrors, setFieldErrors] = useState({});
@@ -498,16 +496,19 @@ export default function AiProfileRequestPage({ initialQuery = {} }) {
               <div style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.8, marginBottom: 12 }}>
                 {featuredCase.summary}
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 10, marginBottom: 12 }}>
-                <MetricCard label="Before" value={`${featuredCase.beforeScore}점`} tone={C.warning} />
-                <MetricCard label="After" value={featuredCase.afterScore !== null ? `${featuredCase.afterScore}점` : "대기"} tone={C.info} />
-                <MetricCard label="Lift" value={featuredLift !== null ? `${featuredLift > 0 ? "+" : ""}${featuredLift}점` : "-"} tone={C.success} />
-                <MetricCard label="Target" value={`${featuredCase.targetScore}점`} tone={C.success} />
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10, marginBottom: 12 }}>
+                <MetricCard label="Before · Lint" value={`${featuredCase.beforeState.lint.passed}/${featuredCase.beforeState.lint.total}`} tone={C.warning} />
+                <MetricCard label="After · Lint" value={`${featuredCase.afterState.lint.passed}/${featuredCase.afterState.lint.total}`} tone={C.info} />
+                <MetricCard label="Before · Facts" value={`${featuredCase.beforeState.groundTruth.fieldCount}개`} tone={C.warning} />
+                <MetricCard label="After · Facts" value={`${featuredCase.afterState.groundTruth.fieldCount}개`} tone={C.success} />
               </div>
               <div style={{ fontSize: 11, color: C.textDim, marginBottom: 12 }}>
-                실측일 {featuredMeasuredAt} · source {featuredCase.baselineSource}
+                기준일 {featuredCase.updatedAt} · 설치 경로 {featuredCase.installPath}
               </div>
-              <TemplateList title="핵심 개입" items={featuredCase.interventions} />
+              <TemplateList title="핵심 개입" items={featuredCase.appliedFixes} />
+              <div style={{ marginTop: 12 }}>
+                <TemplateList title="관찰된 변화" items={featuredCase.observedChanges} />
+              </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
                 <a href={buildPilotCaseHref(featuredCase.id)} style={channelLinkStyle(false)}>케이스 상세 보기</a>
                 <a href={`/diagnose?url=${encodeURIComponent(featuredCase.rootUrl)}`} style={channelLinkStyle(false)}>메인 재진단</a>

@@ -1,0 +1,38 @@
+# delivery 튜닝용 URL — groundTruth > 0 확인된 사이트만
+# 목적: field matcher, cause inference, citation 정밀도 검증
+# 기준: 2026-03-11 preflight에서 실제로 GT 필드가 추출된 사이트
+# 총 19개 URL
+
+# AAO 자체 (JSON-LD Organization + facts block)
+https://aao.co.kr/ai-profile
+https://aao.co.kr
+
+# 한국 기업 — JSON-LD Organization 확인됨
+https://www.wanted.co.kr
+https://www.29cm.co.kr
+
+# 글로벌 — JSON-LD Organization 확인됨
+https://stripe.com
+
+# SEO 도구 회사 (3차 delivery:run 검증 완료)
+https://www.semrush.com
+https://ahrefs.com
+https://www.conductor.com
+https://www.botify.com
+https://www.hubspot.com
+https://www.shopify.com
+
+# 한국 AI 스타트업
+https://www.upstage.ai
+https://www.alcherainc.com
+https://www.deepbrain.io
+https://www.selectstar.ai
+
+# 글로벌 B2B SaaS
+https://www.marketmuse.com
+https://www.gong.io
+https://www.calendly.com
+
+# 한국 B2B SaaS
+https://www.channel.io
+https://www.flex.team

@@ -1,4 +1,5 @@
 import { buildProfileRequestHref, getOperationPageContent } from "@/lib/intake";
+import { CONTACT_EMAIL } from "@/lib/site-identity";
 
 const styles = {
   page: {
@@ -96,7 +97,7 @@ export default function AiProfileOpsPage({ channelId, searchParams = {} }) {
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <a href={requestHref} style={actionButtonStyle(true)}>요청 정보 다시 열기</a>
             <a href={diagnoseHref} style={actionButtonStyle(false)}>도메인 다시 진단</a>
-            <a href={`mailto:bhj31029943@gmail.com?subject=${encodeURIComponent(`[AAO Ops] ${content.title} - ${companyName}`)}`} style={actionButtonStyle(false)}>이메일 보내기</a>
+            <a href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`[AAO Ops] ${content.title} - ${companyName}`)}`} style={actionButtonStyle(false)}>이메일 보내기</a>
           </div>
         </div>
       </div>

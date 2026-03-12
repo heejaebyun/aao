@@ -1,6 +1,6 @@
-// app/api/ai-check/route.js — AI Reality Check endpoint
+// app/api/ai-check/route.js — AI Reality Check endpoint (v5: URL-based delivery verification)
 import { NextResponse } from "next/server";
-import { checkAllEngines } from "@/lib/ai-check";
+import { hydrateOfficialGroundTruth, verifyUrlDelivery } from "@/lib/ai-check";
 import { buildRateLimitHeaders, rateLimit } from "@/lib/rate-limit";
 
 export async function POST(request) {
@@ -20,31 +20,46 @@ export async function POST(request) {
       );
     }
 
-    const { companyName, domain, officialTitle, officialDescription, aliases } = await request.json();
+    const {
+      url,
+      crawlSnapshot,
+      subpageUrls,
+      crawlSignals,
+      groundTruth: serializedGroundTruth,
+    } = await request.json();
 
-    if (!companyName) {
+    if (!url) {
       return NextResponse.json(
-        { error: "companyName is required" },
+        { error: "url is required" },
         { status: 400 }
       );
     }
 
-    console.log(`[AAO] AI Reality Check for: ${companyName}`);
-    const aiCheck = await checkAllEngines({
-      companyName,
-      domain,
-      officialTitle,
-      officialDescription,
-      aliases,
-    });
+    console.log(`[AAO] AI URL Delivery Check for: ${url}`);
+
+    const groundTruth = hydrateOfficialGroundTruth(
+      serializedGroundTruth || {},
+      crawlSnapshot || {},
+    );
+
+    const result = await verifyUrlDelivery(
+      url,
+      groundTruth,
+      Array.isArray(subpageUrls) ? subpageUrls : [],
+      {},
+      crawlSignals || {},
+    );
 
     return NextResponse.json({
       success: true,
-      companyName,
-      domain,
-      defaultMode: aiCheck.defaultMode,
-      defaultIntent: aiCheck.defaultIntent,
-      results: aiCheck.modes,
+      url,
+      groundTruth: {
+        declaredFields: groundTruth.declaredFields,
+        faqPairs: groundTruth.faqPairs,
+        fieldCount: groundTruth.fieldCount,
+        alternateNames: groundTruth.alternateNames,
+      },
+      engines: result.engines,
     }, {
       headers: buildRateLimitHeaders(limit, 10),
     });

@@ -1,0 +1,21 @@
+# lint/blockage 테스트용 URL — JS 렌더링, 접근 제한 사이트
+# 목적: jsRendered, noStaticHtml, robots 시그널 검증
+
+# JS 렌더링 강한 사이트
+https://www.musinsa.com
+https://www.coupang.com
+https://www.kurly.com
+https://brunch.co.kr
+https://www.baemin.com
+
+# 접근 제한 / 크롤 실패
+https://www.hyundai.com/kr/ko/brand/brand-story
+https://www.kakaocorp.com/page/company/main
+https://www.samsunglife.com
+https://www.seoul.go.kr
+
+# 서브페이지 허브 구조
+https://www.saramin.co.kr
+
+# 인코딩 이슈
+https://www.korcham.net

@@ -1,0 +1,19 @@
+# 한국 AI 시리즈A+ 스타트업 — GT preflight 후보
+# 목적: urls-delivery.txt를 15-20개로 확장하기 위한 후보군
+
+# 한국 AI 스타트업
+https://www.upstage.ai
+https://www.twelvelabs.io
+https://riiid.com
+https://www.scatterlab.co.kr
+https://www.voyagerx.com
+https://www.returnzero.com
+https://www.makinarocks.ai
+https://www.lablup.com
+https://www.saltlux.com
+https://www.alcherainc.com
+https://www.tunib.ai
+https://www.cognet9.com
+https://www.42maru.ai
+https://www.deepbrain.io
+https://www.selectstar.ai

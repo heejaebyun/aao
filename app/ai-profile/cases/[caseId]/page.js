@@ -1,5 +1,5 @@
 import { buildProfileRequestHref } from "@/lib/intake";
-import { getPilotCaseById, getPilotCaseLift } from "@/lib/pilot-cases";
+import { getPilotCaseById } from "@/lib/pilot-cases";
 import { ENTITY_SHORT_NAME, SITE_DOMAIN } from "@/lib/site-identity";
 
 const styles = {
@@ -62,109 +62,143 @@ export default function PilotCasePage({ params }) {
     companyName: ENTITY_SHORT_NAME,
     domain: SITE_DOMAIN,
   });
-  const lift = getPilotCaseLift(pilotCase);
 
   return (
     <div style={styles.page}>
       <div style={styles.shell}>
-        <a href="/ai-profile" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "#4a4a65", textDecoration: "none", fontSize: 12, marginBottom: 20 }}>
+        <a
+          href="/ai-profile"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            color: "#4a4a65",
+            textDecoration: "none",
+            fontSize: 12,
+            marginBottom: 20,
+          }}
+        >
           ← AI profile로 돌아가기
         </a>
 
         <div style={styles.card}>
-          <div style={{ fontSize: 11, color: "#4a4a65", letterSpacing: "1.2px", textTransform: "uppercase", marginBottom: 10 }}>Featured Pilot Case</div>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 10 }}>
+            <div style={{ fontSize: 11, color: "#4a4a65", letterSpacing: "1.2px", textTransform: "uppercase" }}>Featured Pilot Case</div>
+            <div style={{ fontSize: 11, color: "#ffb820", fontWeight: 700 }}>{pilotCase.statusLabel}</div>
+          </div>
           <h1 style={{ margin: 0, fontSize: 32, lineHeight: 1.15, fontFamily: "'Outfit',sans-serif" }}>{pilotCase.companyName} self-rollout</h1>
           <p style={{ ...styles.dim, marginTop: 12, marginBottom: 0 }}>{pilotCase.summary}</p>
           <div style={{ ...styles.dim, marginTop: 10 }}>
-            측정일 {pilotCase.measurementMeasuredAt || pilotCase.baselineMeasuredAt} · source {pilotCase.baselineSource}
+            기준일 {pilotCase.updatedAt} · 설치 경로 {pilotCase.installPath}
           </div>
         </div>
 
-        <div style={{ ...styles.card, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
-          {[
-            { label: "Before", value: `${pilotCase.beforeScore}점`, tone: "#ffb820" },
-            { label: "After", value: pilotCase.afterScore !== null ? `${pilotCase.afterScore}점` : "대기", tone: "#38bdf8" },
-            { label: "Lift", value: lift !== null ? `${lift > 0 ? "+" : ""}${lift}점` : "-", tone: "#00e87b" },
-            { label: "Target", value: `${pilotCase.targetScore}점`, tone: "#00e87b" },
-            { label: "Status", value: pilotCase.statusLabel, tone: "#8585a0" },
-          ].map((item) => (
-            <div key={item.label} style={{ background: "#0e0e18", border: "1px solid #1e1e35", borderRadius: 12, padding: 14 }}>
-              <div style={{ fontSize: 10, color: "#4a4a65", marginBottom: 6 }}>{item.label}</div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: item.tone, fontFamily: "'Outfit',sans-serif" }}>{item.value}</div>
-            </div>
-          ))}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, marginBottom: 16 }}>
+          <StateCard title="Before" state={pilotCase.beforeState} accent="#ffb820" />
+          <StateCard title="After" state={pilotCase.afterState} accent="#38bdf8" />
         </div>
 
         <div style={styles.card}>
-          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}>문제 포인트</div>
-          {pilotCase.problemPoints.map((item) => (
+          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}>적용한 수정</div>
+          {pilotCase.appliedFixes.map((item) => (
             <div key={item} style={{ ...styles.dim, marginBottom: 6 }}>· {item}</div>
           ))}
         </div>
 
         <div style={styles.card}>
-          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}>개입 항목</div>
-          {pilotCase.interventions.map((item) => (
+          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}>관찰된 변화</div>
+          {pilotCase.observedChanges.map((item) => (
             <div key={item} style={{ ...styles.dim, marginBottom: 6 }}>· {item}</div>
           ))}
         </div>
 
-        {pilotCase.measurements && (
-          <div style={styles.card}>
-            <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}>실측 스냅샷</div>
-            <div style={{ display: "grid", gap: 12 }}>
-              {Object.values(pilotCase.measurements).map((measurement) => (
-                <div key={measurement.id} style={{ background: "#0e0e18", border: "1px solid #1e1e35", borderRadius: 12, padding: 14 }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700 }}>{measurement.label}</div>
-                    <div style={{ fontSize: 11, color: "#8585a0" }}>{measurement.measuredAt} · {measurement.source}</div>
-                  </div>
-                  <div style={{ ...styles.dim, marginBottom: 8 }}>{measurement.title}</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 8, marginBottom: 8 }}>
-                    {[
-                      { label: "Score", value: `${measurement.score}점 (${measurement.grade})` },
-                      { label: "PACP", value: `${measurement.axes.pacp}점` },
-                      { label: "SEP", value: `${measurement.axes.sep}점` },
-                      { label: "SPF", value: `${measurement.axes.spf}점` },
-                    ].map((item) => (
-                      <div key={item.label} style={{ background: "#121220", border: "1px solid #1e1e35", borderRadius: 10, padding: 10 }}>
-                        <div style={{ fontSize: 10, color: "#4a4a65", marginBottom: 4 }}>{item.label}</div>
-                        <div style={{ fontSize: 14, fontWeight: 700 }}>{item.value}</div>
-                      </div>
-                    ))}
-                  </div>
-                  <div style={styles.dim}>· URL: {measurement.url}</div>
-                  <div style={styles.dim}>· Word count: {measurement.crawl.wordCount}</div>
-                  <div style={styles.dim}>· Indexability: {measurement.crawl.indexability}</div>
-                  <div style={styles.dim}>· Robots meta: {measurement.crawl.robotsMeta || "없음"}</div>
-                  <div style={styles.dim}>· JSON-LD / OpenGraph: {measurement.crawl.hasJsonLd ? "yes" : "no"} / {measurement.crawl.hasOpenGraph ? "yes" : "no"}</div>
-                </div>
-              ))}
+        <div style={styles.card}>
+          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}>검증 포인트</div>
+          {pilotCase.proofPoints.map((item) => (
+            <div key={item.label} style={{ marginBottom: 10 }}>
+              <div style={{ fontSize: 11, color: "#4a4a65", marginBottom: 4 }}>{item.label}</div>
+              <div style={styles.dim}>{item.value}</div>
             </div>
-          </div>
-        )}
+          ))}
+        </div>
 
         <div style={styles.card}>
-          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}>다음 마일스톤</div>
-          {pilotCase.nextMilestones.map((item) => (
+          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}>다음 액션</div>
+          {pilotCase.nextSteps.map((item) => (
             <div key={item} style={{ ...styles.dim, marginBottom: 6 }}>· {item}</div>
           ))}
         </div>
 
         <div style={styles.card}>
           <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}>실행</div>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 14 }}>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <a href={rootDiagnoseHref} style={actionButtonStyle(true)}>메인 랜딩 다시 진단</a>
             <a href={profileDiagnoseHref} style={actionButtonStyle(false)}>/ai-profile 다시 진단</a>
             <a href={requestHref} style={actionButtonStyle(false)}>요청 페이지 열기</a>
           </div>
-          {pilotCase.evidence.map((item) => (
-            <div key={item.label} style={{ ...styles.dim, marginBottom: 6 }}>· {item.label}: {item.value}</div>
-          ))}
         </div>
       </div>
     </div>
   );
+}
+
+function StateCard({ title, state, accent }) {
+  return (
+    <div style={{ ...styles.card, marginBottom: 0 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+        <div style={{ fontSize: 11, color: "#4a4a65", textTransform: "uppercase", letterSpacing: "1.1px" }}>{title}</div>
+        <div style={{ fontSize: 11, color: accent, fontWeight: 700 }}>{state.label}</div>
+      </div>
+      <div style={{ fontSize: 12, color: "#b7b7cd", marginBottom: 8 }}>{state.url}</div>
+      <div style={{ ...styles.dim, marginBottom: 12 }}>{state.summary}</div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(120px, 1fr))", gap: 10, marginBottom: 12 }}>
+        <MiniStat label="Lint" value={`${state.lint.passed}/${state.lint.total}`} tone={accent} />
+        <MiniStat label="Declared Facts" value={`${state.groundTruth.fieldCount}개`} tone="#00e87b" />
+      </div>
+
+      <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 8 }}>엔진별 전달 확인</div>
+      <div style={{ display: "grid", gap: 8, marginBottom: 12 }}>
+        {state.engines.map((item) => (
+          <div key={item.engine} style={{ background: "#0e0e18", border: "1px solid #1e1e35", borderRadius: 12, padding: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
+              <div style={{ fontSize: 12, fontWeight: 700 }}>{engineLabel(item.engine)}</div>
+              <div style={{ fontSize: 12, color: accent, fontWeight: 700 }}>{item.delivered}/{item.total}</div>
+            </div>
+            <div style={{ fontSize: 11, color: "#8585a0" }}>Citation: {citationLabel(item.citation)}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 8 }}>남은 병목</div>
+      {state.blockers.map((item) => (
+        <div key={item} style={{ ...styles.dim, marginBottom: 6 }}>· {item}</div>
+      ))}
+    </div>
+  );
+}
+
+function MiniStat({ label, value, tone }) {
+  return (
+    <div style={{ background: "#0e0e18", border: "1px solid #1e1e35", borderRadius: 12, padding: 12 }}>
+      <div style={{ fontSize: 10, color: "#4a4a65", marginBottom: 6 }}>{label}</div>
+      <div style={{ fontSize: 20, fontWeight: 800, color: tone, fontFamily: "'Outfit',sans-serif" }}>{value}</div>
+    </div>
+  );
+}
+
+function engineLabel(engine) {
+  if (engine === "chatgpt") return "ChatGPT";
+  if (engine === "gemini") return "Gemini";
+  if (engine === "perplexity") return "Perplexity";
+  return engine;
+}
+
+function citationLabel(citation) {
+  if (citation === "exact") return "정확한 URL 일치";
+  if (citation === "path") return "경로 부분 일치";
+  if (citation === "host_only") return "같은 도메인";
+  return "증거 없음";
 }
 
 function actionButtonStyle(primary) {

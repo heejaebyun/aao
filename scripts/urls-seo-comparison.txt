@@ -1,0 +1,18 @@
+# SEO 강자 비교군
+# 목적: "SEO를 매우 잘하는 회사가 AI 전달/구조 검증에서도 강한가?" 비교 실험
+# 사용 예시:
+#   npm run delivery:preflight -- scripts/urls-seo-comparison.txt
+#   npm run delivery:run -- scripts/urls-seo-comparison.txt
+
+# SEO 툴
+https://www.semrush.com
+https://ahrefs.com
+https://surferseo.com
+https://www.brightedge.com
+https://www.conductor.com
+https://www.botify.com
+
+# SEO/콘텐츠 마케팅 SaaS
+https://www.hubspot.com
+https://www.shopify.com
+https://www.cloudflare.com
