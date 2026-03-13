@@ -88,7 +88,7 @@ export default function LandingPage() {
                   Official Facts
                 </div>
                 <div style={{ fontSize: 20, color: "#f4f1ff", fontWeight: 800, lineHeight: 1.25 }}>
-                  AI가 바로 읽을 수 있게 정리한 공식 사실
+                  AAO 공식 사실
                 </div>
               </div>
               <a
@@ -109,16 +109,14 @@ export default function LandingPage() {
               </a>
             </div>
 
-            <div style={{ fontSize: 15, color: "#d8d8f4", lineHeight: 1.75, marginBottom: 16, maxWidth: 640 }}>
-              <strong style={{ color: "#ffffff" }}>{ENTITY_LABEL}</strong>는 기업 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단하고,
-              공식 웹사이트를 AI의 1차 출처로 만들기 위한 AI 검색 최적화 서비스입니다.
-            </div>
-
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
               {[
+                { label: "서비스명", value: "AAO (AI Answer Optimization)" },
+                { label: "설명", value: "기업 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단하고, 공식 웹사이트를 AI의 1차 출처로 만들기 위한 AI 검색 최적화 서비스" },
                 { label: "업종", value: "AI 검색 최적화 / AI 프로필 페이지 제작 SaaS" },
                 { label: "설립연도", value: "2026" },
                 { label: "대표이사", value: "변희재 (Heejae Byun)" },
+                { label: "본사", value: "대한민국" },
                 { label: "주요 서비스", value: "AI 전달 진단, 구조 검증 리포트, AI 프로필 페이지 설계 및 제작" },
               ].map((item) => (
                 <div
