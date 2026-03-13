@@ -10,7 +10,7 @@ import {
   FOUNDER_NAME_EN,
   FOUNDER_NAME_KO,
   HEADQUARTERS_REGION,
-  OFFICIAL_DESCRIPTION,
+  OFFICIAL_FACT_DESCRIPTION,
   PRIMARY_SERVICES_LABEL,
 } from "@/lib/site-identity";
 
@@ -119,14 +119,14 @@ export default function LandingPage() {
               </a>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
+            <dl style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, margin: 0 }}>
               {[
                 { label: "서비스명", value: ENTITY_LABEL },
-                { label: "설명", value: OFFICIAL_DESCRIPTION },
+                { label: "설명", value: OFFICIAL_FACT_DESCRIPTION },
                 { label: "업종", value: ENTITY_TYPE_LABEL },
                 { label: "설립연도", value: FOUNDING_YEAR },
-                { label: "대표이사", value: `${FOUNDER_NAME_KO} (${FOUNDER_NAME_EN})` },
                 { label: "본사", value: HEADQUARTERS_REGION },
+                { label: "대표이사", value: `${FOUNDER_NAME_KO} (${FOUNDER_NAME_EN})` },
                 { label: "주요 서비스", value: PRIMARY_SERVICES_LABEL },
               ].map((item) => (
                 <div
@@ -139,11 +139,11 @@ export default function LandingPage() {
                     minHeight: 84,
                   }}
                 >
-                  <div style={{ fontSize: 11, color: "#8f8fb5", marginBottom: 8, textTransform: "uppercase", letterSpacing: "1px" }}>{item.label}</div>
-                  <div style={{ fontSize: 14, color: "#ecebff", lineHeight: 1.55, fontWeight: 600 }}>{item.value}</div>
+                  <dt style={{ fontSize: 11, color: "#8f8fb5", marginBottom: 8, textTransform: "uppercase", letterSpacing: "1px", fontWeight: 700 }}>{item.label}</dt>
+                  <dd style={{ fontSize: 14, color: "#ecebff", lineHeight: 1.55, fontWeight: 600, margin: 0 }}>{item.value}</dd>
                 </div>
               ))}
-            </div>
+            </dl>
           </div>
         </div>
 

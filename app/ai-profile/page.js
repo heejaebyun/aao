@@ -11,7 +11,7 @@ import {
   FOUNDER_NAME_EN,
   FOUNDER_NAME_KO,
   HEADQUARTERS_REGION,
-  OFFICIAL_DESCRIPTION,
+  OFFICIAL_FACT_DESCRIPTION,
   PRIMARY_SERVICES_LABEL,
   SITE_ORIGIN,
 } from "@/lib/site-identity";
@@ -42,7 +42,7 @@ const organizationSchema = {
   alternateName: [ENTITY_SHORT_NAME, "AI Answer Optimization", `${ENTITY_SHORT_NAME} AI Answer Optimization`],
   url: SITE_ORIGIN,
   mainEntityOfPage: AI_PROFILE_URL,
-  description: OFFICIAL_DESCRIPTION,
+  description: OFFICIAL_FACT_DESCRIPTION,
   foundingDate: FOUNDING_YEAR,
   founder: {
     "@type": "Person",
@@ -86,8 +86,7 @@ const softwareSchema = {
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   url: SITE_ORIGIN,
-  description:
-    `${ENTITY_LABEL}는 URL을 입력하면 생성형 AI가 해당 웹사이트를 얼마나 정확히 이해하는지 진단하고, 메인 페이지와 서브페이지의 정보 격차를 분석하며, 개선 리포트와 AI Profile Page 제작 솔루션을 제공하는 웹 기반 서비스입니다.`,
+  description: OFFICIAL_FACT_DESCRIPTION,
   offers: {
     "@type": "Offer",
     price: "0",
@@ -209,6 +208,31 @@ const styles = {
     paddingLeft: "20px",
     margin: "0 0 10px",
   },
+  factsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+    gap: "12px",
+    margin: 0,
+  },
+  factCard: {
+    margin: 0,
+    background: "#ffffff",
+    border: "1px solid #e5e7eb",
+    borderRadius: "10px",
+    padding: "12px 14px",
+  },
+  factTerm: {
+    fontSize: "0.74rem",
+    fontWeight: 700,
+    letterSpacing: "0.06em",
+    color: "#6b7280",
+    marginBottom: "6px",
+  },
+  factDesc: {
+    margin: 0,
+    color: "#111827",
+    lineHeight: 1.6,
+  },
 };
 
 export default function AiProfilePage() {
@@ -220,25 +244,31 @@ export default function AiProfilePage() {
 
       <h1 style={styles.h1}>{ENTITY_LABEL}</h1>
 
+      {/* 핵심 사실 facts block — JSON-LD + 평문 이중 선언 */}
+      <div style={styles.box}>
+        <p style={styles.p}><strong>핵심 사실 요약 (Key Facts)</strong></p>
+        <dl style={styles.factsGrid}>
+          {[
+            { label: "서비스명", value: ENTITY_LABEL },
+            { label: "설명", value: OFFICIAL_FACT_DESCRIPTION },
+            { label: "업종", value: ENTITY_TYPE_LABEL },
+            { label: "설립연도", value: FOUNDING_YEAR },
+            { label: "본사", value: HEADQUARTERS_REGION },
+            { label: "대표이사", value: `${FOUNDER_NAME_KO} (${FOUNDER_NAME_EN})` },
+            { label: "주요 서비스", value: PRIMARY_SERVICES_LABEL },
+          ].map((item) => (
+            <div key={item.label} style={styles.factCard}>
+              <dt style={styles.factTerm}>{item.label}</dt>
+              <dd style={styles.factDesc}>{item.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+
       <p style={{ ...styles.p, ...styles.lead }}>
         <strong>{ENTITY_LABEL}</strong>는 기업 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단하고,
         공식 웹사이트를 AI의 1차 출처로 만들기 위한 AI 검색 최적화 서비스입니다.
       </p>
-
-      {/* 핵심 사실 facts block — JSON-LD + 평문 이중 선언 */}
-      <div style={styles.box}>
-        <p style={styles.p}><strong>핵심 사실 요약 (Key Facts)</strong></p>
-        <ul style={styles.compactList}>
-          <li style={styles.li}><strong>서비스명:</strong> {ENTITY_LABEL}</li>
-          <li style={styles.li}><strong>설명:</strong> {OFFICIAL_DESCRIPTION}</li>
-          <li style={styles.li}><strong>업종:</strong> {ENTITY_TYPE_LABEL}</li>
-          <li style={styles.li}><strong>설립연도:</strong> {FOUNDING_YEAR}</li>
-          <li style={styles.li}><strong>대표이사:</strong> {FOUNDER_NAME_KO} ({FOUNDER_NAME_EN})</li>
-          <li style={styles.li}><strong>본사:</strong> {HEADQUARTERS_REGION}</li>
-          <li style={styles.li}><strong>주요 서비스:</strong> {PRIMARY_SERVICES_LABEL}</li>
-          <li style={styles.li}><strong>웹사이트:</strong> {SITE_ORIGIN}</li>
-        </ul>
-      </div>
 
       <div style={{ ...styles.box, borderLeft: "4px solid #2563eb" }}>
         <p style={{ ...styles.p, fontWeight: 700, marginBottom: "10px" }}>공식 출처 정책 (Official Source Policy)</p>
