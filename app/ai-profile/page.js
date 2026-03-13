@@ -7,12 +7,16 @@ import {
   ENTITY_LABEL,
   ENTITY_SHORT_NAME,
   ENTITY_TYPE_LABEL,
+  ENTITY_TYPE_LABEL_EN,
   FOUNDING_YEAR,
   FOUNDER_NAME_EN,
   FOUNDER_NAME_KO,
   HEADQUARTERS_REGION,
+  HEADQUARTERS_REGION_EN,
   OFFICIAL_FACT_DESCRIPTION,
+  OFFICIAL_FACT_DESCRIPTION_EN,
   PRIMARY_SERVICES_LABEL,
+  PRIMARY_SERVICES_LABEL_EN,
   SITE_ORIGIN,
 } from "@/lib/site-identity";
 
@@ -33,73 +37,25 @@ export const metadata = {
     url: AI_PROFILE_URL,
     locale: "ko_KR",
   },
+  twitter: {
+    title: AI_PROFILE_META_TITLE,
+    description: AI_PROFILE_META_DESCRIPTION,
+  },
 };
 
-const organizationSchema = {
+const profilePageSchema = {
   "@context": "https://schema.org",
-  "@type": "Organization",
-  name: ENTITY_LABEL,
-  alternateName: [ENTITY_SHORT_NAME, "AI Answer Optimization", `${ENTITY_SHORT_NAME} AI Answer Optimization`],
-  url: SITE_ORIGIN,
-  mainEntityOfPage: AI_PROFILE_URL,
-  description: OFFICIAL_FACT_DESCRIPTION,
-  foundingDate: FOUNDING_YEAR,
-  founder: {
-    "@type": "Person",
-    name: FOUNDER_NAME_KO,
-    alternateName: FOUNDER_NAME_EN,
+  "@type": "AboutPage",
+  name: AI_PROFILE_META_TITLE,
+  url: AI_PROFILE_URL,
+  description: AI_PROFILE_META_DESCRIPTION,
+  inLanguage: ["ko", "en"],
+  isPartOf: {
+    "@id": SITE_ORIGIN,
   },
-  address: {
-    "@type": "PostalAddress",
-    addressCountry: "KR",
-    addressRegion: HEADQUARTERS_REGION,
+  about: {
+    "@id": SITE_ORIGIN,
   },
-  contactPoint: {
-    "@type": "ContactPoint",
-    contactType: "customer service",
-    email: CONTACT_EMAIL,
-  },
-  knowsAbout: [
-    "AI Answer Optimization",
-    "Generative Engine Optimization",
-    "AI Search Optimization",
-    "AI Profile Page",
-    "Schema.org",
-    "JSON-LD",
-    "AEO",
-  ],
-  serviceType: ENTITY_TYPE_LABEL,
-  hasPart: [
-    { "@type": "WebPage", "name": "AAO 진단", "url": `${SITE_ORIGIN}/diagnose`, "description": "URL을 입력하면 구조 검증과 AI 전달 확인을 수행하는 무료 진단 페이지" },
-    { "@type": "WebPage", "name": "AI 프로필 페이지 요청", "url": `${SITE_ORIGIN}/ai-profile/request`, "description": "진단 결과를 기반으로 AI 프로필 페이지 제작을 요청하는 페이지" },
-  ],
-  significantLink: [
-    `${SITE_ORIGIN}/diagnose`,
-    `${SITE_ORIGIN}/ai-profile/request`,
-  ],
-};
-
-const softwareSchema = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: ENTITY_LABEL,
-  applicationCategory: "BusinessApplication",
-  operatingSystem: "Web",
-  url: SITE_ORIGIN,
-  description: OFFICIAL_FACT_DESCRIPTION,
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "KRW",
-    description: "무료 AI 검색 최적화 진단",
-  },
-  featureList: [
-    "구조 검증(린트) + AI 엔진 실제 전달 확인 2단계 진단",
-    "ChatGPT·Perplexity·Gemini AI Reality Check",
-    "선언 기반 ground truth 필드별 전달 확인",
-    "비전문가도 이해할 수 있는 진단 리포트",
-    "AI 프로필 페이지 설계 및 제작",
-  ],
 };
 
 const faqSchema = {
@@ -112,7 +68,7 @@ const faqSchema = {
       name: `${ENTITY_LABEL}이 무엇인가요? What is ${ENTITY_LABEL}?`,
       acceptedAnswer: {
         "@type": "Answer",
-        text: `${ENTITY_LABEL}는 기업, 브랜드, 인플루언서, 소상공인의 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단하고, 공식 웹사이트가 AI의 1차 출처가 되도록 구조와 콘텐츠를 개선하는 서비스입니다.`,
+        text: `${ENTITY_LABEL}는 ${OFFICIAL_FACT_DESCRIPTION}입니다. 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단하고, 공식 웹사이트를 AI의 1차 출처로 만들기 위해 구조와 콘텐츠를 개선합니다.`,
       },
     },
     {
@@ -120,7 +76,7 @@ const faqSchema = {
       name: `${ENTITY_LABEL}는 무엇을 진단하나요? What does ${ENTITY_LABEL} diagnose?`,
       acceptedAnswer: {
         "@type": "Answer",
-        text: `${ENTITY_SHORT_NAME}는 실제 AI 답변, 웹사이트 구조, 메인 페이지와 서브페이지 사이의 정보 격차를 함께 진단합니다. 이를 통해 AI가 기업 정보를 어디서 읽고, 어디서는 놓치는지 확인할 수 있습니다.`,
+        text: "웹사이트 구조 검증(린트)과 ChatGPT·Perplexity·Gemini의 실제 AI 전달 확인을 함께 수행합니다. AI가 기업 정보를 어디서 읽고, 어디서 놓치는지 확인할 수 있습니다.",
       },
     },
     {
@@ -136,7 +92,7 @@ const faqSchema = {
       name: `${ENTITY_LABEL}는 무료인가요? Is ${ENTITY_LABEL} free?`,
       acceptedAnswer: {
         "@type": "Answer",
-        text: "기본 진단은 무료입니다. AI 프로필 페이지 제작, 설치, 반복 측정 등 추가 서비스는 별도 범위와 비용으로 제공됩니다.",
+        text: "기본 진단은 무료입니다. AI 프로필 페이지 제작과 설치는 별도 서비스로 제공합니다.",
       },
     },
     {
@@ -238,8 +194,7 @@ const styles = {
 export default function AiProfilePage() {
   return (
     <main style={styles.page}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(profilePageSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       <h1 style={styles.h1}>{ENTITY_LABEL}</h1>
@@ -266,8 +221,8 @@ export default function AiProfilePage() {
       </div>
 
       <p style={{ ...styles.p, ...styles.lead }}>
-        <strong>{ENTITY_LABEL}</strong>는 기업 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단하고,
-        공식 웹사이트를 AI의 1차 출처로 만들기 위한 AI 검색 최적화 서비스입니다.
+        <strong>{ENTITY_LABEL}</strong>는 {OFFICIAL_FACT_DESCRIPTION}입니다. 구조 검증, AI 전달 진단, AI 프로필 페이지 제작을 통해
+        공식 웹사이트를 AI의 1차 출처로 정리합니다.
       </p>
 
       <div style={{ ...styles.box, borderLeft: "4px solid #2563eb" }}>
@@ -306,7 +261,7 @@ export default function AiProfilePage() {
       <h2 style={styles.h2}>{ENTITY_LABEL}의 방식 (Solution)</h2>
       <div style={styles.box}>
         <p style={styles.p}>
-          <strong>1. AI Reality Check</strong><br />
+          <strong>1. AI 전달 진단 (AI Delivery Check)</strong><br />
           ChatGPT, Perplexity, Gemini가 현재 기업을 어떻게 설명하는지 실제 답변을 확인합니다.
         </p>
         <p style={styles.p}>
@@ -323,8 +278,8 @@ export default function AiProfilePage() {
 
       <h3 style={styles.h3}>Q. {ENTITY_LABEL}이 무엇인가요?</h3>
       <p style={styles.p}>
-        A. {ENTITY_LABEL}는 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단하고, 공식 웹사이트를 AI의 1차 출처로 만들기 위해
-        구조와 콘텐츠를 개선하는 서비스입니다.
+        A. {ENTITY_LABEL}는 {OFFICIAL_FACT_DESCRIPTION}입니다. 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단하고,
+        공식 웹사이트를 AI의 1차 출처로 만들기 위해 구조와 콘텐츠를 개선합니다.
       </p>
 
       <h3 style={styles.h3}>Q. {ENTITY_LABEL}는 무엇을 진단하나요?</h3>
@@ -350,25 +305,23 @@ export default function AiProfilePage() {
 
       <h2 style={styles.h2}>About {ENTITY_LABEL} (English)</h2>
       <p style={styles.p}>
-        <strong>{ENTITY_LABEL}</strong> is a service that diagnoses how accurately generative AI systems can
-        understand a website and helps make the official website a primary source for AI-readable company information.
+        <strong>{ENTITY_LABEL}</strong> is an {OFFICIAL_FACT_DESCRIPTION_EN}. It helps make the official website a
+        primary source for AI-readable company information.
       </p>
       <ul style={styles.ul}>
         <li style={styles.li}><strong>Service:</strong> {ENTITY_LABEL}</li>
-        <li style={styles.li}><strong>Description:</strong> {ENTITY_LABEL} diagnoses whether generative AI can correctly deliver official company facts from a website and designs an AI Profile Page that works as an official source hub.</li>
+        <li style={styles.li}><strong>Description:</strong> {OFFICIAL_FACT_DESCRIPTION_EN}</li>
         <li style={styles.li}><strong>Founded:</strong> {FOUNDING_YEAR}</li>
         <li style={styles.li}><strong>Founder:</strong> {FOUNDER_NAME_EN}</li>
-        <li style={styles.li}><strong>Headquarters:</strong> South Korea</li>
-        <li style={styles.li}><strong>Industry:</strong> AI Search Optimization / B2B·B2C SaaS</li>
-        <li style={styles.li}><strong>Key services:</strong> AI delivery diagnosis, structural lint reports, AI Reality Check, AI Profile Page design and deployment</li>
-        <li style={styles.li}><strong>Website:</strong> {SITE_ORIGIN}</li>
-        <li style={styles.li}><strong>Email:</strong> {CONTACT_EMAIL}</li>
+        <li style={styles.li}><strong>Headquarters:</strong> {HEADQUARTERS_REGION_EN}</li>
+        <li style={styles.li}><strong>Industry:</strong> {ENTITY_TYPE_LABEL_EN}</li>
+        <li style={styles.li}><strong>Key services:</strong> {PRIMARY_SERVICES_LABEL_EN}</li>
       </ul>
 
       <h3 style={styles.h3}>Q. What does {ENTITY_LABEL} do?</h3>
       <p style={styles.p}>
-        A. {ENTITY_LABEL} diagnoses how generative AI systems read a website, identifies information gaps between the main page and
-        supporting pages, and designs AI Profile Pages for clearer machine-readable company information.
+        A. {ENTITY_LABEL} is an {OFFICIAL_FACT_DESCRIPTION_EN}. It diagnoses how generative AI systems read a website,
+        identifies information gaps between the main page and supporting pages, and builds AI Profile Pages as official source hubs.
       </p>
 
       <h3 style={styles.h3}>Q. What is an AI Profile Page?</h3>

@@ -46,6 +46,7 @@ export default function RootLayout({ children }) {
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": SITE_ORIGIN,
     name: ENTITY_LABEL,
     alternateName: [ENTITY_SHORT_NAME, ENTITY_FULL_NAME, "에이에이오"],
     url: SITE_ORIGIN,
@@ -79,6 +80,7 @@ export default function RootLayout({ children }) {
   const softwareApplicationSchema = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
+    "@id": `${SITE_ORIGIN}#software`,
     name: ENTITY_LABEL,
     alternateName: [ENTITY_SHORT_NAME, ENTITY_FULL_NAME, "에이에이오"],
     applicationCategory: "BusinessApplication",
