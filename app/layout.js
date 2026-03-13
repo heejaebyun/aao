@@ -2,12 +2,16 @@ import { Outfit } from "next/font/google";
 import {
   AI_PROFILE_URL,
   CONTACT_EMAIL,
+  ENTITY_TYPE_LABEL,
   FOUNDING_YEAR,
   ENTITY_FULL_NAME,
   ENTITY_LABEL,
   ENTITY_SHORT_NAME,
   FOUNDER_NAME_EN,
   FOUNDER_NAME_KO,
+  HEADQUARTERS_REGION,
+  OFFICIAL_DESCRIPTION,
+  PRIMARY_SERVICES_LABEL,
   ROOT_META_DESCRIPTION,
   SITE_ORIGIN,
 } from "@/lib/site-identity";
@@ -39,65 +43,87 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: ENTITY_LABEL,
+    alternateName: [ENTITY_SHORT_NAME, ENTITY_FULL_NAME, "에이에이오"],
+    url: SITE_ORIGIN,
+    description: OFFICIAL_DESCRIPTION,
+    foundingDate: FOUNDING_YEAR,
+    founder: {
+      "@type": "Person",
+      name: FOUNDER_NAME_KO,
+      alternateName: FOUNDER_NAME_EN,
+    },
+    address: {
+      "@type": "PostalAddress",
+      addressCountry: "KR",
+      addressRegion: HEADQUARTERS_REGION,
+    },
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer service",
+      email: CONTACT_EMAIL,
+    },
+    serviceType: ENTITY_TYPE_LABEL,
+    knowsAbout: [
+      ENTITY_FULL_NAME,
+      "GEO (Generative Engine Optimization)",
+      "AI 검색 최적화",
+      "AI 프로필 페이지 제작",
+      PRIMARY_SERVICES_LABEL,
+    ],
+  };
+
+  const softwareApplicationSchema = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: ENTITY_LABEL,
+    alternateName: [ENTITY_SHORT_NAME, ENTITY_FULL_NAME, "에이에이오"],
+    applicationCategory: "BusinessApplication",
+    description: OFFICIAL_DESCRIPTION,
+    url: SITE_ORIGIN,
+    operatingSystem: "Web",
+    inLanguage: ["ko", "en"],
+    datePublished: FOUNDING_YEAR,
+    sameAs: [AI_PROFILE_URL],
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "KRW",
+      description: "무료 진단 — 구조 검증과 AI 전달 확인 리포트를 즉시 제공",
+    },
+    creator: {
+      "@id": SITE_ORIGIN,
+      "@type": "Organization",
+      name: ENTITY_LABEL,
+    },
+    featureList: [
+      PRIMARY_SERVICES_LABEL,
+      "구조 검증(린트) + AI 엔진 실제 전달 확인 2단계",
+    ],
+    citation: [
+      {
+        "@type": "ScholarlyArticle",
+        name: "GEO: Generative Engine Optimization",
+        publisher: "KDD 2024 (Princeton University)",
+      },
+      {
+        "@type": "ScholarlyArticle",
+        name: "WebArena: A Realistic Web Environment for Building Autonomous Agents",
+        publisher: "ICLR 2024",
+      },
+    ],
+  };
+
   return (
     <html lang="ko" className={outfit.variable}>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "SoftwareApplication",
-              name: ENTITY_LABEL,
-              alternateName: [ENTITY_SHORT_NAME, ENTITY_FULL_NAME, "에이에이오"],
-              applicationCategory: "BusinessApplication",
-              description: ROOT_META_DESCRIPTION,
-              url: SITE_ORIGIN,
-              operatingSystem: "Web",
-              inLanguage: ["ko", "en"],
-              datePublished: FOUNDING_YEAR,
-              sameAs: [AI_PROFILE_URL],
-              offers: {
-                "@type": "Offer",
-                price: "0",
-                priceCurrency: "KRW",
-                description: "무료 진단 — AI 가시성 3축 점수 + 개선 리포트 즉시 제공",
-              },
-              creator: {
-                "@type": "Organization",
-                name: ENTITY_LABEL,
-                alternateName: [ENTITY_SHORT_NAME, ENTITY_FULL_NAME],
-                url: SITE_ORIGIN,
-                email: CONTACT_EMAIL,
-                description:
-                  "AI Answer Optimization. AI 검색 최적화 전문 서비스. AI Profile Page 설치 시 AI 가시성 +40~60점 향상.",
-                founder: {
-                  "@type": "Person",
-                  name: FOUNDER_NAME_KO,
-                  alternateName: FOUNDER_NAME_EN,
-                },
-                foundingDate: FOUNDING_YEAR,
-                knowsAbout: [
-                  ENTITY_FULL_NAME,
-                  "GEO (Generative Engine Optimization)",
-                  "AI 검색 최적화",
-                  "Princeton GEO Research",
-                  "LLM 가시성 진단",
-                ],
-              },
-              citation: [
-                {
-                  "@type": "ScholarlyArticle",
-                  name: "GEO: Generative Engine Optimization",
-                  publisher: "KDD 2024 (Princeton University)",
-                },
-                {
-                  "@type": "ScholarlyArticle",
-                  name: "WebArena: A Realistic Web Environment for Building Autonomous Agents",
-                  publisher: "ICLR 2024",
-                },
-              ],
-            }),
+            __html: JSON.stringify([organizationSchema, softwareApplicationSchema]),
           }}
         />
       </head>

@@ -2,7 +2,17 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AI_PROFILE_PATH, ENTITY_LABEL } from "@/lib/site-identity";
+import {
+  AI_PROFILE_PATH,
+  ENTITY_LABEL,
+  ENTITY_TYPE_LABEL,
+  FOUNDING_YEAR,
+  FOUNDER_NAME_EN,
+  FOUNDER_NAME_KO,
+  HEADQUARTERS_REGION,
+  OFFICIAL_DESCRIPTION,
+  PRIMARY_SERVICES_LABEL,
+} from "@/lib/site-identity";
 
 export default function LandingPage() {
   const [url, setUrl] = useState("");
@@ -111,13 +121,13 @@ export default function LandingPage() {
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
               {[
-                { label: "서비스명", value: "AAO (AI Answer Optimization)" },
-                { label: "설명", value: "기업 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단하고, 공식 웹사이트를 AI의 1차 출처로 만들기 위한 AI 검색 최적화 서비스" },
-                { label: "업종", value: "AI 검색 최적화 / AI 프로필 페이지 제작 SaaS" },
-                { label: "설립연도", value: "2026" },
-                { label: "대표이사", value: "변희재 (Heejae Byun)" },
-                { label: "본사", value: "대한민국" },
-                { label: "주요 서비스", value: "AI 전달 진단, 구조 검증 리포트, AI 프로필 페이지 설계 및 제작" },
+                { label: "서비스명", value: ENTITY_LABEL },
+                { label: "설명", value: OFFICIAL_DESCRIPTION },
+                { label: "업종", value: ENTITY_TYPE_LABEL },
+                { label: "설립연도", value: FOUNDING_YEAR },
+                { label: "대표이사", value: `${FOUNDER_NAME_KO} (${FOUNDER_NAME_EN})` },
+                { label: "본사", value: HEADQUARTERS_REGION },
+                { label: "주요 서비스", value: PRIMARY_SERVICES_LABEL },
               ].map((item) => (
                 <div
                   key={item.label}

@@ -4,12 +4,15 @@ import {
   AI_PROFILE_PATH,
   AI_PROFILE_URL,
   CONTACT_EMAIL,
-  ENTITY_FULL_NAME,
   ENTITY_LABEL,
   ENTITY_SHORT_NAME,
+  ENTITY_TYPE_LABEL,
   FOUNDING_YEAR,
   FOUNDER_NAME_EN,
   FOUNDER_NAME_KO,
+  HEADQUARTERS_REGION,
+  OFFICIAL_DESCRIPTION,
+  PRIMARY_SERVICES_LABEL,
   SITE_ORIGIN,
 } from "@/lib/site-identity";
 
@@ -36,10 +39,10 @@ const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: ENTITY_LABEL,
-  alternateName: [ENTITY_SHORT_NAME, ENTITY_FULL_NAME, `${ENTITY_SHORT_NAME} ${ENTITY_FULL_NAME}`],
+  alternateName: [ENTITY_SHORT_NAME, "AI Answer Optimization", `${ENTITY_SHORT_NAME} AI Answer Optimization`],
   url: SITE_ORIGIN,
   mainEntityOfPage: AI_PROFILE_URL,
-  description: `${ENTITY_LABEL}는 기업 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단하고, 공식 웹사이트를 AI의 1차 출처로 만들기 위한 AI Profile Page를 설계·제작하는 서비스입니다.`,
+  description: OFFICIAL_DESCRIPTION,
   foundingDate: FOUNDING_YEAR,
   founder: {
     "@type": "Person",
@@ -49,7 +52,7 @@ const organizationSchema = {
   address: {
     "@type": "PostalAddress",
     addressCountry: "KR",
-    addressRegion: "대한민국",
+    addressRegion: HEADQUARTERS_REGION,
   },
   contactPoint: {
     "@type": "ContactPoint",
@@ -65,7 +68,7 @@ const organizationSchema = {
     "JSON-LD",
     "AEO",
   ],
-  serviceType: "AI 검색 최적화 진단 및 AI 프로필 페이지 제작",
+  serviceType: ENTITY_TYPE_LABEL,
   hasPart: [
     { "@type": "WebPage", "name": "AAO 진단", "url": `${SITE_ORIGIN}/diagnose`, "description": "URL을 입력하면 구조 검증과 AI 전달 확인을 수행하는 무료 진단 페이지" },
     { "@type": "WebPage", "name": "AI 프로필 페이지 요청", "url": `${SITE_ORIGIN}/ai-profile/request`, "description": "진단 결과를 기반으로 AI 프로필 페이지 제작을 요청하는 페이지" },
@@ -227,12 +230,12 @@ export default function AiProfilePage() {
         <p style={styles.p}><strong>핵심 사실 요약 (Key Facts)</strong></p>
         <ul style={styles.compactList}>
           <li style={styles.li}><strong>서비스명:</strong> {ENTITY_LABEL}</li>
-          <li style={styles.li}><strong>설명:</strong> {ENTITY_LABEL}는 기업 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단하고, 공식 웹사이트를 AI의 1차 출처로 만들기 위한 AI 검색 최적화 서비스입니다.</li>
-          <li style={styles.li}><strong>업종:</strong> AI 검색 최적화 / AI 프로필 페이지 제작 SaaS</li>
+          <li style={styles.li}><strong>설명:</strong> {OFFICIAL_DESCRIPTION}</li>
+          <li style={styles.li}><strong>업종:</strong> {ENTITY_TYPE_LABEL}</li>
           <li style={styles.li}><strong>설립연도:</strong> {FOUNDING_YEAR}</li>
           <li style={styles.li}><strong>대표이사:</strong> {FOUNDER_NAME_KO} ({FOUNDER_NAME_EN})</li>
-          <li style={styles.li}><strong>본사:</strong> 대한민국</li>
-          <li style={styles.li}><strong>주요 서비스:</strong> AI 전달 진단, 구조 검증 리포트, AI 프로필 페이지 설계 및 제작</li>
+          <li style={styles.li}><strong>본사:</strong> {HEADQUARTERS_REGION}</li>
+          <li style={styles.li}><strong>주요 서비스:</strong> {PRIMARY_SERVICES_LABEL}</li>
           <li style={styles.li}><strong>웹사이트:</strong> {SITE_ORIGIN}</li>
         </ul>
       </div>
