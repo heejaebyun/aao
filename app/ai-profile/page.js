@@ -308,15 +308,28 @@ export default function AiProfilePage() {
         <strong>{ENTITY_LABEL}</strong> is an {OFFICIAL_FACT_DESCRIPTION_EN}. It helps make the official website a
         primary source for AI-readable company information.
       </p>
-      <ul style={styles.ul}>
-        <li style={styles.li}><strong>Service:</strong> {ENTITY_LABEL}</li>
-        <li style={styles.li}><strong>Description:</strong> {OFFICIAL_FACT_DESCRIPTION_EN}</li>
-        <li style={styles.li}><strong>Founded:</strong> {FOUNDING_YEAR}</li>
-        <li style={styles.li}><strong>Founder:</strong> {FOUNDER_NAME_EN}</li>
-        <li style={styles.li}><strong>Headquarters:</strong> {HEADQUARTERS_REGION_EN}</li>
-        <li style={styles.li}><strong>Industry:</strong> {ENTITY_TYPE_LABEL_EN}</li>
-        <li style={styles.li}><strong>Key services:</strong> {PRIMARY_SERVICES_LABEL_EN}</li>
-      </ul>
+      <div style={styles.box}>
+        <p style={styles.p}><strong>English Key Facts</strong></p>
+        <dl style={styles.factsGrid}>
+          {[
+            { label: "Description", value: OFFICIAL_FACT_DESCRIPTION_EN },
+            { label: "Industry", value: ENTITY_TYPE_LABEL_EN },
+            { label: "Founded", value: FOUNDING_YEAR },
+            { label: "Headquarters", value: HEADQUARTERS_REGION_EN },
+          ].map((item) => (
+            <div key={item.label} style={styles.factCard}>
+              <dt style={styles.factTerm}>{item.label}</dt>
+              <dd style={styles.factDesc}>{item.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+      <p style={styles.p}>
+        <strong>Founder:</strong> {FOUNDER_NAME_EN}
+      </p>
+      <p style={styles.p}>
+        <strong>Key services:</strong> {PRIMARY_SERVICES_LABEL_EN}
+      </p>
 
       <h3 style={styles.h3}>Q. What does {ENTITY_LABEL} do?</h3>
       <p style={styles.p}>
