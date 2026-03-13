@@ -108,7 +108,10 @@ function main() {
       const lowConfMissed = missed.filter((m) => m.confidence === "low");
       // Separate jsonld_only misses (engine tendency, not judgment error) from real review items
       const jsonldOnlyMissed = lowConfMissed.filter((m) => m.observedSignal === "jsonld_only");
-      const realLowConfMissed = lowConfMissed.filter((m) => m.observedSignal !== "jsonld_only");
+      const dualSourceMissed = lowConfMissed.filter((m) => m.observedSignal === "dual_source_missed");
+      const realLowConfMissed = lowConfMissed.filter(
+        (m) => m.observedSignal !== "jsonld_only"
+      );
 
       if (jsonldOnlyMissed.length > 0) {
         reviewItems.push({
@@ -127,15 +130,34 @@ function main() {
         });
       }
 
-      if (realLowConfMissed.length > 0) {
+      if (dualSourceMissed.length > 0) {
+        reviewItems.push({
+          type: "dual_source_miss",
+          severity: "review",
+          url: log.url,
+          hostname,
+          engine: engineId,
+          detail: `${dualSourceMissed.length} fields declared in both JSON-LD and facts block but still missed`,
+          fields: dualSourceMissed.map((m) => ({
+            field: m.field,
+            declaredValue: m.declaredValue,
+            cause: m.inferredCause,
+            signal: m.observedSignal,
+          })),
+        });
+      }
+
+      const reviewOnlyLowConfMissed = realLowConfMissed.filter((m) => m.observedSignal !== "dual_source_missed");
+
+      if (reviewOnlyLowConfMissed.length > 0) {
         reviewItems.push({
           type: "missed_low_confidence",
           severity: "review",
           url: log.url,
           hostname,
           engine: engineId,
-          detail: `${realLowConfMissed.length} missed fields with low confidence cause — verify manually`,
-          fields: realLowConfMissed.map((m) => ({
+          detail: `${reviewOnlyLowConfMissed.length} missed fields with low confidence cause — verify manually`,
+          fields: reviewOnlyLowConfMissed.map((m) => ({
             field: m.field,
             declaredValue: m.declaredValue,
             cause: m.inferredCause,
