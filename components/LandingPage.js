@@ -57,15 +57,85 @@ export default function LandingPage() {
           AI의 1차 출처로 만들기 위해, 메인 페이지 구조와 실제 AI 전달 결과를 함께 진단하는 서비스입니다.
         </p>
 
-        <div style={{ maxWidth: 620, margin: "0 auto 28px", background: "#0f0f1e", border: "1px solid #1a1a2e", borderRadius: 14, padding: "18px 20px", textAlign: "left" }}>
-          <div style={{ fontSize: 13, color: "#a78bfa", fontWeight: 700, marginBottom: 10 }}>공식 사실 요약</div>
-          <div style={{ fontSize: 14, color: "#d8d8f4", lineHeight: 1.8 }}>
-            <div><strong>서비스명:</strong> {ENTITY_LABEL}</div>
-            <div><strong>설명:</strong> {ENTITY_LABEL}는 기업 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단하고, 공식 웹사이트를 AI의 1차 출처로 만들기 위한 AI 검색 최적화 서비스입니다.</div>
-            <div><strong>업종:</strong> AI 검색 최적화 / AI 프로필 페이지 제작 SaaS</div>
-            <div><strong>설립연도:</strong> 2026</div>
-            <div><strong>대표이사:</strong> 변희재 (Heejae Byun)</div>
-            <div><strong>주요 서비스:</strong> AI 전달 진단, 구조 검증 리포트, AI 프로필 페이지 설계 및 제작</div>
+        <div
+          style={{
+            maxWidth: 760,
+            margin: "0 auto 32px",
+            background: "linear-gradient(180deg, rgba(18,18,42,0.92), rgba(10,10,24,0.96))",
+            border: "1px solid rgba(167,139,250,0.18)",
+            borderRadius: 22,
+            padding: "22px 22px 18px",
+            textAlign: "left",
+            boxShadow: "0 24px 60px rgba(0,0,0,0.28)",
+            overflow: "hidden",
+            position: "relative",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              inset: "0 auto auto 0",
+              width: 220,
+              height: 220,
+              background: "radial-gradient(circle, rgba(108,99,255,0.22), rgba(108,99,255,0))",
+              pointerEvents: "none",
+            }}
+          />
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 14 }}>
+              <div>
+                <div style={{ fontSize: 12, color: "#a78bfa", fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", marginBottom: 8 }}>
+                  Official Facts
+                </div>
+                <div style={{ fontSize: 20, color: "#f4f1ff", fontWeight: 800, lineHeight: 1.25 }}>
+                  AI가 바로 읽을 수 있게 정리한 공식 사실
+                </div>
+              </div>
+              <a
+                href={AI_PROFILE_PATH}
+                style={{
+                  alignSelf: "flex-start",
+                  padding: "10px 14px",
+                  borderRadius: 999,
+                  background: "#14142a",
+                  border: "1px solid rgba(167,139,250,0.2)",
+                  color: "#d8d3ff",
+                  textDecoration: "none",
+                  fontSize: 12,
+                  fontWeight: 700,
+                }}
+              >
+                /ai-profile 바로 보기
+              </a>
+            </div>
+
+            <div style={{ fontSize: 15, color: "#d8d8f4", lineHeight: 1.75, marginBottom: 16, maxWidth: 640 }}>
+              <strong style={{ color: "#ffffff" }}>{ENTITY_LABEL}</strong>는 기업 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단하고,
+              공식 웹사이트를 AI의 1차 출처로 만들기 위한 AI 검색 최적화 서비스입니다.
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
+              {[
+                { label: "업종", value: "AI 검색 최적화 / AI 프로필 페이지 제작 SaaS" },
+                { label: "설립연도", value: "2026" },
+                { label: "대표이사", value: "변희재 (Heejae Byun)" },
+                { label: "주요 서비스", value: "AI 전달 진단, 구조 검증 리포트, AI 프로필 페이지 설계 및 제작" },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  style={{
+                    background: "rgba(9,9,20,0.72)",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                    borderRadius: 16,
+                    padding: "14px 14px 13px",
+                    minHeight: 84,
+                  }}
+                >
+                  <div style={{ fontSize: 11, color: "#8f8fb5", marginBottom: 8, textTransform: "uppercase", letterSpacing: "1px" }}>{item.label}</div>
+                  <div style={{ fontSize: 14, color: "#ecebff", lineHeight: 1.55, fontWeight: 600 }}>{item.value}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
