@@ -15,13 +15,13 @@ const PRODUCT_PREVIEW_COPY = {
     category: "웹사이트 구조 분석",
     name: "구조 검증 리포트",
     tagline: "공식 출처 레이어가 AI 검색에 맞게 준비됐는지 점검합니다.",
-    output: "구조적 문제와 누락된 source-layer 요소를 우선순위 리포트로 정리합니다.",
+    output: "구조적 문제와 누락된 공식 출처 레이어 요소를 우선순위 리포트로 정리합니다.",
   },
   "ai-profile-page": {
     category: "공식 출처 허브",
     name: "AI 프로필 페이지",
     tagline: "AI가 읽기 쉬운 공식 회사 사실 허브를 만듭니다.",
-    output: "공식 사실, JSON-LD, FAQ를 모은 전용 source page를 제공합니다.",
+    output: "공식 사실, JSON-LD, FAQ를 모은 전용 공식 출처 페이지를 제공합니다.",
   },
 };
 
@@ -29,7 +29,7 @@ const INSIGHT_PREVIEW_COPY = {
   "why-ai-search-engines-miss-official-company-facts": {
     title: "왜 AI는 공식 회사 사실을 놓칠까",
     description:
-      "AI 답변에서 공식 회사 사실이 빠지는 이유와, 한 개의 visible source hub가 왜 중요한지 설명합니다.",
+      "AI 답변에서 공식 회사 사실이 빠지는 이유와, 눈에 보이는 공식 출처 허브가 왜 중요한지 설명합니다.",
     readingTime: "3분 읽기",
   },
   "why-json-ld-alone-is-not-enough-for-ai-citation": {
@@ -120,7 +120,7 @@ export default function LandingPage() {
           </a>
           <div style={{ fontSize: 12, color: "#555577", textAlign: "center" }}>무료 · 회원가입 불필요 · 구조 검증과 AI 전달 확인 동시 실행</div>
           <div style={{ fontSize: 12, color: "#7f7fa6", textAlign: "center" }}>
-            공식 구조 설명이 필요하면 <a href={AI_PROFILE_PATH} style={inlineLinkStyle()}>AI Profile Page</a>를 바로 확인할 수 있습니다.
+            공식 구조 설명이 필요하면 <a href={AI_PROFILE_PATH} style={inlineLinkStyle()}>AI 프로필 페이지</a>를 바로 확인할 수 있습니다.
           </div>
         </div>
       </section>
@@ -143,7 +143,7 @@ export default function LandingPage() {
       <section style={{ maxWidth: 860, margin: "0 auto 80px", padding: "0 24px" }}>
         <h2 style={{ textAlign: "center", fontSize: 22, fontWeight: 700, marginBottom: 18, color: "#f3f1ff" }}>공식 모듈</h2>
         <p style={{ textAlign: "center", fontSize: 14, color: "#7f7fa6", lineHeight: 1.75, margin: "0 auto 32px", maxWidth: 640 }}>
-          AAO는 하나의 회사 사실 허브를 넘어, 제품 단위 source page와 재사용 가능한 AI-readable 모듈로 확장하고 있습니다.
+          AAO는 하나의 회사 사실 허브를 넘어, 제품 단위 공식 출처 페이지와 재사용 가능한 AI 전달 모듈로 확장하고 있습니다.
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
           {PRODUCTS.map((product) => (
@@ -192,7 +192,7 @@ export default function LandingPage() {
       <section style={{ maxWidth: 860, margin: "0 auto 80px", padding: "0 24px" }}>
         <h2 style={{ textAlign: "center", fontSize: 22, fontWeight: 700, marginBottom: 18, color: "#f3f1ff" }}>자체 인사이트 노트</h2>
         <p style={{ textAlign: "center", fontSize: 14, color: "#7f7fa6", lineHeight: 1.75, margin: "0 auto 32px", maxWidth: 680 }}>
-          AAO가 AI-readable source structure, citation behavior, first-party discoverability에 대해 실험하며 배운 내용을 정리합니다.
+          AAO가 공식 출처 구조, AI 인용 패턴, 자사 도메인 발견 가능성에 대해 실험하며 배운 내용을 정리합니다.
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
           {INSIGHTS.slice(0, 2).map((insight) => (
@@ -257,7 +257,7 @@ export default function LandingPage() {
           >
             무료 진단 시작하기
           </a>
-          <a href={AI_PROFILE_PATH} style={secondaryLinkStyle()}>공식 AI Profile 보기</a>
+          <a href={AI_PROFILE_PATH} style={secondaryLinkStyle()}>공식 AI 프로필 보기</a>
         </div>
       </section>
 
