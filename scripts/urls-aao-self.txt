@@ -1,3 +1,4 @@
-# AAO 자체 before/after 확인용 URL
-https://aao.co.kr/ai-profile
+# AAO 운영군 — 메인 + AI Profile
+# 언어 정책: / (ko), /ai-profile (en)
 https://aao.co.kr
+https://aao.co.kr/ai-profile

@@ -19,6 +19,16 @@ const VERBOSE = process.argv.includes("--verbose");
 // Citation이 약한 엔진 — delivered_no_citation을 warn 대신 info로 낮춤
 const WEAK_CITATION_ENGINES = new Set(["gemini"]);
 
+function formatUrlTarget(url) {
+  try {
+    const parsed = new URL(url);
+    const pathname = parsed.pathname === "/" ? "/" : parsed.pathname.replace(/\/$/, "");
+    return `${parsed.hostname}${pathname}`;
+  } catch {
+    return url;
+  }
+}
+
 function loadLogs() {
   try {
     const files = readdirSync(LOG_DIR).filter((f) => f.endsWith(".json")).sort();
@@ -49,6 +59,7 @@ function main() {
 
   for (const log of logs) {
     const hostname = (() => { try { return new URL(log.url).hostname; } catch { return log.url; } })();
+    const target = formatUrlTarget(log.url);
 
     for (const [engineId, eng] of Object.entries(log.engines || {})) {
       if (!engineStats[engineId]) {
@@ -85,6 +96,7 @@ function main() {
           severity: sev,
           url: log.url,
           hostname,
+          target,
           engine: engineId,
           detail: `${delivered.length} fields delivered but no official URL cited`,
           fields: delivered.map((f) => f.field),
@@ -98,6 +110,7 @@ function main() {
           severity: "info",
           url: log.url,
           hostname,
+          target,
           engine: engineId,
           detail: `Cited same domain but different page`,
           citations: eng.citations?.slice(0, 3),
@@ -119,6 +132,7 @@ function main() {
           severity: "info",
           url: log.url,
           hostname,
+          target,
           engine: engineId,
           detail: `${jsonldOnlyMissed.length} fields declared in JSON-LD only — engine may not read structured data`,
           fields: jsonldOnlyMissed.map((m) => ({
@@ -136,6 +150,7 @@ function main() {
           severity: "review",
           url: log.url,
           hostname,
+          target,
           engine: engineId,
           detail: `${dualSourceMissed.length} fields declared in both JSON-LD and facts block but still missed`,
           fields: dualSourceMissed.map((m) => ({
@@ -155,6 +170,7 @@ function main() {
           severity: "review",
           url: log.url,
           hostname,
+          target,
           engine: engineId,
           detail: `${reviewOnlyLowConfMissed.length} missed fields with low confidence cause — verify manually`,
           fields: reviewOnlyLowConfMissed.map((m) => ({
@@ -174,6 +190,7 @@ function main() {
           severity: "review",
           url: log.url,
           hostname,
+          target,
           engine: engineId,
           detail: `${uncertain.length} subpages with uncertain reach — check manually`,
           subpages: uncertain.map((s) => ({ url: s.url, evidence: s.evidence })),
@@ -188,12 +205,62 @@ function main() {
           severity: allJsonldOnly ? "info" : "warn",
           url: log.url,
           hostname,
+          target,
           engine: engineId,
           detail: `0/${missed.length} fields delivered — check if engine actually read the page`,
           responsePreview: eng.responsePreview?.slice(0, 150),
         });
       }
     }
+  }
+
+  // === Per-URL delivery table ===
+  const AAO_SELF_PATHS = new Set(["/", "/ai-profile"]);
+  const EXPERIMENT_PATHS = new Set(["/experiments/root-link-only", "/experiments/root-min-facts"]);
+
+  function classifyUrl(url) {
+    try {
+      const pathname = new URL(url).pathname.replace(/\/$/, "") || "/";
+      if (AAO_SELF_PATHS.has(pathname)) return "운영";
+      if (EXPERIMENT_PATHS.has(pathname)) return "실험";
+      return "외부";
+    } catch { return "외부"; }
+  }
+
+  function shortPath(url) {
+    try {
+      const parsed = new URL(url);
+      const pathname = parsed.pathname.replace(/\/$/, "") || "/";
+      if (parsed.hostname === "aao.co.kr") return pathname;
+      return `${parsed.hostname}${pathname}`;
+    } catch { return url; }
+  }
+
+  // Collect AAO URLs for the comparison table
+  const aaoLogs = logs.filter((log) => {
+    try { return new URL(log.url).hostname === "aao.co.kr"; } catch { return false; }
+  });
+
+  if (aaoLogs.length > 0) {
+    const engineIds = [...new Set(aaoLogs.flatMap((log) => Object.keys(log.engines || {})))];
+    console.log("── AAO Delivery Comparison ──\n");
+    const header = ["  구분", "경로", ...engineIds.map((e) => e.padEnd(12))].join(" | ");
+    console.log(header);
+    console.log("  " + "─".repeat(header.length - 2));
+    for (const log of aaoLogs) {
+      const group = classifyUrl(log.url);
+      const path = shortPath(log.url).padEnd(32);
+      const cells = engineIds.map((eid) => {
+        const eng = (log.engines || {})[eid];
+        if (!eng || eng.status !== "success") return "ERR".padEnd(12);
+        const d = eng.deliveredFields?.length || 0;
+        const t = d + (eng.missedFields?.length || 0);
+        const cite = eng.citationMatchLevel || "none";
+        return `${d}/${t} ${cite}`.padEnd(12);
+      });
+      console.log(`  ${group}   | ${path} | ${cells.join(" | ")}`);
+    }
+    console.log();
   }
 
   // === Print engine stats ===
@@ -223,7 +290,7 @@ function main() {
   if (bySeverity.warn.length > 0) {
     console.log(`  ⚠ WARNINGS (${bySeverity.warn.length}) — likely false positives/negatives:\n`);
     for (const item of bySeverity.warn) {
-      console.log(`    [${item.type}] ${item.hostname} / ${item.engine}`);
+      console.log(`    [${item.type}] ${item.target} / ${item.engine}`);
       console.log(`      ${item.detail}`);
       if (VERBOSE && item.fields) console.log(`      fields: ${item.fields.join(", ")}`);
       if (VERBOSE && item.responsePreview) console.log(`      preview: "${item.responsePreview}..."`);
@@ -234,7 +301,7 @@ function main() {
   if (bySeverity.review.length > 0) {
     console.log(`  🔍 REVIEW (${bySeverity.review.length}) — manual verification needed:\n`);
     for (const item of bySeverity.review) {
-      console.log(`    [${item.type}] ${item.hostname} / ${item.engine}`);
+      console.log(`    [${item.type}] ${item.target} / ${item.engine}`);
       console.log(`      ${item.detail}`);
       if (VERBOSE && item.fields) {
         for (const f of item.fields) {
@@ -253,7 +320,7 @@ function main() {
   if (bySeverity.info.length > 0) {
     console.log(`  ℹ INFO (${bySeverity.info.length}):\n`);
     for (const item of bySeverity.info) {
-      console.log(`    [${item.type}] ${item.hostname} / ${item.engine}: ${item.detail}`);
+      console.log(`    [${item.type}] ${item.target} / ${item.engine}: ${item.detail}`);
       if (VERBOSE && item.citations) console.log(`      citations: ${item.citations.join(", ")}`);
     }
     console.log();

@@ -1,5 +1,5 @@
-# AAO 루트 구조 실험용 URL
-https://aao.co.kr/ai-profile
-https://aao.co.kr
+# AAO 실험군 — root 구조 변형 비교
+# root-link-only: facts 없이 /ai-profile 링크만
+# root-min-facts: 최소 visible facts만
 https://aao.co.kr/experiments/root-link-only
 https://aao.co.kr/experiments/root-min-facts

@@ -4,9 +4,14 @@
 //
 // 사전 조건: Next.js dev 서버가 실행 중이어야 합니다.
 //   1. AAO_DEBUG_LOG=1 npm run dev   (터미널 1)
-//   2. node --experimental-default-type=module ./scripts/delivery-sample-run.mjs   (터미널 2)
+//   2. npm run delivery:run -- [urls-file]   (터미널 2)
 //
-// urls-file: 한 줄에 URL 하나. 없으면 기본 샘플 사용.
+// ── 표준 실행 템플릿 ──
+//   운영군:  npm run delivery:run -- scripts/urls-aao-self.txt
+//   실험군:  npm run delivery:run -- scripts/urls-aao-root-experiments.txt
+//   리뷰:    npm run delivery:review
+//
+// urls-file: 한 줄에 URL 하나. #으로 시작하면 주석. 없으면 기본 샘플 사용.
 // 결과: /tmp/aao-delivery-logs/ 에 JSON 파일 생성 (서버 측에서 저장)
 
 import { readFileSync } from "node:fs";

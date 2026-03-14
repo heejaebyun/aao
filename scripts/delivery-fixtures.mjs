@@ -207,6 +207,43 @@ const FIXTURES = [
       assert.equal(result.missedFields[0].field, "headquarters");
     },
   },
+  // 15. Citation path but zero delivery — Perplexity pattern
+  // Perplexity sometimes cites the domain/path but returns generic info with no actual field values
+  {
+    id: "citation-path-zero-delivery",
+    description: "citation=path이지만 필드 전달 0건 — Perplexity 패턴",
+    groundTruth: buildGt([
+      ["entity_name", "AAO (AI Answer Optimization)"],
+      ["entity_type", "AI 검색 최적화 SaaS"],
+      ["founded", "2026"],
+      ["headquarters", "대한민국"],
+    ]),
+    responseText: "해당 웹사이트에 대한 구체적인 정보를 찾기 어렵습니다. 직접 방문하여 확인해 보시기 바랍니다.",
+    observedEvidence: {},
+    assert(result) {
+      assert.equal(result.deliveredFields.length, 0, "generic deflection should deliver 0 fields");
+      assert.equal(result.missedFields.length, 4);
+    },
+  },
+
+  // 16. Partial delivery without citation — Gemini pattern
+  // Gemini sometimes delivers entity_name from general knowledge but cites nothing
+  {
+    id: "partial-delivery-no-citation-gemini",
+    description: "entity_name만 delivered, citation none — Gemini 일반 지식 패턴",
+    groundTruth: buildGt([
+      ["entity_name", "AAO"],
+      ["entity_type", "AI 검색 최적화 SaaS"],
+      ["founded", "2026"],
+    ]),
+    responseText: "AAO는 AI 관련 서비스를 제공하는 것으로 보입니다. 정확한 설립 연도나 서비스 유형에 대한 정보는 확인되지 않습니다.",
+    observedEvidence: {},
+    assert(result) {
+      assert.equal(result.deliveredFields.length, 1, "only entity_name should match");
+      assert.equal(result.deliveredFields[0].field, "entity_name");
+      assert.equal(result.missedFields.length, 2, "entity_type and founded should be missed");
+    },
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -247,6 +284,54 @@ const GT_FIXTURES = [
       assert.equal(fields.entity_type, "IT 서비스", "사업 분야 should map to entity_type");
       assert.ok(Array.isArray(fields.key_products), "주요 서비스 should be array");
       assert.ok(fields.key_products.includes("웹개발"), "should include 웹개발");
+    },
+  },
+  {
+    id: "gt-inline-facts-block",
+    description: "한 줄 문단형 facts block에서도 공식 사실 추출",
+    crawlSnapshot: {
+      jsonLdBlocks: [],
+      content: [
+        "공식 사실 요약",
+        "서비스명: AAO (AI Answer Optimization) 설명: AAO는 기업 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단하는 서비스입니다. 업종: AI 검색 최적화 / AI 프로필 페이지 제작 SaaS 설립연도: 2026 대표이사: 변희재 (Heejae Byun) 주요 서비스: AI 전달 진단, 구조 검증 리포트, AI 프로필 페이지 설계 및 제작",
+      ].join(" "),
+    },
+    assert(gt) {
+      const fields = Object.fromEntries(gt.declaredFields.map((f) => [f.field, f.value]));
+      assert.equal(fields.entity_name, "AAO (AI Answer Optimization)", "서비스명 should map from inline facts block");
+      assert.match(String(fields.description), /기업 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단/, "설명 should map from inline facts block");
+      assert.equal(fields.entity_type, "AI 검색 최적화 / AI 프로필 페이지 제작 SaaS");
+      assert.equal(fields.founded, "2026");
+      assert.equal(fields.ceo_or_leader, "변희재 (Heejae Byun)");
+      assert.ok(Array.isArray(fields.key_products), "주요 서비스 should still be parsed as array");
+      assert.ok(fields.key_products.includes("AI 전달 진단"), "주요 서비스 should include AI 전달 진단");
+    },
+  },
+  {
+    id: "gt-inline-facts-block-windowed",
+    description: "facts block 뒤 일반 본문이 이어져도 값이 과도하게 확장되지 않음",
+    crawlSnapshot: {
+      jsonLdBlocks: [],
+      content: [
+        "공식 사실 요약",
+        "서비스명: AAO (AI Answer Optimization) 설명: AAO는 기업 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단하는 서비스입니다. 업종: AI 검색 최적화 / AI 프로필 페이지 제작 SaaS 설립연도: 2026 대표이사: 변희재 (Heejae Byun) 주요 서비스: AI 전달 진단, 구조 검증 리포트, AI 프로필 페이지 설계 및 제작",
+        "핵심 관찰 Key Findings 국내 기업 웹사이트 대다수는 AI가 선언된 사실을 절반 이상 전달하지 못함 Princeton GEO 연구 KDD 2024 통계 데이터 포함 시 AI 인용 확률 상승",
+      ].join(" "),
+    },
+    assert(gt) {
+      const fields = Object.fromEntries(gt.declaredFields.map((f) => [f.field, f.value]));
+      assert.equal(
+        fields.description,
+        "AAO는 기업 웹사이트를 생성형 AI가 얼마나 정확히 이해하는지 진단하는 서비스입니다.",
+      );
+      assert.ok(Array.isArray(fields.key_products), "주요 서비스 should stay array-shaped");
+      assert.ok(fields.key_products.includes("AI 전달 진단"));
+      assert.ok(fields.key_products.includes("구조 검증 리포트"));
+      assert.ok(fields.key_products.some((item) => item.includes("AI 프로필 페이지 설계")));
+      assert.ok(
+        fields.key_products.every((item) => item.length < 60 && !item.includes("핵심 관찰")),
+        "주요 서비스 should not swallow the following section text",
+      );
     },
   },
   {
