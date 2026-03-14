@@ -4,18 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { INSIGHTS } from "@/lib/insights";
 import { PRODUCTS } from "@/lib/products";
-import {
-  AI_PROFILE_PATH,
-  ENTITY_LABEL,
-  ENTITY_TYPE_LABEL,
-  FOUNDER_NAME_EN,
-  FOUNDER_NAME_KO,
-  FOUNDING_YEAR,
-  HEADQUARTERS_REGION,
-  OFFICIAL_FACT_DESCRIPTION,
-  OFFICIAL_FACT_DESCRIPTION_EN,
-  PRIMARY_SERVICES_LABEL,
-} from "@/lib/site-identity";
+import { AI_PROFILE_PATH, ENTITY_LABEL } from "@/lib/site-identity";
 
 export default function LandingPage() {
   const [url, setUrl] = useState("");
@@ -76,7 +65,7 @@ export default function LandingPage() {
           style={{
             maxWidth: 760,
             margin: "0 auto 32px",
-            padding: "20px 22px",
+            padding: "16px 20px",
             textAlign: "left",
             background: "rgba(14,14,30,0.88)",
             border: "1px solid rgba(167,139,250,0.16)",
@@ -85,21 +74,7 @@ export default function LandingPage() {
             boxShadow: "0 20px 50px rgba(0,0,0,0.2)",
           }}
         >
-          <div style={{ fontSize: 12, color: "#a78bfa", fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", marginBottom: 10 }}>
-            Official Overview
-          </div>
-          <p style={{ margin: "0 0 14px", fontSize: 16, color: "#f4f1ff", lineHeight: 1.8 }}>
-            <strong>{ENTITY_LABEL}</strong>는 <strong>{OFFICIAL_FACT_DESCRIPTION}</strong>
-            {" "}({OFFICIAL_FACT_DESCRIPTION_EN})입니다.
-          </p>
-          <div style={{ fontSize: 14, color: "#d4d1f6", lineHeight: 1.9 }}>
-            <div>업종 / Industry: {ENTITY_TYPE_LABEL}</div>
-            <div>설립연도 / Founded: {FOUNDING_YEAR}</div>
-            <div>본사 / Headquarters: {HEADQUARTERS_REGION}</div>
-            <div>대표이사 / Founder: {FOUNDER_NAME_KO} ({FOUNDER_NAME_EN})</div>
-            <div>주요 서비스 / Key services: {PRIMARY_SERVICES_LABEL}</div>
-          </div>
-          <p style={{ margin: "14px 0 0", fontSize: 13, color: "#b8b5de", lineHeight: 1.7 }}>
+          <p style={{ margin: 0, fontSize: 14, color: "#d4d1f6", lineHeight: 1.8 }}>
             전체 공식 사실과 공식 출처 정책은{" "}
             <a href={AI_PROFILE_PATH} style={inlineLinkStyle()}>
               /ai-profile
