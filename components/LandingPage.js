@@ -6,6 +6,42 @@ import { INSIGHTS } from "@/lib/insights";
 import { PRODUCTS } from "@/lib/products";
 import { AI_PROFILE_PATH, ENTITY_LABEL } from "@/lib/site-identity";
 
+const PRODUCT_PREVIEW_COPY = {
+  "ai-delivery-diagnosis": {
+    category: "AI 전달 측정",
+    name: "AI 전달 진단",
+    tagline: "AI가 공식 회사 사실을 실제로 어떻게 설명하는지 측정합니다.",
+    output: "엔진별 전달 결과와 누락 필드, 인용 상태를 리포트로 보여줍니다.",
+  },
+  "structural-lint-reports": {
+    category: "웹사이트 구조 분석",
+    name: "구조 검증 리포트",
+    tagline: "공식 출처 레이어가 AI 검색에 맞게 준비됐는지 점검합니다.",
+    output: "구조적 문제와 누락된 source-layer 요소를 우선순위 리포트로 정리합니다.",
+  },
+  "ai-profile-page": {
+    category: "공식 출처 허브",
+    name: "AI 프로필 페이지",
+    tagline: "AI가 읽기 쉬운 공식 회사 사실 허브를 만듭니다.",
+    output: "공식 사실, JSON-LD, FAQ를 모은 전용 source page를 제공합니다.",
+  },
+};
+
+const INSIGHT_PREVIEW_COPY = {
+  "why-ai-search-engines-miss-official-company-facts": {
+    title: "왜 AI는 공식 회사 사실을 놓칠까",
+    description:
+      "AI 답변에서 공식 회사 사실이 빠지는 이유와, 한 개의 visible source hub가 왜 중요한지 설명합니다.",
+    readingTime: "3분 읽기",
+  },
+  "why-json-ld-alone-is-not-enough-for-ai-citation": {
+    title: "왜 JSON-LD만으로는 AI 인용이 부족할까",
+    description:
+      "구조화 데이터만으로는 부족하고, visible facts와 공식 출처 구조가 함께 있어야 하는 이유를 정리합니다.",
+    readingTime: "3분 읽기",
+  },
+};
+
 export default function LandingPage() {
   const [url, setUrl] = useState("");
   const [error, setError] = useState("");
@@ -34,12 +70,12 @@ export default function LandingPage() {
       <header style={{ padding: "20px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, borderBottom: "1px solid #1a1a2e", flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: -1, background: "linear-gradient(90deg,#6c63ff,#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>AAO</span>
-          <span style={{ fontSize: 11, background: "#6c63ff22", color: "#a78bfa", border: "1px solid #6c63ff44", borderRadius: 4, padding: "2px 7px", fontWeight: 700, letterSpacing: 1 }}>BETA</span>
+          <span style={{ fontSize: 11, background: "#6c63ff22", color: "#a78bfa", border: "1px solid #6c63ff44", borderRadius: 4, padding: "2px 7px", fontWeight: 700, letterSpacing: 1 }}>베타</span>
         </div>
         <nav style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-          <a href={AI_PROFILE_PATH} style={navLinkStyle()}>공식 AI Profile</a>
-          <a href="/products" style={navLinkStyle()}>Products</a>
-          <a href="/insights" style={navLinkStyle()}>Insights</a>
+          <a href={AI_PROFILE_PATH} style={navLinkStyle()}>공식 AI 프로필</a>
+          <a href="/products" style={navLinkStyle()}>모듈 소개</a>
+          <a href="/insights" style={navLinkStyle()}>인사이트 노트</a>
           <a href="#diagnose-start" style={navLinkStyle()}>무료 진단</a>
         </nav>
       </header>
@@ -149,12 +185,21 @@ export default function LandingPage() {
       </section>
 
       <section style={{ maxWidth: 860, margin: "0 auto 80px", padding: "0 24px" }}>
-        <h2 style={{ textAlign: "center", fontSize: 22, fontWeight: 700, marginBottom: 18, color: "#f3f1ff" }}>Official Modules</h2>
+        <h2 style={{ textAlign: "center", fontSize: 22, fontWeight: 700, marginBottom: 18, color: "#f3f1ff" }}>공식 모듈</h2>
         <p style={{ textAlign: "center", fontSize: 14, color: "#7f7fa6", lineHeight: 1.75, margin: "0 auto 32px", maxWidth: 640 }}>
-          AAO is expanding from one company facts hub into product-level source pages and reusable AI-readable modules.
+          AAO는 하나의 회사 사실 허브를 넘어, 제품 단위 source page와 재사용 가능한 AI-readable 모듈로 확장하고 있습니다.
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
           {PRODUCTS.map((product) => (
+            (() => {
+              const preview = PRODUCT_PREVIEW_COPY[product.slug] ?? {
+                category: product.category,
+                name: product.name,
+                tagline: product.tagline,
+                output: product.output,
+              };
+
+              return (
             <a
               key={product.slug}
               href={product.officialPath}
@@ -170,29 +215,39 @@ export default function LandingPage() {
               }}
             >
               <div style={{ fontSize: 11, color: "#8f8fb5", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>
-                {product.category}
+                {preview.category}
               </div>
               <div style={{ fontSize: 20, fontWeight: 800, lineHeight: 1.3, marginBottom: 10, color: "#f3f1ff" }}>
-                {product.name}
+                {preview.name}
               </div>
               <div style={{ fontSize: 14, color: "#b3b0d8", lineHeight: 1.7, marginBottom: 14 }}>
-                {product.tagline}
+                {preview.tagline}
               </div>
               <div style={{ fontSize: 12, color: "#7f7fa6", lineHeight: 1.7 }}>
-                {product.output}
+                {preview.output}
               </div>
             </a>
+              );
+            })()
           ))}
         </div>
       </section>
 
       <section style={{ maxWidth: 860, margin: "0 auto 80px", padding: "0 24px" }}>
-        <h2 style={{ textAlign: "center", fontSize: 22, fontWeight: 700, marginBottom: 18, color: "#f3f1ff" }}>First-Party Insights</h2>
+        <h2 style={{ textAlign: "center", fontSize: 22, fontWeight: 700, marginBottom: 18, color: "#f3f1ff" }}>자체 인사이트 노트</h2>
         <p style={{ textAlign: "center", fontSize: 14, color: "#7f7fa6", lineHeight: 1.75, margin: "0 auto 32px", maxWidth: 680 }}>
-          These notes document what AAO is learning about AI-readable source structure, citation behavior, and first-party discoverability.
+          AAO가 AI-readable source structure, citation behavior, first-party discoverability에 대해 실험하며 배운 내용을 정리합니다.
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
           {INSIGHTS.slice(0, 2).map((insight) => (
+            (() => {
+              const preview = INSIGHT_PREVIEW_COPY[insight.slug] ?? {
+                title: insight.title,
+                description: insight.description,
+                readingTime: insight.readingTime,
+              };
+
+              return (
             <a
               key={insight.slug}
               href={`/insights/${insight.slug}`}
@@ -207,15 +262,17 @@ export default function LandingPage() {
               }}
             >
               <div style={{ fontSize: 11, color: "#8f8fb5", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>
-                {insight.publishedAt} · {insight.readingTime}
+                {insight.publishedAt} · {preview.readingTime}
               </div>
               <div style={{ fontSize: 19, fontWeight: 800, lineHeight: 1.35, marginBottom: 10, color: "#f3f1ff" }}>
-                {insight.title}
+                {preview.title}
               </div>
               <div style={{ fontSize: 14, color: "#b3b0d8", lineHeight: 1.7 }}>
-                {insight.description}
+                {preview.description}
               </div>
             </a>
+              );
+            })()
           ))}
         </div>
       </section>
@@ -251,9 +308,9 @@ export default function LandingPage() {
         <div style={{ marginBottom: 8 }}>{ENTITY_LABEL} · 구조 검증(린트) + AI 전달 확인 리포트</div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14, flexWrap: "wrap" }}>
           <a href="/" style={footerLinkStyle()}>홈</a>
-          <a href={AI_PROFILE_PATH} style={footerLinkStyle()}>AI Profile Page</a>
-          <a href="/products" style={footerLinkStyle()}>Products</a>
-          <a href="/insights" style={footerLinkStyle()}>Insights</a>
+          <a href={AI_PROFILE_PATH} style={footerLinkStyle()}>AI 프로필</a>
+          <a href="/products" style={footerLinkStyle()}>모듈 소개</a>
+          <a href="/insights" style={footerLinkStyle()}>인사이트 노트</a>
           <a href="/llms.txt" style={footerLinkStyle()}>llms.txt</a>
           <a href="/sitemap.xml" style={footerLinkStyle()}>sitemap.xml</a>
         </div>
