@@ -2,15 +2,18 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { INSIGHTS } from "@/lib/insights";
+import { PRODUCTS } from "@/lib/products";
 import {
   AI_PROFILE_PATH,
   ENTITY_LABEL,
   ENTITY_TYPE_LABEL,
-  FOUNDING_YEAR,
   FOUNDER_NAME_EN,
   FOUNDER_NAME_KO,
+  FOUNDING_YEAR,
   HEADQUARTERS_REGION,
   OFFICIAL_FACT_DESCRIPTION,
+  OFFICIAL_FACT_DESCRIPTION_EN,
   PRIMARY_SERVICES_LABEL,
 } from "@/lib/site-identity";
 
@@ -46,6 +49,8 @@ export default function LandingPage() {
         </div>
         <nav style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
           <a href={AI_PROFILE_PATH} style={navLinkStyle()}>공식 AI Profile</a>
+          <a href="/products" style={navLinkStyle()}>Products</a>
+          <a href="/insights" style={navLinkStyle()}>Insights</a>
           <a href="#diagnose-start" style={navLinkStyle()}>무료 진단</a>
         </nav>
       </header>
@@ -71,80 +76,36 @@ export default function LandingPage() {
           style={{
             maxWidth: 760,
             margin: "0 auto 32px",
-            background: "linear-gradient(180deg, rgba(18,18,42,0.92), rgba(10,10,24,0.96))",
-            border: "1px solid rgba(167,139,250,0.18)",
-            borderRadius: 22,
-            padding: "22px 22px 18px",
+            padding: "20px 22px",
             textAlign: "left",
-            boxShadow: "0 24px 60px rgba(0,0,0,0.28)",
-            overflow: "hidden",
-            position: "relative",
+            background: "rgba(14,14,30,0.88)",
+            border: "1px solid rgba(167,139,250,0.16)",
+            borderLeft: "3px solid #6c63ff",
+            borderRadius: 18,
+            boxShadow: "0 20px 50px rgba(0,0,0,0.2)",
           }}
         >
-          <div
-            style={{
-              position: "absolute",
-              inset: "0 auto auto 0",
-              width: 220,
-              height: 220,
-              background: "radial-gradient(circle, rgba(108,99,255,0.22), rgba(108,99,255,0))",
-              pointerEvents: "none",
-            }}
-          />
-          <div style={{ position: "relative", zIndex: 1 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 14 }}>
-              <div>
-                <div style={{ fontSize: 12, color: "#a78bfa", fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", marginBottom: 8 }}>
-                  Official Facts
-                </div>
-                <div style={{ fontSize: 20, color: "#f4f1ff", fontWeight: 800, lineHeight: 1.25 }}>
-                  AAO 공식 사실
-                </div>
-              </div>
-              <a
-                href={AI_PROFILE_PATH}
-                style={{
-                  alignSelf: "flex-start",
-                  padding: "10px 14px",
-                  borderRadius: 999,
-                  background: "#14142a",
-                  border: "1px solid rgba(167,139,250,0.2)",
-                  color: "#d8d3ff",
-                  textDecoration: "none",
-                  fontSize: 12,
-                  fontWeight: 700,
-                }}
-              >
-                /ai-profile 바로 보기
-              </a>
-            </div>
-
-            <dl style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, margin: 0 }}>
-              {[
-                { label: "서비스명", value: ENTITY_LABEL },
-                { label: "설명", value: OFFICIAL_FACT_DESCRIPTION },
-                { label: "업종", value: ENTITY_TYPE_LABEL },
-                { label: "설립연도", value: FOUNDING_YEAR },
-                { label: "본사", value: HEADQUARTERS_REGION },
-                { label: "대표이사", value: `${FOUNDER_NAME_KO} (${FOUNDER_NAME_EN})` },
-                { label: "주요 서비스", value: PRIMARY_SERVICES_LABEL },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  style={{
-                    background: "rgba(9,9,20,0.72)",
-                    border: "1px solid rgba(255,255,255,0.06)",
-                    borderRadius: 16,
-                    padding: "14px 14px 13px",
-                    minHeight: 84,
-                  }}
-                >
-                  <dt style={{ fontSize: 11, color: "#8f8fb5", marginBottom: 8, textTransform: "uppercase", letterSpacing: "1px", fontWeight: 700 }}>{item.label}</dt>
-                  <dd style={{ fontSize: 14, color: "#ecebff", lineHeight: 1.55, fontWeight: 600, margin: 0 }}>{item.value}</dd>
-                </div>
-              ))}
-            </dl>
+          <div style={{ fontSize: 12, color: "#a78bfa", fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", marginBottom: 10 }}>
+            Official Overview
           </div>
+          <p style={{ margin: "0 0 14px", fontSize: 16, color: "#f4f1ff", lineHeight: 1.8 }}>
+            <strong>{ENTITY_LABEL}</strong>는 <strong>{OFFICIAL_FACT_DESCRIPTION}</strong>
+            {" "}({OFFICIAL_FACT_DESCRIPTION_EN})입니다.
+          </p>
+          <div style={{ fontSize: 14, color: "#d4d1f6", lineHeight: 1.9 }}>
+            <div>업종 / Industry: {ENTITY_TYPE_LABEL}</div>
+            <div>설립연도 / Founded: {FOUNDING_YEAR}</div>
+            <div>본사 / Headquarters: {HEADQUARTERS_REGION}</div>
+            <div>대표이사 / Founder: {FOUNDER_NAME_KO} ({FOUNDER_NAME_EN})</div>
+            <div>주요 서비스 / Key services: {PRIMARY_SERVICES_LABEL}</div>
+          </div>
+          <p style={{ margin: "14px 0 0", fontSize: 13, color: "#b8b5de", lineHeight: 1.7 }}>
+            전체 공식 사실과 공식 출처 정책은{" "}
+            <a href={AI_PROFILE_PATH} style={inlineLinkStyle()}>
+              /ai-profile
+            </a>
+            에서 확인할 수 있습니다.
+          </p>
         </div>
 
         <div id="diagnose-start" style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 560, margin: "0 auto" }}>
@@ -212,22 +173,74 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section style={{ maxWidth: 720, margin: "0 auto 80px", padding: "0 24px" }}>
-          <h2 style={{ textAlign: "center", fontSize: 22, fontWeight: 700, marginBottom: 20, color: "#ccccee" }}>{ENTITY_LABEL}가 확인하는 것</h2>
+      <section style={{ maxWidth: 860, margin: "0 auto 80px", padding: "0 24px" }}>
+        <h2 style={{ textAlign: "center", fontSize: 22, fontWeight: 700, marginBottom: 18, color: "#f3f1ff" }}>Official Modules</h2>
         <p style={{ textAlign: "center", fontSize: 14, color: "#7f7fa6", lineHeight: 1.75, margin: "0 auto 32px", maxWidth: 640 }}>
-          메인 페이지가 선언한 사실을 AI가 실제로 전달하는지, 서브페이지까지 도달하는지, 그리고 <code style={inlineCodeStyle()}>/ai-profile</code> 허브를 추가했을 때 무엇이 개선되는지 함께 봅니다.
+          AAO is expanding from one company facts hub into product-level source pages and reusable AI-readable modules.
         </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
-          {[
-            { icon: "🤖", title: "AI 전달 확인", desc: "ChatGPT · Gemini · Perplexity가 회사명, 업종, 설명, 주요 서비스 같은 공식 사실을 실제로 가져오는지 확인합니다." },
-            { icon: "🧱", title: "구조 검증", desc: "첫 문장 정의, facts block, JSON-LD, FAQ, 서브페이지 허브 구조를 린트로 먼저 검사합니다." },
-            { icon: "🛠", title: "AI Profile 실행", desc: "놓친 사실을 평문 facts block과 정적 AI Profile 구조로 다시 선언해 공식 출처 허브를 만듭니다." },
-          ].map((feature) => (
-            <div key={feature.title} style={{ background: "#0f0f1e", border: "1px solid #1a1a2e", borderRadius: 14, padding: "28px 20px" }}>
-              <div style={{ fontSize: 32, marginBottom: 14 }}>{feature.icon}</div>
-              <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 10, color: "#ddddff" }}>{feature.title}</div>
-              <div style={{ fontSize: 13, color: "#666688", lineHeight: 1.65 }}>{feature.desc}</div>
-            </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
+          {PRODUCTS.map((product) => (
+            <a
+              key={product.slug}
+              href={product.officialPath}
+              style={{
+                display: "block",
+                textDecoration: "none",
+                background: "linear-gradient(180deg, rgba(17,17,34,0.92), rgba(10,10,24,0.98))",
+                border: "1px solid rgba(255,255,255,0.07)",
+                borderRadius: 18,
+                padding: "22px 20px",
+                color: "#fff",
+                boxShadow: "0 18px 50px rgba(0,0,0,0.22)",
+              }}
+            >
+              <div style={{ fontSize: 11, color: "#8f8fb5", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>
+                {product.category}
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 800, lineHeight: 1.3, marginBottom: 10, color: "#f3f1ff" }}>
+                {product.name}
+              </div>
+              <div style={{ fontSize: 14, color: "#b3b0d8", lineHeight: 1.7, marginBottom: 14 }}>
+                {product.tagline}
+              </div>
+              <div style={{ fontSize: 12, color: "#7f7fa6", lineHeight: 1.7 }}>
+                {product.output}
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section style={{ maxWidth: 860, margin: "0 auto 80px", padding: "0 24px" }}>
+        <h2 style={{ textAlign: "center", fontSize: 22, fontWeight: 700, marginBottom: 18, color: "#f3f1ff" }}>First-Party Insights</h2>
+        <p style={{ textAlign: "center", fontSize: 14, color: "#7f7fa6", lineHeight: 1.75, margin: "0 auto 32px", maxWidth: 680 }}>
+          These notes document what AAO is learning about AI-readable source structure, citation behavior, and first-party discoverability.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
+          {INSIGHTS.slice(0, 2).map((insight) => (
+            <a
+              key={insight.slug}
+              href={`/insights/${insight.slug}`}
+              style={{
+                display: "block",
+                textDecoration: "none",
+                background: "#0f0f1e",
+                border: "1px solid #1a1a2e",
+                borderRadius: 18,
+                padding: "22px 20px",
+                color: "#fff",
+              }}
+            >
+              <div style={{ fontSize: 11, color: "#8f8fb5", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>
+                {insight.publishedAt} · {insight.readingTime}
+              </div>
+              <div style={{ fontSize: 19, fontWeight: 800, lineHeight: 1.35, marginBottom: 10, color: "#f3f1ff" }}>
+                {insight.title}
+              </div>
+              <div style={{ fontSize: 14, color: "#b3b0d8", lineHeight: 1.7 }}>
+                {insight.description}
+              </div>
+            </a>
           ))}
         </div>
       </section>
@@ -264,6 +277,8 @@ export default function LandingPage() {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14, flexWrap: "wrap" }}>
           <a href="/" style={footerLinkStyle()}>홈</a>
           <a href={AI_PROFILE_PATH} style={footerLinkStyle()}>AI Profile Page</a>
+          <a href="/products" style={footerLinkStyle()}>Products</a>
+          <a href="/insights" style={footerLinkStyle()}>Insights</a>
           <a href="/llms.txt" style={footerLinkStyle()}>llms.txt</a>
           <a href="/sitemap.xml" style={footerLinkStyle()}>sitemap.xml</a>
         </div>
