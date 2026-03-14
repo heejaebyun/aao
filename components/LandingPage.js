@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { INSIGHTS } from "@/lib/insights";
 import { PRODUCTS } from "@/lib/products";
 import { AI_PROFILE_PATH, ENTITY_LABEL } from "@/lib/site-identity";
@@ -43,28 +41,6 @@ const INSIGHT_PREVIEW_COPY = {
 };
 
 export default function LandingPage() {
-  const [url, setUrl] = useState("");
-  const [error, setError] = useState("");
-  const router = useRouter();
-
-  function handleStart() {
-    const trimmed = url.trim();
-    if (!trimmed) {
-      setError("웹사이트 주소를 입력해주세요.");
-      return;
-    }
-    let finalUrl = trimmed;
-    if (!/^https?:\/\//i.test(finalUrl)) {
-      finalUrl = `https://${finalUrl}`;
-    }
-    setError("");
-    router.push(`/diagnose?url=${encodeURIComponent(finalUrl)}`);
-  }
-
-  function handleKeyDown(event) {
-    if (event.key === "Enter") handleStart();
-  }
-
   return (
     <div style={{ minHeight: "100vh", background: "#07070d", color: "#fff", fontFamily: "'Outfit', sans-serif" }}>
       <header style={{ padding: "20px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, borderBottom: "1px solid #1a1a2e", flexWrap: "wrap" }}>
@@ -119,49 +95,27 @@ export default function LandingPage() {
           </p>
         </div>
 
-        <div id="diagnose-start" style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 560, margin: "0 auto" }}>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <input
-              type="text"
-              value={url}
-              onChange={(event) => {
-                setUrl(event.target.value);
-                setError("");
-              }}
-              onKeyDown={handleKeyDown}
-              placeholder="https://yourcompany.com"
-              style={{
-                flex: 1,
-                minWidth: 0,
-                padding: "14px 18px",
-                borderRadius: 10,
-                border: error ? "1.5px solid #ff4444" : "1.5px solid #2a2a4a",
-                background: "#12122a",
-                color: "#fff",
-                fontSize: 15,
-                fontFamily: "'Outfit', sans-serif",
-                outline: "none",
-              }}
-            />
-            <button
-              onClick={handleStart}
-              style={{
-                padding: "14px 28px",
-                borderRadius: 10,
-                border: "none",
-                background: "linear-gradient(135deg, #6c63ff, #a78bfa)",
-                color: "#fff",
-                fontWeight: 700,
-                fontSize: 15,
-                cursor: "pointer",
-                fontFamily: "'Outfit', sans-serif",
-                whiteSpace: "nowrap",
-              }}
-            >
-              무료 진단 시작
-            </button>
-          </div>
-          {error && <div style={{ color: "#ff6b6b", fontSize: 13, textAlign: "left" }}>{error}</div>}
+        <div id="diagnose-start" style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 560, margin: "0 auto", alignItems: "center" }}>
+          <a
+            href="/diagnose"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "14px 28px",
+              borderRadius: 10,
+              border: "none",
+              background: "linear-gradient(135deg, #6c63ff, #a78bfa)",
+              color: "#fff",
+              fontWeight: 700,
+              fontSize: 15,
+              fontFamily: "'Outfit', sans-serif",
+              whiteSpace: "nowrap",
+              textDecoration: "none",
+            }}
+          >
+            진단하러 가기
+          </a>
           <div style={{ fontSize: 12, color: "#555577", textAlign: "center" }}>무료 · 회원가입 불필요 · 구조 검증과 AI 전달 확인 동시 실행</div>
           <div style={{ fontSize: 12, color: "#7f7fa6", textAlign: "center" }}>
             공식 구조 설명이 필요하면 <a href={AI_PROFILE_PATH} style={inlineLinkStyle()}>AI Profile Page</a>를 바로 확인할 수 있습니다.
@@ -280,13 +234,12 @@ export default function LandingPage() {
       <section style={{ textAlign: "center", padding: "48px 24px 80px", borderTop: "1px solid #1a1a2e" }}>
         <p style={{ color: "#666688", fontSize: 15, marginBottom: 20 }}>공식 사실이 AI에 어떻게 전달되는지 지금 바로 확인해보세요.</p>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
-          <button
-            onClick={() => {
-              const input = document.querySelector("input");
-              input?.scrollIntoView({ behavior: "smooth" });
-              input?.focus();
-            }}
+          <a
+            href="/diagnose"
             style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
               padding: "14px 36px",
               borderRadius: 10,
               border: "none",
@@ -294,12 +247,12 @@ export default function LandingPage() {
               color: "#fff",
               fontWeight: 700,
               fontSize: 16,
-              cursor: "pointer",
               fontFamily: "'Outfit', sans-serif",
+              textDecoration: "none",
             }}
           >
             무료 진단 시작하기
-          </button>
+          </a>
           <a href={AI_PROFILE_PATH} style={secondaryLinkStyle()}>공식 AI Profile 보기</a>
         </div>
       </section>
