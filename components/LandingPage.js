@@ -102,16 +102,18 @@ export default function LandingPage() {
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
-              padding: "14px 28px",
-              borderRadius: 10,
+              minWidth: 240,
+              padding: "18px 40px",
+              borderRadius: 14,
               border: "none",
               background: "linear-gradient(135deg, #6c63ff, #a78bfa)",
               color: "#fff",
               fontWeight: 700,
-              fontSize: 15,
+              fontSize: 18,
               fontFamily: "'Outfit', sans-serif",
               whiteSpace: "nowrap",
               textDecoration: "none",
+              boxShadow: "0 18px 40px rgba(108,99,255,0.24)",
             }}
           >
             진단하러 가기
@@ -240,15 +242,17 @@ export default function LandingPage() {
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
-              padding: "14px 36px",
-              borderRadius: 10,
+              minWidth: 220,
+              padding: "16px 38px",
+              borderRadius: 12,
               border: "none",
               background: "linear-gradient(135deg, #6c63ff, #a78bfa)",
               color: "#fff",
               fontWeight: 700,
-              fontSize: 16,
+              fontSize: 17,
               fontFamily: "'Outfit', sans-serif",
               textDecoration: "none",
+              boxShadow: "0 16px 32px rgba(108,99,255,0.2)",
             }}
           >
             무료 진단 시작하기
