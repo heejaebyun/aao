@@ -59,7 +59,7 @@ export default function LandingPage() {
           <a href={AI_PROFILE_PATH} style={navLinkStyle()}>공식 AI 프로필</a>
           <a href="/products" style={navLinkStyle()}>모듈 소개</a>
           <a href="/insights" style={navLinkStyle()}>인사이트 노트</a>
-          <a href="#diagnose-start" style={navLinkStyle()}>무료 진단</a>
+          <a href="/diagnose" style={navLinkStyle()}>무료 진단</a>
         </nav>
       </header>
 
