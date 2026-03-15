@@ -1,0 +1,56 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">AAO LinkedIn Logo</title>
+  <desc id="desc">Square brand logo for AAO, AI Answer Optimization.</desc>
+  <defs>
+    <linearGradient id="bg" x1="112" y1="96" x2="912" y2="928" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F1020"/>
+      <stop offset="1" stop-color="#06070D"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="248" y1="246" x2="785" y2="779" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6C63FF"/>
+      <stop offset="1" stop-color="#A78BFA"/>
+    </linearGradient>
+    <radialGradient id="glowA" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(768 232) rotate(122.984) scale(395.54 492.199)">
+      <stop stop-color="#6C63FF" stop-opacity="0.36"/>
+      <stop offset="1" stop-color="#6C63FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(260 824) rotate(-44.043) scale(317.463 351.588)">
+      <stop stop-color="#A78BFA" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#A78BFA" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="164" y="214" width="696" height="385" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="16"/>
+      <feGaussianBlur stdDeviation="18"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.025 0 0 0 0 0.027 0 0 0 0 0.051 0 0 0 0.45 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_1"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_1" result="shape"/>
+    </filter>
+  </defs>
+
+  <rect x="32" y="32" width="960" height="960" rx="220" fill="url(#bg)"/>
+  <circle cx="798" cy="226" r="284" fill="url(#glowA)"/>
+  <circle cx="250" cy="818" r="218" fill="url(#glowB)"/>
+
+  <g opacity="0.14">
+    <path d="M134 812C259 677 364 616 487 580C607 545 741 544 894 626" stroke="#E9E6FF" stroke-width="2"/>
+    <path d="M144 852C281 705 386 642 513 608C638 574 758 586 876 651" stroke="#E9E6FF" stroke-width="2"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    <text x="512" y="473" text-anchor="middle" fill="url(#brand)" font-family="Arial, Helvetica, sans-serif" font-size="264" font-weight="900" letter-spacing="-20">
+      AAO
+    </text>
+  </g>
+
+  <rect x="256" y="568" width="512" height="60" rx="30" fill="#FFFFFF" fill-opacity="0.06"/>
+  <text x="512" y="609" text-anchor="middle" fill="#E8E5FF" font-family="Arial, Helvetica, sans-serif" font-size="44" font-weight="700" letter-spacing="2">
+    AI ANSWER OPTIMIZATION
+  </text>
+
+  <text x="512" y="724" text-anchor="middle" fill="#9D9AB9" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="600" letter-spacing="6">
+    AI SEARCH OPTIMIZATION
+  </text>
+</svg>
