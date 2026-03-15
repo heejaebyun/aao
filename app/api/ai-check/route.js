@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { hydrateOfficialGroundTruth, verifyUrlDelivery } from "@/lib/ai-check";
 import { buildRateLimitHeaders, rateLimit } from "@/lib/rate-limit";
+import { redactUrl } from "@/lib/log-utils";
 
 export async function POST(request) {
   try {
@@ -20,13 +21,19 @@ export async function POST(request) {
       );
     }
 
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
     const {
       url,
       crawlSnapshot,
       subpageUrls,
       crawlSignals,
       groundTruth: serializedGroundTruth,
-    } = await request.json();
+    } = body;
 
     if (!url) {
       return NextResponse.json(
@@ -35,7 +42,7 @@ export async function POST(request) {
       );
     }
 
-    console.log(`[AAO] AI URL Delivery Check for: ${url}`);
+    console.log(`[AAO] AI URL Delivery Check for: ${redactUrl(url)}`);
 
     const groundTruth = hydrateOfficialGroundTruth(
       serializedGroundTruth || {},
@@ -50,6 +57,8 @@ export async function POST(request) {
       crawlSignals || {},
     );
 
+    const cacheHeaders = { "Cache-Control": "private, no-store" };
+
     return NextResponse.json({
       success: true,
       url,
@@ -61,10 +70,10 @@ export async function POST(request) {
       },
       engines: result.engines,
     }, {
-      headers: buildRateLimitHeaders(limit, 10),
+      headers: { ...cacheHeaders, ...buildRateLimitHeaders(limit, 10) },
     });
   } catch (error) {
-    console.error("[AAO] AI Check error:", error);
+    console.error("[AAO] AI Check error:", error?.message || "unknown");
     return NextResponse.json(
       { error: error.message || "AI check failed" },
       { status: 500 }

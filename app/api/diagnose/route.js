@@ -5,6 +5,7 @@ import { buildAaoLintReport } from "@/lib/aao-lint";
 import { resolveOfficialGroundTruth } from "@/lib/ai-check";
 import { buildRateLimitHeaders, rateLimit } from "@/lib/rate-limit";
 import { isPublicUrlValidationError } from "@/lib/url-safety";
+import { redactUrl } from "@/lib/log-utils";
 
 export async function POST(request) {
   try {
@@ -23,14 +24,20 @@ export async function POST(request) {
       );
     }
 
-    const { url } = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
+    const { url } = body;
 
     if (!url) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
     }
 
     // Step 1: Crawl the site via direct fetch + light crawl + Jina fallback
-    console.log(`[AAO] Crawling: ${url}`);
+    console.log(`[AAO] Crawling: ${redactUrl(url)}`);
     const crawlBundle = await crawlSite(url);
 
     // Step 2: 콘텐츠 최소치 확인
@@ -44,13 +51,15 @@ export async function POST(request) {
     }
 
     // Step 3: Lint report + ground truth extraction (no AI call)
-    console.log(`[AAO] Building lint report for: ${crawlBundle.main.title}`);
+    console.log(`[AAO] Building lint report for: ${redactUrl(crawlBundle.url)}`);
     const lintReport = buildAaoLintReport({
       snapshot: crawlBundle.main,
       discoverySignals: crawlBundle.discoverySignals,
     });
 
     const groundTruth = resolveOfficialGroundTruth(crawlBundle.main);
+
+    const cacheHeaders = { "Cache-Control": "private, no-store" };
 
     return NextResponse.json({
       success: true,
@@ -85,10 +94,10 @@ export async function POST(request) {
         alternateNames: groundTruth.alternateNames,
       },
     }, {
-      headers: buildRateLimitHeaders(limit, 10),
+      headers: { ...cacheHeaders, ...buildRateLimitHeaders(limit, 10) },
     });
   } catch (error) {
-    console.error("[AAO] Diagnosis error:", error);
+    console.error("[AAO] Diagnosis error:", error?.message || "unknown");
 
     if (isPublicUrlValidationError(error)) {
       return NextResponse.json(

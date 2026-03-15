@@ -2,6 +2,7 @@
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Dashboard from "@/components/Dashboard";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 function DiagnoseContent() {
   const searchParams = useSearchParams();
@@ -11,8 +12,10 @@ function DiagnoseContent() {
 
 export default function DiagnosePage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: "100vh", background: "#07070d" }} />}>
-      <DiagnoseContent />
-    </Suspense>
+    <ErrorBoundary>
+      <Suspense fallback={<div style={{ minHeight: "100vh", background: "#07070d" }} />}>
+        <DiagnoseContent />
+      </Suspense>
+    </ErrorBoundary>
   );
 }

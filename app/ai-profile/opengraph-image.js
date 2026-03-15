@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "AAO (AI Answer Optimization) | 공식 AI Profile Page";
+export const alt = "AAO (AI Answer Optimization) | Official AI Profile";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -21,7 +21,6 @@ export default function OgImage() {
           position: "relative",
         }}
       >
-        {/* 배경 강조선 */}
         <div
           style={{
             position: "absolute",
@@ -34,7 +33,6 @@ export default function OgImage() {
           }}
         />
 
-        {/* 배경 원 */}
         <div
           style={{
             position: "absolute",
@@ -48,7 +46,6 @@ export default function OgImage() {
           }}
         />
 
-        {/* 상단: 배지 */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
           <div
             style={{
@@ -62,7 +59,7 @@ export default function OgImage() {
               display: "flex",
             }}
           >
-            공식 AI Profile Page
+            Official AI Profile
           </div>
           <div
             style={{
@@ -76,11 +73,10 @@ export default function OgImage() {
               display: "flex",
             }}
           >
-            Official Source
+            Structured source hub
           </div>
         </div>
 
-        {/* 브랜드명 */}
         <div
           style={{
             fontSize: 54,
@@ -98,7 +94,6 @@ export default function OgImage() {
           </span>
         </div>
 
-        {/* 서브카피 */}
         <div
           style={{
             fontSize: 24,
@@ -109,15 +104,14 @@ export default function OgImage() {
             display: "flex",
           }}
         >
-          공식 웹사이트를 ChatGPT · Gemini · Perplexity의 1차 출처로 만드는 AI 검색 최적화 서비스
+          Structured company facts, official-source policy, and AI-readable discovery
         </div>
 
-        {/* 하단 수치 */}
         <div style={{ display: "flex", gap: 20 }}>
           {[
-            { num: "3축 진단", label: "PACP · SEP · SPF" },
-            { num: "+40~60점", label: "AI Profile 설치 후 향상" },
-            { num: "무료 진단", label: "회원가입 불필요" },
+            { num: "Visible facts", label: "Plain-text company facts in one place" },
+            { num: "Aligned JSON-LD", label: "Same facts repeated in structured data" },
+            { num: "Official policy", label: "Preferred source links and FAQ coverage" },
           ].map((item) => (
             <div
               key={item.label}
@@ -139,7 +133,6 @@ export default function OgImage() {
           ))}
         </div>
 
-        {/* 우측 하단 도메인 */}
         <div
           style={{
             position: "absolute",

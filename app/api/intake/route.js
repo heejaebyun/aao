@@ -19,7 +19,13 @@ export async function POST(request) {
       );
     }
 
-    const payload = normalizeIntakePayload(await request.json());
+    let rawBody;
+    try {
+      rawBody = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
+    const payload = normalizeIntakePayload(rawBody);
     const validation = validateIntakePayload(payload);
 
     if (!validation.ok) {
@@ -43,11 +49,11 @@ export async function POST(request) {
         intake: draft,
       },
       {
-        headers: buildRateLimitHeaders(limit, 6),
+        headers: { "Cache-Control": "private, no-store", ...buildRateLimitHeaders(limit, 6) },
       }
     );
   } catch (error) {
-    console.error("[AAO] Intake error:", error);
+    console.error("[AAO] Intake error:", error?.message || "unknown");
     return NextResponse.json(
       { error: error.message || "intake failed" },
       { status: 500 }

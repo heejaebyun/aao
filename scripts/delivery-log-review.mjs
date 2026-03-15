@@ -11,10 +11,32 @@
 //     - uncertain 서브페이지
 //     - citation level이 host_only인 것
 
-import { readdirSync, readFileSync } from "node:fs";
+import { readdirSync, readFileSync, mkdirSync, appendFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 
 const LOG_DIR = "/tmp/aao-delivery-logs";
 const VERBOSE = process.argv.includes("--verbose");
+
+function setupReportLog(prefix) {
+  const projectRoot = resolve(import.meta.dirname, "..");
+  const reportDir = join(projectRoot, "reports", "delivery");
+  mkdirSync(reportDir, { recursive: true });
+  const ts = new Date().toISOString().replace(/[T:]/g, "").replace(/\..+/, "").slice(0, 15).replace(/(\d{8})(\d{6})/, "$1-$2");
+  const filePath = join(reportDir, `${prefix}-${ts}.log`);
+  const origLog = console.log;
+  const origError = console.error;
+  console.log = (...args) => {
+    const line = args.map(String).join(" ");
+    origLog(...args);
+    try { appendFileSync(filePath, line + "\n"); } catch {}
+  };
+  console.error = (...args) => {
+    const line = args.map(String).join(" ");
+    origError(...args);
+    try { appendFileSync(filePath, "[ERROR] " + line + "\n"); } catch {}
+  };
+  return filePath;
+}
 
 // Citation이 약한 엔진 — delivered_no_citation을 warn 대신 info로 낮춤
 const WEAK_CITATION_ENGINES = new Set(["gemini"]);
@@ -49,6 +71,8 @@ function loadLogs() {
 }
 
 function main() {
+  const reportFile = setupReportLog("review");
+  console.log(`Report → ${reportFile}\n`);
   const logs = loadLogs();
   console.log(`=== Delivery Log Review ===`);
   console.log(`Logs: ${logs.length} files from ${LOG_DIR}\n`);

@@ -1,7 +1,6 @@
 # AAO — AI Answer Optimization MVP
 
-> AI가 당신의 회사를 정확히 설명할 수 있는지 진단하고 최적화하는 서비스  
-> Princeton GEO Research (KDD 2024) 기반 3축 진단: PACP · SEP · SPF
+> AI가 당신의 회사를 정확히 설명할 수 있는지 진단하고, 공식 웹사이트를 AI의 1차 출처로 만드는 서비스
 
 ## 🚀 Quick Start
 
@@ -20,7 +19,7 @@ cp .env.example .env.local
 | API | 용도 | 발급처 |
 |-----|------|--------|
 | `JINA_API_KEY` | URL 크롤링 | https://jina.ai (무료 키 발급) |
-| `OPENAI_API_KEY` | 진단 엔진 + ChatGPT 답변 확인 | https://platform.openai.com |
+| `OPENAI_API_KEY` | ChatGPT 전달 확인 | https://platform.openai.com |
 | `GEMINI_API_KEY` | Gemini 답변 확인 | https://aistudio.google.com |
 | `PERPLEXITY_API_KEY` | Perplexity 답변 확인 | https://www.perplexity.ai/settings/api |
 
@@ -46,12 +45,12 @@ aao-mvp/
 │   ├── page.js            # 메인 페이지
 │   └── api/
 │       ├── diagnose/
-│       │   └── route.js   # POST /api/diagnose — 크롤링 + 진단
+│       │   └── route.js   # POST /api/diagnose — 크롤링 + 린트 + ground truth
 │       └── ai-check/
-│           └── route.js   # POST /api/ai-check — 3개 AI 엔진 질의
+│           └── route.js   # POST /api/ai-check — 3개 AI 엔진 전달 확인
 ├── lib/
 │   ├── jina.js            # Jina AI Reader 크롤링
-│   ├── diagnose.js        # OpenAI 진단 엔진 (GEO 기반 프롬프트)
+│   ├── aao-lint.js        # 구조 검증 (lint)
 │   ├── ai-check.js        # 3개 AI 엔진 동시 질의
 │   └── rate-limit.js      # 인메모리 IP 레이트리밋
 ├── components/
@@ -61,13 +60,13 @@ aao-mvp/
 └── README.md
 ```
 
-## 🔬 진단 체계 (3-Axis Scoring)
+## 🔬 진단 체계
 
-| 축 | 만점 | 기반 연구 |
-|----|------|-----------|
-| **PACP** (위치 기반 인용 확률) | 40점 | Princeton GEO PAWC, Citation Frequency |
-| **SEP** (의미론적 엔티티 정밀도) | 30점 | Semantic F1, NER, Knowledge Graph |
-| **SPF** (구조적 파싱 충실도) | 30점 | Token Efficiency, WebArena, Chunking |
+AAO는 점수판보다 `구조 검증(lint)`과 `실제 AI 전달 확인(delivery check)`을 중심으로 동작합니다.
+
+- `lint report`: 첫 문장 정의, facts source, 정적 렌더링, 허브 구조 등 핵심 구조 오류 확인
+- `delivery check`: ChatGPT, Gemini, Perplexity가 선언된 사실을 실제로 끌고 오는지 확인
+- `blockage review`: 못 읽은 이유와 수정 방법을 리포트로 정리
 
 ## 🔗 API 엔드포인트
 
@@ -75,13 +74,13 @@ aao-mvp/
 ```json
 { "url": "https://example.com" }
 ```
-→ 크롤링 + PACP/SEP/SPF 점수 + 개선 리포트
+→ 크롤링 + lint report + declared facts 추출
 
 ### POST /api/ai-check
 ```json
-{ "companyName": "회사이름" }
+{ "url": "https://example.com", "crawlSnapshot": { "...": "..." } }
 ```
-→ 3개 AI 엔진 답변 + 인식 여부 + 정확도
+→ 3개 AI 엔진 전달 확인 + missed field 원인 + 서브페이지 도달 결과
 
 현재 지원 엔진:
 - ChatGPT (OpenAI)
@@ -101,7 +100,7 @@ Claude, 네이버 큐는 향후 추가 예정
 
 ## 🧪 Wikipedia Benchmark Pilot (100 pages / batch 10)
 
-AAO 점수 체계 검증용으로 위키피디아 기업 페이지 100개 파일럿 파이프라인이 포함되어 있습니다. 기본 흐름은 `수집 -> 크롤링 -> 3엔진 추출 -> 분석 -> 수정 대상 선정 -> Step A~D 수정 실험`이고, 각 단계는 중간 저장 및 resume를 지원합니다.
+위키피디아 기업 페이지 100개 파일럿 파이프라인이 포함되어 있습니다. 기본 흐름은 `수집 -> 크롤링 -> 3엔진 추출 -> 분석 -> 수정 대상 선정 -> Step A~D 수정 실험`이고, 각 단계는 중간 저장 및 resume를 지원합니다.
 
 생성 결과물은 `artifacts/wiki-benchmark/pilot-100` 아래에 저장됩니다.
 

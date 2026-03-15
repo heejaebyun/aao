@@ -245,34 +245,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section style={{ textAlign: "center", padding: "48px 24px 80px", borderTop: "1px solid #1a1a2e" }}>
-        <p style={{ color: "#666688", fontSize: 15, marginBottom: 20 }}>공식 사실이 AI에 어떻게 전달되는지 지금 바로 확인해보세요.</p>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
-          <a
-            href="/diagnose"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              minWidth: 220,
-              padding: "16px 38px",
-              borderRadius: 12,
-              border: "none",
-              background: "linear-gradient(135deg, #6c63ff, #a78bfa)",
-              color: "#fff",
-              fontWeight: 700,
-              fontSize: 17,
-              fontFamily: "'Outfit', sans-serif",
-              textDecoration: "none",
-              boxShadow: "0 16px 32px rgba(108,99,255,0.2)",
-            }}
-          >
-            무료 진단 시작하기
-          </a>
-          <a href={AI_PROFILE_PATH} style={secondaryLinkStyle()}>공식 AI Profile 보기</a>
-        </div>
-      </section>
-
       <footer style={{ textAlign: "center", padding: "24px", borderTop: "1px solid #1a1a2e", color: "#4f4f72", fontSize: 12 }}>
         <div style={{ marginBottom: 8 }}>{ENTITY_LABEL} · 구조 검증(린트) + AI 전달 확인 리포트</div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14, flexWrap: "wrap" }}>
@@ -302,18 +274,6 @@ function inlineLinkStyle() {
     color: "#c9c7ff",
     textDecoration: "none",
     fontWeight: 600,
-  };
-}
-
-function secondaryLinkStyle() {
-  return {
-    padding: "14px 20px",
-    borderRadius: 10,
-    border: "1px solid #2a2a4a",
-    color: "#cfcdf8",
-    textDecoration: "none",
-    fontWeight: 700,
-    fontSize: 14,
   };
 }
 

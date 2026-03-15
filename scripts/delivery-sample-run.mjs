@@ -14,7 +14,8 @@
 // urls-file: 한 줄에 URL 하나. #으로 시작하면 주석. 없으면 기본 샘플 사용.
 // 결과: /tmp/aao-delivery-logs/ 에 JSON 파일 생성 (서버 측에서 저장)
 
-import { readFileSync } from "node:fs";
+import { readFileSync, mkdirSync, appendFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 
 const BASE = process.env.AAO_BASE_URL || "http://localhost:3000";
 const LOCAL_RETRYABLE_STATUSES = new Set([404, 408, 429, 500, 502, 503, 504]);
@@ -298,7 +299,30 @@ async function runOne(url, index, total) {
   }
 }
 
+function setupReportLog(prefix) {
+  const projectRoot = resolve(import.meta.dirname, "..");
+  const reportDir = join(projectRoot, "reports", "delivery");
+  mkdirSync(reportDir, { recursive: true });
+  const ts = new Date().toISOString().replace(/[T:]/g, "").replace(/\..+/, "").slice(0, 15).replace(/(\d{8})(\d{6})/, "$1-$2");
+  const filePath = join(reportDir, `${prefix}-${ts}.log`);
+  const origLog = console.log;
+  const origError = console.error;
+  console.log = (...args) => {
+    const line = args.map(String).join(" ");
+    origLog(...args);
+    try { appendFileSync(filePath, line + "\n"); } catch {}
+  };
+  console.error = (...args) => {
+    const line = args.map(String).join(" ");
+    origError(...args);
+    try { appendFileSync(filePath, "[ERROR] " + line + "\n"); } catch {}
+  };
+  return filePath;
+}
+
 async function main() {
+  const reportFile = setupReportLog("run");
+
   // Check server is running
   try {
     await fetch(`${BASE}/api/diagnose`, { method: "OPTIONS" }).catch(() => null);
@@ -310,6 +334,7 @@ async function main() {
   console.log(`=== AAO Delivery Sample Run ===`);
   console.log(`Server: ${BASE}`);
   console.log(`URLs: ${urls.length}`);
+  console.log(`Report → ${reportFile}`);
   console.log(`Debug logs → /tmp/aao-delivery-logs/ (saved by server when AAO_DEBUG_LOG=1)\n`);
 
   const results = [];

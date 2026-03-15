@@ -7,13 +7,18 @@ import {
   ENTITY_FULL_NAME,
   ENTITY_LABEL,
   ENTITY_SHORT_NAME,
+  FOUNDER_INDIE_HACKERS_URL,
   FOUNDER_NAME_EN,
   FOUNDER_NAME_KO,
   HEADQUARTERS_REGION,
+  NOTION_OVERVIEW_URL,
   OFFICIAL_FACT_DESCRIPTION,
+  OFFICIAL_EXTERNAL_PROFILES,
   PRIMARY_SERVICES_LABEL,
+  PRODUCT_HUNT_URL,
   ROOT_META_DESCRIPTION,
   SITE_ORIGIN,
+  X_PROFILE_URL,
 } from "@/lib/site-identity";
 
 const outfit = Outfit({
@@ -56,6 +61,7 @@ export default function RootLayout({ children }) {
       "@type": "Person",
       name: FOUNDER_NAME_KO,
       alternateName: FOUNDER_NAME_EN,
+      sameAs: [FOUNDER_INDIE_HACKERS_URL],
     },
     address: {
       "@type": "PostalAddress",
@@ -75,6 +81,7 @@ export default function RootLayout({ children }) {
       "AI 프로필 페이지 제작",
       PRIMARY_SERVICES_LABEL,
     ],
+    sameAs: OFFICIAL_EXTERNAL_PROFILES.map((profile) => profile.url),
   };
 
   const softwareApplicationSchema = {
@@ -89,7 +96,7 @@ export default function RootLayout({ children }) {
     operatingSystem: "Web",
     inLanguage: ["ko", "en"],
     datePublished: FOUNDING_YEAR,
-    sameAs: [AI_PROFILE_URL],
+    sameAs: [AI_PROFILE_URL, PRODUCT_HUNT_URL, NOTION_OVERVIEW_URL, X_PROFILE_URL],
     offers: {
       "@type": "Offer",
       price: "0",

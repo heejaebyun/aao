@@ -31,7 +31,7 @@ const styles = {
 export function generateMetadata({ params }) {
   const pilotCase = getPilotCaseById(params.caseId);
   return {
-    title: pilotCase ? `${pilotCase.companyName} Pilot Case | AAO` : "Pilot Case | AAO",
+    title: pilotCase ? `${pilotCase.companyName} 자체 검증 사례 | AAO` : "자체 검증 사례 | AAO",
     description: pilotCase?.summary || "AAO pilot case detail",
     robots: {
       index: false,
@@ -83,10 +83,10 @@ export default function PilotCasePage({ params }) {
 
         <div style={styles.card}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 10 }}>
-            <div style={{ fontSize: 11, color: "#4a4a65", letterSpacing: "1.2px", textTransform: "uppercase" }}>Featured Pilot Case</div>
+            <div style={{ fontSize: 11, color: "#4a4a65", letterSpacing: "1.2px", textTransform: "uppercase" }}>AAO 자체 검증 사례</div>
             <div style={{ fontSize: 11, color: "#ffb820", fontWeight: 700 }}>{pilotCase.statusLabel}</div>
           </div>
-          <h1 style={{ margin: 0, fontSize: 32, lineHeight: 1.15, fontFamily: "'Outfit',sans-serif" }}>{pilotCase.companyName} self-rollout</h1>
+          <h1 style={{ margin: 0, fontSize: 32, lineHeight: 1.15, fontFamily: "'Outfit',sans-serif" }}>{pilotCase.companyName} 자체 검증 리포트</h1>
           <p style={{ ...styles.dim, marginTop: 12, marginBottom: 0 }}>{pilotCase.summary}</p>
           <div style={{ ...styles.dim, marginTop: 10 }}>
             기준일 {pilotCase.updatedAt} · 설치 경로 {pilotCase.installPath}
@@ -94,8 +94,8 @@ export default function PilotCasePage({ params }) {
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, marginBottom: 16 }}>
-          <StateCard title="Before" state={pilotCase.beforeState} accent="#ffb820" />
-          <StateCard title="After" state={pilotCase.afterState} accent="#38bdf8" />
+          <StateCard title="기존 메인 랜딩" state={pilotCase.beforeState} accent="#ffb820" />
+          <StateCard title="공식 AI Profile 허브" state={pilotCase.afterState} accent="#38bdf8" />
         </div>
 
         <div style={styles.card}>

@@ -6,6 +6,8 @@ import {
   buildDiagnosticSnapshot,
   buildProfileRequestHref,
 } from "@/lib/intake";
+import { INSIGHTS } from "@/lib/insights";
+import { PRODUCTS } from "@/lib/products";
 import { COPYRIGHT_YEAR, ENTITY_LABEL, ENTITY_SHORT_NAME } from "@/lib/site-identity";
 
 const C = {
@@ -360,6 +362,297 @@ function GroundTruthSummary({ groundTruth }) {
   );
 }
 
+function getAllLintChecks(lintReport) {
+  if (!lintReport) return [];
+  if (Array.isArray(lintReport.checks) && lintReport.checks.length > 0) return lintReport.checks;
+  return [
+    ...(Array.isArray(lintReport.coreChecks) ? lintReport.coreChecks : []),
+    ...(Array.isArray(lintReport.platformChecks) ? lintReport.platformChecks : []),
+  ];
+}
+
+function buildOfficialSourceReport({ crawlData, lintReport, groundTruth, engines, officialDomain }) {
+  const allLintChecks = getAllLintChecks(lintReport);
+  const lintFails = allLintChecks.filter((check) => check.status === "fail");
+  const lintWarns = allLintChecks.filter((check) => check.status === "warn");
+  const declaredFacts = groundTruth?.declaredFields || [];
+
+  const engineSummaries = ENGINES.map((engine) => {
+    const data = engines?.[engine.id];
+    if (!data) return null;
+    const deliveredCount = data.deliveredFields?.length || 0;
+    const totalDeclaredFields = data.totalDeclaredFields || 0;
+    const deliveryRate = typeof data.deliveryRate === "number"
+      ? data.deliveryRate
+      : totalDeclaredFields > 0
+      ? deliveredCount / totalDeclaredFields
+      : null;
+    const citation = data.citationMatchLevel || (data.citedOfficialUrl ? "exact" : "none");
+
+    return {
+      id: engine.id,
+      name: engine.name,
+      deliveredCount,
+      totalDeclaredFields,
+      deliveryRate,
+      citation,
+    };
+  }).filter(Boolean);
+
+  const exactCitationCount = engineSummaries.filter((engine) => engine.citation === "exact").length;
+  const pathCitationCount = engineSummaries.filter((engine) => engine.citation === "path").length;
+  const partialCitationCount = engineSummaries.filter((engine) => engine.citation === "domain").length;
+  const noCitationCount = engineSummaries.filter((engine) => !engine.citation || engine.citation === "none").length;
+  const weakEngines = engineSummaries.filter((engine) => engine.deliveryRate !== null && engine.deliveryRate < 0.8);
+
+  const nextActions = [];
+
+  if (declaredFacts.length === 0) {
+    nextActions.push({
+      title: "Declare official facts more explicitly",
+      body: "The site still lacks a reliable facts layer. Add visible company facts and keep them aligned with structured data.",
+      href: "/products/ai-profile-page",
+      hrefLabel: "View AI Profile Page",
+    });
+  }
+
+  if (lintFails.length > 0 || lintWarns.length > 0) {
+    nextActions.push({
+      title: "Fix structural blockers before chasing citation",
+      body: lintFails.length > 0
+        ? `${lintFails.length} structural blockers and ${lintWarns.length} warning signals are still reducing retrieval reliability.`
+        : `${lintWarns.length} warning signals still weaken the official source layer.`,
+      href: "/products/structural-lint-reports",
+      hrefLabel: "Review Structural Lint Reports",
+    });
+  }
+
+  if (weakEngines.length > 0) {
+    nextActions.push({
+      title: "Improve engine-by-engine delivery consistency",
+      body: `${weakEngines.map((engine) => engine.name).join(", ")} still miss some official facts. Keep the source hub concentrated and re-run delivery checks after each structure change.`,
+      href: "/products/ai-delivery-diagnosis",
+      hrefLabel: "Open AI Delivery Diagnosis",
+    });
+  }
+
+  if (exactCitationCount === 0) {
+    nextActions.push({
+      title: "Strengthen citation and discovery signals",
+      body: "No engine cited the exact official URL. Internal structure is only one layer; external profile consistency and discoverability still matter.",
+      href: `/insights/${INSIGHTS[1].slug}`,
+      hrefLabel: "Read the citation note",
+    });
+  }
+
+  if (nextActions.length === 0) {
+    nextActions.push({
+      title: "Keep the official source layer stable",
+      body: "This site already has a solid baseline. Avoid unnecessary structure churn, add supporting external references, and re-check delivery after new signals propagate.",
+      href: "/insights",
+      hrefLabel: "Read the insights hub",
+    });
+  }
+
+  return {
+    targetLabel: crawlData?.title || officialDomain || "current website",
+    declaredFactsCount: declaredFacts.length,
+    faqPairsCount: groundTruth?.faqPairs?.length || 0,
+    structureStatus: lintFails.length > 0
+      ? `${lintFails.length} blockers`
+      : lintWarns.length > 0
+      ? `${lintWarns.length} warnings`
+      : "ready",
+    enginesChecked: engineSummaries.length,
+    exactCitationCount,
+    pathCitationCount,
+    partialCitationCount,
+    noCitationCount,
+    engineSummaries,
+    nextActions: nextActions.slice(0, 4),
+    relatedInsights: INSIGHTS.map((insight) => ({
+      slug: insight.slug,
+      title: insight.title,
+      summary: insight.summary,
+    })),
+    recommendedProducts: PRODUCTS.filter((product) =>
+      ["ai-delivery-diagnosis", "structural-lint-reports", "ai-profile-page"].includes(product.slug)
+    ),
+  };
+}
+
+function buildReportCopyText({ report, lintReport }) {
+  const allLintChecks = getAllLintChecks(lintReport);
+  const lintFails = allLintChecks.filter((check) => check.status === "fail").length;
+  const lintWarns = allLintChecks.filter((check) => check.status === "warn").length;
+
+  return [
+    "AAO Official Source Report",
+    `Target: ${report.targetLabel}`,
+    `Declared facts: ${report.declaredFactsCount}${report.faqPairsCount ? ` | FAQ pairs: ${report.faqPairsCount}` : ""}`,
+    `Structure: ${lintFails > 0 ? `${lintFails} blockers` : "0 blockers"}${lintWarns > 0 ? ` | ${lintWarns} warnings` : ""}`,
+    `Exact citations: ${report.exactCitationCount}/${report.enginesChecked}`,
+    "",
+    "Engine delivery",
+    ...report.engineSummaries.map((engine) =>
+      `- ${engine.name}: ${engine.deliveredCount}/${engine.totalDeclaredFields} delivered${engine.deliveryRate !== null ? ` (${Math.round(engine.deliveryRate * 100)}%)` : ""} | citation: ${engine.citation || "none"}`
+    ),
+    "",
+    "Next actions",
+    ...report.nextActions.map((action) => `- ${action.title}: ${action.body}`),
+  ].join("\n");
+}
+
+function OfficialSourceReport({ report, lintReport, onCopy, copiedReport, onProfileRequest }) {
+  return (
+    <section
+      style={{
+        background: C.card,
+        borderRadius: 16,
+        padding: 18,
+        border: `1px solid ${C.border}`,
+        marginBottom: 20,
+        boxShadow: "0 14px 36px rgba(0,0,0,0.18)",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 14 }}>
+        <div>
+          <div style={{ fontSize: 10, color: C.textDim, textTransform: "uppercase", letterSpacing: "1.4px", marginBottom: 8 }}>
+            Official Source Report
+          </div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: C.text, marginBottom: 6 }}>
+            {report.targetLabel} official-source snapshot
+          </div>
+          <div style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.6 }}>
+            Screenshot or copy this block as a fixed report of declared facts, engine delivery, citation status, and next actions.
+          </div>
+        </div>
+
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-start" }}>
+          <button
+            onClick={onCopy}
+            style={{
+              padding: "9px 12px",
+              borderRadius: 10,
+              border: `1px solid ${copiedReport ? C.success : C.border}`,
+              background: copiedReport ? C.successBg : C.surface,
+              color: copiedReport ? C.success : C.text,
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            {copiedReport ? "리포트 복사됨" : "리포트 텍스트 복사"}
+          </button>
+          <button
+            onClick={onProfileRequest}
+            style={{
+              padding: "9px 12px",
+              borderRadius: 10,
+              border: "none",
+              background: `linear-gradient(135deg,${C.g1},${C.g2})`,
+              color: "#fff",
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            AI Profile 요청
+          </button>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10, marginBottom: 16 }}>
+        {[
+          { label: "Declared facts", value: `${report.declaredFactsCount}`, sub: report.faqPairsCount ? `FAQ ${report.faqPairsCount} pairs` : "No FAQ pairs" },
+          { label: "Structure status", value: report.structureStatus, sub: "Visible facts + schema + source hub" },
+          { label: "Engines checked", value: `${report.enginesChecked}`, sub: "ChatGPT, Gemini, Perplexity" },
+          { label: "Exact official citations", value: `${report.exactCitationCount}`, sub: `${report.pathCitationCount} path matches · ${report.noCitationCount} none` },
+        ].map((item) => (
+          <div key={item.label} style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, padding: 14 }}>
+            <div style={{ fontSize: 10, color: C.textDim, textTransform: "uppercase", letterSpacing: "1px", marginBottom: 8 }}>{item.label}</div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: C.text, marginBottom: 4 }}>{item.value}</div>
+            <div style={{ fontSize: 11, color: C.textMuted, lineHeight: 1.5 }}>{item.sub}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: "grid", gap: 16 }}>
+        <div>
+          <div style={{ fontSize: 10, color: C.textDim, textTransform: "uppercase", letterSpacing: "1.4px", marginBottom: 8 }}>
+            Engine summary
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
+            {report.engineSummaries.map((engine) => (
+              <div key={engine.id} style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, padding: 14 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", marginBottom: 6 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{engine.name}</div>
+                  <div style={{ fontSize: 11, color: engine.deliveryRate >= 0.8 ? C.success : engine.deliveryRate >= 0.5 ? C.warning : C.danger, fontWeight: 700 }}>
+                    {engine.deliveryRate !== null ? `${Math.round(engine.deliveryRate * 100)}% delivered` : "No fields"}
+                  </div>
+                </div>
+                <div style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.6 }}>
+                  {engine.deliveredCount}/{engine.totalDeclaredFields} official fields delivered
+                </div>
+                <div style={{ fontSize: 12, color: C.textMuted, marginTop: 4 }}>
+                  Citation: <span style={{ color: C.text, fontWeight: 600 }}>{engine.citation || "none"}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <div style={{ fontSize: 10, color: C.textDim, textTransform: "uppercase", letterSpacing: "1.4px", marginBottom: 8 }}>
+            Next actions
+          </div>
+          <div style={{ display: "grid", gap: 10 }}>
+            {report.nextActions.map((action) => (
+              <div key={action.title} style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, padding: 14 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 6 }}>{action.title}</div>
+                <div style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.7, marginBottom: 8 }}>{action.body}</div>
+                <a href={action.href} style={{ color: C.info, textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+                  {action.hrefLabel}
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
+          <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, padding: 14 }}>
+            <div style={{ fontSize: 10, color: C.textDim, textTransform: "uppercase", letterSpacing: "1.4px", marginBottom: 8 }}>
+              Related first-party insights
+            </div>
+            <div style={{ display: "grid", gap: 10 }}>
+              {report.relatedInsights.map((insight) => (
+                <a key={insight.slug} href={`/insights/${insight.slug}`} style={{ textDecoration: "none" }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 4 }}>{insight.title}</div>
+                  <div style={{ fontSize: 11, color: C.textMuted, lineHeight: 1.6 }}>{insight.summary}</div>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, padding: 14 }}>
+            <div style={{ fontSize: 10, color: C.textDim, textTransform: "uppercase", letterSpacing: "1.4px", marginBottom: 8 }}>
+              AAO modules
+            </div>
+            <div style={{ display: "grid", gap: 10 }}>
+              {report.recommendedProducts.map((product) => (
+                <a key={product.slug} href={product.officialPath} style={{ textDecoration: "none" }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 4 }}>{product.name}</div>
+                  <div style={{ fontSize: 11, color: C.textMuted, lineHeight: 1.6 }}>{product.tagline}</div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Dashboard({ initialUrl = "" }) {
   const isMobile = useIsMobile();
   const [url, setUrl] = useState(initialUrl);
@@ -371,6 +664,7 @@ export default function Dashboard({ initialUrl = "" }) {
   const [groundTruth, setGroundTruth] = useState(null);
   const [engines, setEngines] = useState(null);
   const [tab, setTab] = useState("lint");
+  const [copiedReport, setCopiedReport] = useState(false);
 
   useEffect(() => {
     if (initialUrl) scan();
@@ -489,6 +783,27 @@ export default function Dashboard({ initialUrl = "" }) {
   const hasResults = lintReport || engines;
   const lintFails = lintReport?.checks?.filter((c) => c.status === "fail") || [];
   const lintWarns = lintReport?.checks?.filter((c) => c.status === "warn") || [];
+  const officialSourceReport = buildOfficialSourceReport({
+    crawlData,
+    lintReport,
+    groundTruth,
+    engines,
+    officialDomain,
+  });
+  const reportCopyText = buildReportCopyText({
+    report: officialSourceReport,
+    lintReport,
+  });
+
+  const handleCopyReport = async () => {
+    try {
+      await navigator.clipboard.writeText(reportCopyText);
+      setCopiedReport(true);
+      window.setTimeout(() => setCopiedReport(false), 1600);
+    } catch {
+      setCopiedReport(false);
+    }
+  };
 
   const tabs = [
     { id: "lint", label: "구조 검증" },
@@ -616,6 +931,14 @@ export default function Dashboard({ initialUrl = "" }) {
                 </div>
               )}
             </div>
+
+            <OfficialSourceReport
+              report={officialSourceReport}
+              lintReport={lintReport}
+              onCopy={handleCopyReport}
+              copiedReport={copiedReport}
+              onProfileRequest={handleProfileRequest}
+            />
 
             {/* Tabs */}
             <div style={{

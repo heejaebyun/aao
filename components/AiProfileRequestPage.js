@@ -115,8 +115,6 @@ export default function AiProfileRequestPage({ initialQuery = {} }) {
   const previewStageFlow = getPreviewPilotStages();
   const previewCaseStudy = getPreviewCaseStudy({
     companyName: form.companyName || snapshot.companyName,
-    beforeScore: previewBeforeScore,
-    afterScore: previewAfterScore,
     templateLabel: selectedTemplate.label,
     planLabel: selectedPlan.label,
   });
@@ -204,15 +202,15 @@ export default function AiProfileRequestPage({ initialQuery = {} }) {
                 AI 프로필 페이지 제작 요청
               </h1>
               <p style={{ marginTop: 12, marginBottom: 0, fontSize: 14, color: C.textMuted, lineHeight: 1.8 }}>
-                진단 결과를 기준으로 `문제 발견 → 제작 요청 → 설치 → Before/After 재진단` 흐름을 바로 시작하는 폼입니다.
+                진단 결과를 기준으로 `문제 발견 → 제작 요청 → 설치 → 전달 확인 재진단` 흐름을 바로 시작하는 폼입니다.
               </p>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, marginBottom: 16 }}>
               {[
-                { label: "현재 점수", value: snapshot.currentScore !== null ? `${snapshot.currentScore}점` : "미측정", color: C.warning },
-                { label: "목표 점수", value: previewAfterScore !== null ? `${previewAfterScore}점` : "설치 후 측정", color: C.success },
-                { label: "Gap", value: snapshot.gapScore !== null ? `+${snapshot.gapScore}점` : "—", color: C.info },
+                { label: "현재 진단 상태", value: snapshot.currentScore !== null ? "진단 완료" : "미측정", color: C.warning },
+                { label: "설치 후 재확인", value: previewAfterScore !== null ? "재확인 예정" : "설치 후 재확인", color: C.success },
+                { label: "구조 검증", value: snapshot.gapScore !== null ? "개선 항목 확인" : "기본 구조 점검", color: C.info },
                 { label: "설치 경로", value: "/ai-profile", color: C.text },
               ].map((item) => (
                 <div key={item.label} style={{ background: C.card, borderRadius: 14, padding: 16, border: `1px solid ${C.border}` }}>
@@ -251,7 +249,7 @@ export default function AiProfileRequestPage({ initialQuery = {} }) {
               <div style={{ marginTop: 12, padding: 14, borderRadius: 12, background: C.surface, border: `1px solid ${C.border}` }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{selectedTemplate.label}</div>
-                  <div style={{ fontSize: 11, color: C.warning, fontWeight: 700 }}>템플릿 가이드 +{selectedTemplate.targetLift}점</div>
+                  <div style={{ fontSize: 11, color: C.warning, fontWeight: 700 }}>템플릿 가이드</div>
                 </div>
                 <div style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.8, marginBottom: 10 }}>{selectedTemplate.summary}</div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 10 }}>
@@ -276,22 +274,6 @@ export default function AiProfileRequestPage({ initialQuery = {} }) {
               {snapshot.detail && (
                 <div style={{ marginTop: 10, fontSize: 12, color: C.textDim, lineHeight: 1.7 }}>
                   {snapshot.detail}
-                </div>
-              )}
-              {(snapshot.pacpScore !== null || snapshot.sepScore !== null || snapshot.spfScore !== null) && (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginTop: 12 }}>
-                  {[
-                    { label: "PACP", value: snapshot.pacpScore, max: 40, color: "#ff6b35" },
-                    { label: "SEP", value: snapshot.sepScore, max: 30, color: "#38bdf8" },
-                    { label: "SPF", value: snapshot.spfScore, max: 30, color: "#a855f7" },
-                  ].map((axis) => (
-                    <div key={axis.label} style={{ background: C.surface, borderRadius: 10, padding: 12, border: `1px solid ${C.border}` }}>
-                      <div style={{ fontSize: 10, color: C.textDim }}>{axis.label}</div>
-                      <div style={{ fontSize: 18, fontWeight: 800, color: axis.color, fontFamily: "'Outfit',sans-serif" }}>
-                        {axis.value !== null ? `${axis.value}/${axis.max}` : "—"}
-                      </div>
-                    </div>
-                  ))}
                 </div>
               )}
             </div>
@@ -420,7 +402,7 @@ export default function AiProfileRequestPage({ initialQuery = {} }) {
                 ))}
               </div>
               <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px solid ${C.border}`, fontSize: 11, color: C.textDim, lineHeight: 1.7 }}>
-                플랜 가이드 uplift: +{selectedPlan.targetLift}점 기준 · 납기 {selectedPlan.turnaroundLabel}
+                납기 {selectedPlan.turnaroundLabel}
               </div>
             </div>
 
@@ -497,10 +479,10 @@ export default function AiProfileRequestPage({ initialQuery = {} }) {
                 {featuredCase.summary}
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10, marginBottom: 12 }}>
-                <MetricCard label="Before · Lint" value={`${featuredCase.beforeState.lint.passed}/${featuredCase.beforeState.lint.total}`} tone={C.warning} />
-                <MetricCard label="After · Lint" value={`${featuredCase.afterState.lint.passed}/${featuredCase.afterState.lint.total}`} tone={C.info} />
-                <MetricCard label="Before · Facts" value={`${featuredCase.beforeState.groundTruth.fieldCount}개`} tone={C.warning} />
-                <MetricCard label="After · Facts" value={`${featuredCase.afterState.groundTruth.fieldCount}개`} tone={C.success} />
+                <MetricCard label="기존 · Lint" value={`${featuredCase.beforeState.lint.passed}/${featuredCase.beforeState.lint.total}`} tone={C.warning} />
+                <MetricCard label="허브 · Lint" value={`${featuredCase.afterState.lint.passed}/${featuredCase.afterState.lint.total}`} tone={C.info} />
+                <MetricCard label="기존 · Facts" value={`${featuredCase.beforeState.groundTruth.fieldCount}개`} tone={C.warning} />
+                <MetricCard label="허브 · Facts" value={`${featuredCase.afterState.groundTruth.fieldCount}개`} tone={C.success} />
               </div>
               <div style={{ fontSize: 11, color: C.textDim, marginBottom: 12 }}>
                 기준일 {featuredCase.updatedAt} · 설치 경로 {featuredCase.installPath}
@@ -517,10 +499,10 @@ export default function AiProfileRequestPage({ initialQuery = {} }) {
             </div>
 
             <div style={{ background: C.card, borderRadius: 16, padding: 20, border: `1px solid ${C.border}`, marginBottom: 16 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}>Before / After 초안</div>
+              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}>전달 확인 리포트</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
-                <MetricCard label="Before" value={previewBeforeScore !== null ? `${previewBeforeScore}점` : "미측정"} tone={C.warning} />
-                <MetricCard label="After" value={previewAfterScore !== null ? `${previewAfterScore}점` : "설치 후 측정"} tone={C.success} />
+                <MetricCard label="현재 진단" value={previewBeforeScore !== null ? `${previewBeforeScore}점` : "미측정"} tone={C.warning} />
+                <MetricCard label="설치 후 재검증" value={previewAfterScore !== null ? `${previewAfterScore}점` : "설치 후 측정"} tone={C.success} />
               </div>
               <div style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.8, marginBottom: 12 }}>
                 메인 사이트를 크게 건드리지 않고 `/ai-profile` 정적 페이지를 추가하는 방식으로 AI가 읽는 공식 정보를 재구성합니다.
@@ -795,19 +777,15 @@ function getPreviewPilotStages() {
     { id: "scoped", label: "범위 확정", owner: "AAO + 고객", description: "플랜, 템플릿, 납기 확정", status: "pending" },
     { id: "draft", label: "초안 전달", owner: "AAO", description: "AI 프로필 1차안 전달", status: "pending" },
     { id: "install", label: "설치 완료", owner: "AAO / 고객", description: "`/ai-profile` 배포 및 검증", status: "pending" },
-    { id: "case_study", label: "케이스 승인", owner: "AAO + 고객", description: "공개 가능한 Before/After 승인", status: "pending" },
+    { id: "case_study", label: "케이스 승인", owner: "AAO + 고객", description: "공개 가능한 전달 확인 사례 승인", status: "pending" },
   ];
 }
 
-function getPreviewCaseStudy({ companyName, beforeScore, afterScore, templateLabel, planLabel }) {
+function getPreviewCaseStudy({ companyName, templateLabel, planLabel }) {
   const label = companyName || "고객사";
   return {
-    title: `${label} AI Profile Before/After`,
-    hook: `${templateLabel} 템플릿과 ${planLabel} 플랜 기준으로 Before/After 케이스 스터디를 만들 수 있습니다.`,
-    metrics: [
-      { id: "before", label: "Before", value: beforeScore !== null ? `${beforeScore}점` : "미측정" },
-      { id: "after", label: "After", value: afterScore !== null ? `${afterScore}점` : "설치 후 측정" },
-    ],
+    title: `${label} AI Profile 전달 확인 사례`,
+    hook: `${templateLabel} 템플릿과 ${planLabel} 플랜 기준으로 전달 확인 사례를 만들 수 있습니다.`,
   };
 }
 

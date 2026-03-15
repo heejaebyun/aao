@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "AAO (AI Answer Optimization) — AI가 당신의 회사를 정확히 알고 있을까요?";
+export const alt = "AAO (AI Answer Optimization) | AI search optimization service";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -47,7 +47,6 @@ export default function OgImage() {
           }}
         />
 
-        {/* 상단 배지 */}
         <div
           style={{
             display: "flex",
@@ -68,11 +67,10 @@ export default function OgImage() {
               display: "flex",
             }}
           >
-            Princeton GEO Research 기반 · AI 가시성 진단
+            AI search optimization service
           </div>
         </div>
 
-        {/* 브랜드명 */}
         <div
           style={{
             fontSize: 52,
@@ -97,10 +95,9 @@ export default function OgImage() {
           <span style={{ color: "#ccccee" }}>AI Answer Optimization</span>
         </div>
 
-        {/* 메인 카피 */}
         <div
           style={{
-            fontSize: 36,
+            fontSize: 34,
             fontWeight: 700,
             color: "#e4e4f0",
             lineHeight: 1.3,
@@ -108,15 +105,14 @@ export default function OgImage() {
             display: "flex",
           }}
         >
-          AI가 당신의 회사를 정확히 알고 있을까요?
+          Make your official website the primary source for AI answers
         </div>
 
-        {/* 하단 수치 3개 */}
         <div style={{ display: "flex", gap: 24 }}>
           {[
-            { num: "3개", label: "AI 엔진 동시 검증" },
-            { num: "100점", label: "GEO 진단 점수" },
-            { num: "무료", label: "기본 진단" },
+            { num: "3 engines", label: "ChatGPT, Gemini, Perplexity" },
+            { num: "2 layers", label: "Visible facts + aligned JSON-LD" },
+            { num: "1 hub", label: "Official AI Profile as source page" },
           ].map((item) => (
             <div
               key={item.label}
@@ -149,7 +145,6 @@ export default function OgImage() {
           ))}
         </div>
 
-        {/* 우측 하단 도메인 */}
         <div
           style={{
             position: "absolute",
