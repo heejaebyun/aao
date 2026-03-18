@@ -8,6 +8,8 @@ import {
   ENTITY_LABEL,
   ENTITY_SHORT_NAME,
   FOUNDER_INDIE_HACKERS_URL,
+  FOUNDER_LINKEDIN_URL,
+  FOUNDER_PRODUCT_HUNT_URL,
   FOUNDER_NAME_EN,
   FOUNDER_NAME_KO,
   HEADQUARTERS_REGION,
@@ -61,7 +63,7 @@ export default function RootLayout({ children }) {
       "@type": "Person",
       name: FOUNDER_NAME_KO,
       alternateName: FOUNDER_NAME_EN,
-      sameAs: [FOUNDER_INDIE_HACKERS_URL],
+      sameAs: [FOUNDER_LINKEDIN_URL, FOUNDER_PRODUCT_HUNT_URL, FOUNDER_INDIE_HACKERS_URL],
     },
     address: {
       "@type": "PostalAddress",
