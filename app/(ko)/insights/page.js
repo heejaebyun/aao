@@ -3,21 +3,21 @@ import { INSIGHTS, INSIGHTS_COLLECTION_SCHEMA } from "@/lib/insights";
 import { ENTITY_LABEL, SITE_ORIGIN } from "@/lib/site-identity";
 
 export const metadata = {
-  title: `${ENTITY_LABEL} | Insights`,
-  description: "English-first notes on AI search optimization, official-source structure, and AI-readable company facts.",
+  title: `${ENTITY_LABEL} | 인사이트 노트`,
+  description: "AI 검색 최적화, 공식 출처 구조, AI가 읽기 쉬운 회사 사실에 대한 인사이트 노트입니다.",
   alternates: {
     canonical: "/insights",
   },
   openGraph: {
-    title: `${ENTITY_LABEL} | Insights`,
-    description: "English-first notes on AI search optimization and official-source structure.",
+    title: `${ENTITY_LABEL} | 인사이트 노트`,
+    description: "AI 검색 최적화와 공식 출처 구조에 대한 인사이트 노트입니다.",
     url: `${SITE_ORIGIN}/insights`,
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${ENTITY_LABEL} | Insights`,
-    description: "English-first notes on AI search optimization and official-source structure.",
+    title: `${ENTITY_LABEL} | 인사이트 노트`,
+    description: "AI 검색 최적화와 공식 출처 구조에 대한 인사이트 노트입니다.",
   },
 };
 
@@ -119,10 +119,10 @@ export default function InsightsPage() {
 
       <section style={styles.hero}>
         <div style={styles.eyebrow}>INSIGHTS</div>
-        <h1 style={styles.h1}>English-first notes on AI-readable official sources</h1>
+        <h1 style={styles.h1}>AI가 읽기 쉬운 공식 출처 인사이트 노트</h1>
         <p style={styles.lead}>
-          These notes explain how AI systems retrieve company facts, why official sites get missed, and what source-layer
-          patterns improve delivery and citation. They are written to support the official source model behind {ENTITY_LABEL}.
+          이 노트는 AI가 회사 사실을 어떻게 읽어오는지, 왜 공식 사이트가 누락되는지, 어떤 공식 출처 구조가 전달과 인용을 개선하는지 설명합니다.
+          {` `}{ENTITY_LABEL}의 공식 출처 모델을 뒷받침하는 실험과 관찰을 바탕으로 정리했습니다.
         </p>
       </section>
 
@@ -141,7 +141,7 @@ export default function InsightsPage() {
               ))}
             </div>
             <Link href={`/insights/${insight.slug}`} style={styles.link}>
-              Read insight
+              글 보기
             </Link>
           </article>
         ))}

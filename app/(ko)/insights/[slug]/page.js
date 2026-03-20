@@ -152,7 +152,7 @@ export default async function InsightPage({ params }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
 
       <Link href="/insights" style={styles.breadcrumb}>
-        Back to insights
+        인사이트 목록으로 돌아가기
       </Link>
 
       <div style={styles.meta}>
@@ -188,12 +188,12 @@ export default async function InsightPage({ params }) {
 
       <section style={styles.cta}>
         <p style={styles.p}>
-          Want the official source layer, not just another SEO page?
+          단순한 SEO 페이지가 아니라 공식 출처 레이어가 필요하신가요?
         </p>
         <p style={{ ...styles.p, marginBottom: 0 }}>
-          <Link href="/ai-profile" style={styles.ctaLink}>View the official AI Profile</Link>
-          {" "}or{" "}
-          <Link href="/products" style={styles.ctaLink}>see the product source pages</Link>.
+          <Link href="/ai-profile" style={styles.ctaLink}>공식 AI 프로필 보기</Link>
+          {" "}또는{" "}
+          <Link href="/products" style={styles.ctaLink}>모듈 소개 보기</Link>.
         </p>
       </section>
     </main>

@@ -3,21 +3,21 @@ import { PRODUCTS, PRODUCTS_COLLECTION_SCHEMA } from "@/lib/products";
 import { ENTITY_LABEL, SITE_ORIGIN } from "@/lib/site-identity";
 
 export const metadata = {
-  title: `${ENTITY_LABEL} | Products`,
-  description: "Official product source pages for AI Delivery Diagnosis, Structural Lint Reports, and AI Profile Page.",
+  title: `${ENTITY_LABEL} | 모듈 소개`,
+  description: "AI 전달 진단, 구조 검증 리포트, AI 프로필 페이지를 위한 공식 모듈 소개 페이지입니다.",
   alternates: {
     canonical: "/products",
   },
   openGraph: {
-    title: `${ENTITY_LABEL} | Products`,
-    description: "Official product source pages for the AAO source-layer workflow.",
+    title: `${ENTITY_LABEL} | 모듈 소개`,
+    description: "AAO 공식 출처 워크플로를 구성하는 모듈 소개 페이지입니다.",
     url: `${SITE_ORIGIN}/products`,
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${ENTITY_LABEL} | Products`,
-    description: "Official product source pages for the AAO source-layer workflow.",
+    title: `${ENTITY_LABEL} | 모듈 소개`,
+    description: "AAO 공식 출처 워크플로를 구성하는 모듈 소개 페이지입니다.",
   },
 };
 
@@ -105,10 +105,10 @@ export default function ProductsPage() {
 
       <section style={styles.hero}>
         <div style={styles.eyebrow}>PRODUCT SOURCE PAGES</div>
-        <h1 style={styles.h1}>Official product pages for the AAO source-layer workflow</h1>
+        <h1 style={styles.h1}>AAO 공식 출처 워크플로를 구성하는 모듈 소개</h1>
         <p style={styles.lead}>
-          These pages describe what each AAO product module does, who it is for, and what official output it creates.
-          They are written as product-level source pages for AI-readable retrieval and agent-facing discovery.
+          각 모듈이 무엇을 하는지, 누구에게 필요한지, 어떤 공식 결과물을 만드는지 설명합니다.
+          AI가 읽기 쉬운 제품 단위 공식 출처 페이지로 정리했습니다.
         </p>
       </section>
 
@@ -118,9 +118,9 @@ export default function ProductsPage() {
             <div style={styles.category}>{product.category}</div>
             <h2 style={styles.title}>{product.name}</h2>
             <p style={styles.desc}>{product.description}</p>
-            <p style={styles.meta}><strong>Best for:</strong> {product.bestFor}</p>
+            <p style={styles.meta}><strong>추천 대상:</strong> {product.bestFor}</p>
             <Link href={product.officialPath} style={styles.link}>
-              View official product page
+              공식 모듈 페이지 보기
             </Link>
           </article>
         ))}
