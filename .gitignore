@@ -6,3 +6,7 @@ node_modules/
 *.log
 artifacts/wiki-benchmark/
 reports/delivery/
+*.docx
+indiehackers-draft-*.md
+medium-draft-*.md
+예창팸_*.md
