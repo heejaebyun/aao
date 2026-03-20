@@ -76,8 +76,8 @@ export default function LandingPage() {
           AI가 메인 페이지를 읽고, 놓치고, 잘못 이해하는 지점을 진단합니다.
         </p>
         <p style={{ fontSize: 14, color: "#7f7fa6", lineHeight: 1.75, margin: "0 0 48px" }}>
-          <strong style={{ color: "#d8d8f4" }}>{ENTITY_LABEL}</strong>는 공식 웹사이트와 <code style={inlineCodeStyle()}>/ai-profile</code> 페이지를
-          AI의 1차 출처로 만들기 위해, 메인 페이지 구조와 실제 AI 전달 결과를 함께 진단하는 서비스입니다.
+          <strong style={{ color: "#d8d8f4" }}>{ENTITY_LABEL}</strong>는 AI 검색 최적화 SaaS입니다. 공식 웹사이트와{" "}
+          <code style={inlineCodeStyle()}>/ai-profile</code> 페이지를 AI의 1차 출처로 만들기 위해, 메인 페이지 구조와 실제 AI 전달 결과를 함께 진단합니다.
         </p>
 
         <p style={{ fontSize: 14, color: "#b3b0d8", lineHeight: 1.85, margin: "0 0 28px", textAlign: "left", maxWidth: 640, marginLeft: "auto", marginRight: "auto" }}>
@@ -204,7 +204,7 @@ export default function LandingPage() {
       <section style={{ maxWidth: 860, margin: "0 auto 80px", padding: "0 24px" }}>
         <h2 style={{ textAlign: "center", fontSize: 22, fontWeight: 700, marginBottom: 18, color: "#f3f1ff" }}>자체 인사이트 노트</h2>
         <p style={{ textAlign: "center", fontSize: 14, color: "#7f7fa6", lineHeight: 1.75, margin: "0 auto 32px", maxWidth: 680 }}>
-          AAO가 AI-readable source structure, citation behavior, first-party discoverability에 대해 실험하며 배운 내용을 정리합니다.
+          AAO가 AI 읽기 가능한 출처 구조, 인용 동작, 자체 출처 발견성에 대해 실험하며 배운 내용을 정리합니다.
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
           {INSIGHTS.slice(0, 2).map((insight) => (

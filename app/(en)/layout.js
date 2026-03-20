@@ -72,6 +72,16 @@ export default function EnLayout({ children }) {
     },
     serviceType: ENTITY_TYPE_LABEL_EN,
     sameAs: OFFICIAL_EXTERNAL_PROFILES.map((profile) => profile.url),
+    hasPart: [
+      { "@type": "WebPage", name: "AI Delivery Diagnosis", url: `${SITE_ORIGIN}/diagnose` },
+      { "@type": "WebPage", name: "Official AI Profile", url: `${SITE_ORIGIN}/ai-profile` },
+      { "@type": "WebPage", name: "Request AI Profile Page", url: `${SITE_ORIGIN}/ai-profile/request` },
+    ],
+    significantLink: [
+      `${SITE_ORIGIN}/diagnose`,
+      `${SITE_ORIGIN}/ai-profile`,
+      `${SITE_ORIGIN}/ai-profile/request`,
+    ],
   };
 
   return (

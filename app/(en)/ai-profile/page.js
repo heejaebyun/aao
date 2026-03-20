@@ -28,11 +28,15 @@ export const metadata = {
     index: true,
     follow: true,
   },
+  other: {
+    "content-language": "en",
+  },
   openGraph: {
     title: AI_PROFILE_META_TITLE,
     description: AI_PROFILE_META_DESCRIPTION,
     type: "website",
     url: AI_PROFILE_URL,
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
@@ -190,7 +194,7 @@ export default function AiProfilePage() {
   ];
 
   return (
-    <main style={styles.page}>
+    <main lang="en" style={styles.page}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(profilePageSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
