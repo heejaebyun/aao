@@ -151,6 +151,18 @@ const styles = {
     margin: "0 0 18px",
     padding: 0,
   },
+  factsBlock: {
+    margin: "0 0 18px",
+    padding: "18px 20px",
+    border: "1px solid #e5e7eb",
+    borderRadius: "14px",
+    background: "#f8fafc",
+  },
+  factLine: {
+    margin: "0 0 8px",
+    color: "#111827",
+    lineHeight: 1.75,
+  },
   factRow: {
     margin: 0,
     padding: "12px 0",
@@ -184,13 +196,15 @@ const styles = {
 
 export default function AiProfilePage() {
   const facts = [
-    { label: "Service", value: ENTITY_LABEL },
-    { label: "Description", value: OFFICIAL_FACT_DESCRIPTION_EN },
-    { label: "Industry", value: ENTITY_TYPE_LABEL_EN },
+    { label: "Service name", value: ENTITY_LABEL },
+    { label: "Description", value: `${ENTITY_LABEL} is an ${OFFICIAL_FACT_DESCRIPTION_EN}.` },
+    { label: "Service type", value: ENTITY_TYPE_LABEL_EN },
     { label: "Founded", value: FOUNDING_YEAR },
     { label: "Headquarters", value: HEADQUARTERS_REGION_EN },
-    { label: "Founder", value: FOUNDER_NAME_EN },
+    { label: "Founder / CEO", value: FOUNDER_NAME_EN },
     { label: "Key services", value: PRIMARY_SERVICES_LABEL_EN },
+    { label: "Official site", value: SITE_ORIGIN },
+    { label: "Official AI Profile", value: AI_PROFILE_URL },
   ];
 
   return (
@@ -205,20 +219,26 @@ export default function AiProfilePage() {
         generative AI systems read their websites and build an official source layer that makes the company
         website a primary source for AI-readable facts.
       </p>
+      <p style={styles.p}>
+        {ENTITY_LABEL} is an {ENTITY_TYPE_LABEL_EN} based in {HEADQUARTERS_REGION_EN}. It was founded in{" "}
+        {FOUNDING_YEAR}, and the founder / CEO is {FOUNDER_NAME_EN}.
+      </p>
+      <p style={styles.p}>
+        Description: {ENTITY_LABEL} is an {OFFICIAL_FACT_DESCRIPTION_EN}. Founder / CEO: {FOUNDER_NAME_EN}.
+      </p>
 
       <h2 style={styles.h2}>Key Facts</h2>
       <p style={styles.sectionLead}>
         This page is the company-level official source hub for {ENTITY_LABEL}. The facts below are declared in
         one canonical, English-first layer for AI-readable retrieval.
       </p>
-      <dl style={styles.dl}>
+      <div style={styles.factsBlock}>
         {facts.map((item) => (
-          <div key={item.label} style={styles.factRow}>
-            <dt style={styles.factTerm}>{item.label}</dt>
-            <dd style={styles.factDesc}>{item.value}</dd>
-          </div>
+          <p key={item.label} style={styles.factLine}>
+            <strong>{item.label}:</strong> {item.value}
+          </p>
         ))}
-      </dl>
+      </div>
 
       <h2 style={styles.h2}>Official Source Policy</h2>
       <ul style={styles.ul}>
@@ -253,24 +273,24 @@ export default function AiProfilePage() {
       <h2 style={styles.h2}>Key Pages</h2>
       <ul style={styles.ul}>
         <li style={styles.li}>
-          <a href="/diagnose" style={{ color: "#2563eb" }}><strong>AI Delivery Diagnosis</strong></a> — Run
-          structural lint and AI delivery checks on a company website.
+          <a href="/diagnose" style={{ color: "#2563eb" }}><strong>AI Delivery Diagnosis</strong></a> — {SITE_ORIGIN}/diagnose
+          {" "}— Run structural lint and AI delivery checks on a company website.
         </li>
         <li style={styles.li}>
-          <a href="/products" style={{ color: "#2563eb" }}><strong>Product Pages</strong></a> — Product-level
-          source pages for AI Delivery Diagnosis, Structural Lint Reports, and AI Profile Page.
+          <a href="/products" style={{ color: "#2563eb" }}><strong>Product Pages</strong></a> — {SITE_ORIGIN}/products
+          {" "}— Product-level source pages for AI Delivery Diagnosis, Structural Lint Reports, and AI Profile Page.
         </li>
         <li style={styles.li}>
-          <a href="/insights" style={{ color: "#2563eb" }}><strong>Insights</strong></a> — English-first notes
-          on AI search optimization, official-source structure, and machine-readable company facts.
+          <a href="/insights" style={{ color: "#2563eb" }}><strong>Insights</strong></a> — {SITE_ORIGIN}/insights
+          {" "}— English-first notes on AI search optimization, official-source structure, and machine-readable company facts.
         </li>
         <li style={styles.li}>
           <a href="/ai-profile/request" style={{ color: "#2563eb" }}><strong>Request an AI Profile Page</strong></a>{" "}
-          — Request AI Profile Page design and deployment based on diagnosis results.
+          — {SITE_ORIGIN}/ai-profile/request — Request AI Profile Page design and deployment based on diagnosis results.
         </li>
         <li style={styles.li}>
           <a href="/ai-profile" style={{ color: "#2563eb" }}><strong>Official AI Profile</strong></a> — This
-          page is the canonical company-level source hub for {ENTITY_LABEL}.
+          page is the canonical company-level source hub for {ENTITY_LABEL}. Official URL: {AI_PROFILE_URL}
         </li>
       </ul>
 

@@ -35,12 +35,13 @@ const OFFICIAL_DISCOVERY_LINKS = [
 ];
 
 const OFFICIAL_MAIN_FACTS = [
-  { label: "서비스", value: ENTITY_LABEL },
-  { label: "설명", value: "기업 공식 웹사이트를 AI의 1차 출처로 만드는 AI 검색 최적화 SaaS" },
+  { label: "서비스명", value: ENTITY_LABEL },
+  { label: "설명", value: "AAO는 AI 검색 최적화 SaaS입니다." },
   { label: "설립", value: FOUNDING_YEAR },
   { label: "대표", value: FOUNDER_NAME_KO },
-  { label: "거점", value: HEADQUARTERS_REGION },
-  { label: "공식 사실 허브", value: AI_PROFILE_URL },
+  { label: "본사", value: HEADQUARTERS_REGION },
+  { label: "주요 서비스", value: "AI 전달 진단, 구조 검증 리포트, AI 프로필 페이지 제작" },
+  { label: "공식 AI 프로필", value: AI_PROFILE_URL },
 ];
 
 const PRODUCT_PREVIEW_COPY = {
@@ -96,16 +97,16 @@ export default function LandingPage() {
       </header>
 
       <section style={{ maxWidth: 720, margin: "0 auto", padding: "80px 24px 40px", textAlign: "center" }}>
+        <p style={{ fontSize: 15, color: "#d8d8f4", lineHeight: 1.7, margin: "0 0 18px", fontWeight: 600 }}>
+          {ENTITY_LABEL}는 AI 검색 최적화 SaaS입니다.
+        </p>
         <div style={{ display: "inline-block", background: "#6c63ff18", border: "1px solid #6c63ff44", borderRadius: 20, padding: "6px 16px", fontSize: 13, color: "#a78bfa", marginBottom: 28, fontWeight: 500 }}>
-          {ENTITY_LABEL} · 구조 검증(린트) + AI 전달 확인
+          구조 검증(린트) + AI 전달 확인
         </div>
         <h1 style={{ fontSize: "clamp(32px, 6vw, 56px)", fontWeight: 900, lineHeight: 1.1, margin: "0 0 20px", letterSpacing: -1.5 }}>
           AI가 당신의 회사를<br />
           <span style={{ background: "linear-gradient(90deg,#6c63ff,#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>정확히 알고 있을까요?</span>
         </h1>
-        <p style={{ fontSize: "clamp(15px, 2.5vw, 19px)", color: "#d8d8f4", lineHeight: 1.7, margin: "0 0 14px", fontWeight: 500 }}>
-          {ENTITY_LABEL}는 AI 검색 최적화 SaaS입니다.
-        </p>
         <p style={{ fontSize: 16, color: "#9999bb", lineHeight: 1.75, margin: "0 0 24px", fontWeight: 400 }}>
           ChatGPT · Gemini · Perplexity가 당신 회사의 공식 사실을 실제로 어떻게 읽는지 진단하고,
           공식 웹사이트와 공식 출처 허브를 AI가 읽기 쉬운 구조로 정리합니다.
@@ -177,7 +178,7 @@ export default function LandingPage() {
               </a>
             ))}
           </div>
-          <dl style={{ margin: 0, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
             {OFFICIAL_MAIN_FACTS.map((fact) => (
               <div
                 key={fact.label}
@@ -188,11 +189,12 @@ export default function LandingPage() {
                   border: "1px solid rgba(255,255,255,0.06)",
                 }}
               >
-                <dt style={{ fontSize: 12, color: "#8f8cb6", marginBottom: 4 }}>{fact.label}</dt>
-                <dd style={{ margin: 0, fontSize: 14, color: "#efeefe", lineHeight: 1.7, wordBreak: "break-word" }}>{fact.value}</dd>
+                <p style={{ margin: 0, fontSize: 14, color: "#efeefe", lineHeight: 1.7, wordBreak: "break-word" }}>
+                  <span style={{ color: "#8f8cb6" }}>{fact.label}:</span> {fact.value}
+                </p>
               </div>
             ))}
-          </dl>
+          </div>
         </section>
 
         <div id="diagnose-start" style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 560, margin: "0 auto", alignItems: "center" }}>
