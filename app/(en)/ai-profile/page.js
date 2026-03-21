@@ -197,14 +197,14 @@ const styles = {
 export default function AiProfilePage() {
   const facts = [
     { label: "Service name", value: ENTITY_LABEL },
-    { label: "Description", value: `${ENTITY_LABEL} is an ${OFFICIAL_FACT_DESCRIPTION_EN}.` },
-    { label: "Industry", value: ENTITY_TYPE_LABEL_EN },
+    { label: "Description", value: OFFICIAL_FACT_DESCRIPTION_EN },
+    { label: "Type", value: ENTITY_TYPE_LABEL_EN },
     { label: "Founded", value: FOUNDING_YEAR },
     { label: "Headquarters", value: HEADQUARTERS_REGION_EN },
-    { label: "Founder / CEO", value: FOUNDER_NAME_EN },
-    { label: "Key services", value: PRIMARY_SERVICES_LABEL_EN },
+    { label: "Founder", value: FOUNDER_NAME_EN },
+    { label: "Key products", value: PRIMARY_SERVICES_LABEL_EN },
     { label: "Official site", value: SITE_ORIGIN },
-    { label: "Official AI Profile", value: AI_PROFILE_URL },
+    { label: "Official AI Profile URL", value: AI_PROFILE_URL },
     { label: "Product pages", value: `${SITE_ORIGIN}/products` },
   ];
 
@@ -216,17 +216,13 @@ export default function AiProfilePage() {
       <h1 style={styles.h1}>{ENTITY_LABEL}</h1>
 
       <p style={{ ...styles.p, ...styles.lead }}>
-        {ENTITY_LABEL} is an AI search optimization service and {ENTITY_TYPE_LABEL_EN} based in{" "}
-        {HEADQUARTERS_REGION_EN}, and its key services are {PRIMARY_SERVICES_LABEL_EN}.
+        {ENTITY_LABEL} is an AI search optimization service based in {HEADQUARTERS_REGION_EN}.
       </p>
       <p style={styles.p}>
-        Founded: {FOUNDING_YEAR}. Headquarters: {HEADQUARTERS_REGION_EN}. Founder / CEO: {FOUNDER_NAME_EN}.
+        It was founded in {FOUNDING_YEAR} by {FOUNDER_NAME_EN}.
       </p>
       <p style={styles.p}>
-        Official AI Profile URL: {AI_PROFILE_URL}. Product pages hub: {SITE_ORIGIN}/products.
-      </p>
-      <p style={styles.p}>
-        Description: {ENTITY_LABEL} is an {OFFICIAL_FACT_DESCRIPTION_EN}. Founder / CEO: {FOUNDER_NAME_EN}.
+        Its key products are {PRIMARY_SERVICES_LABEL_EN}.
       </p>
 
       <h2 style={styles.h2}>Key Facts</h2>
