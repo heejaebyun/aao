@@ -216,8 +216,11 @@ export default function AiProfilePage() {
       <h1 style={styles.h1}>{ENTITY_LABEL}</h1>
 
       <p style={{ ...styles.p, ...styles.lead }}>
-        {ENTITY_LABEL} is an AI search optimization service. It is an {ENTITY_TYPE_LABEL_EN} based in{" "}
-        {HEADQUARTERS_REGION_EN}, founded in {FOUNDING_YEAR} by {FOUNDER_NAME_EN}.
+        {ENTITY_LABEL} is an AI search optimization service and {ENTITY_TYPE_LABEL_EN} based in{" "}
+        {HEADQUARTERS_REGION_EN}, and its key services are {PRIMARY_SERVICES_LABEL_EN}.
+      </p>
+      <p style={styles.p}>
+        Founded: {FOUNDING_YEAR}. Headquarters: {HEADQUARTERS_REGION_EN}. Founder / CEO: {FOUNDER_NAME_EN}.
       </p>
       <p style={styles.p}>
         Official AI Profile URL: {AI_PROFILE_URL}. Product pages hub: {SITE_ORIGIN}/products.

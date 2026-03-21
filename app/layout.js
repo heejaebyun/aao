@@ -170,6 +170,7 @@ function getEnSchemas() {
     address: {
       "@type": "PostalAddress",
       addressCountry: "KR",
+      addressLocality: HEADQUARTERS_REGION_EN,
       addressRegion: HEADQUARTERS_REGION_EN,
     },
     contactPoint: {
@@ -178,6 +179,14 @@ function getEnSchemas() {
       email: CONTACT_EMAIL,
     },
     serviceType: ENTITY_TYPE_LABEL_EN,
+    knowsAbout: [
+      ENTITY_FULL_NAME,
+      "AI search optimization",
+      "AI Profile Page",
+      "AI delivery diagnosis",
+      "structural lint reports",
+      PRIMARY_SERVICES_LABEL_EN,
+    ],
     sameAs: [
       LINKEDIN_COMPANY_URL,
       X_PROFILE_URL,
@@ -188,11 +197,13 @@ function getEnSchemas() {
     hasPart: [
       { "@type": "WebPage", name: "AI Delivery Diagnosis", url: `${SITE_ORIGIN}/diagnose` },
       { "@type": "WebPage", name: "Official AI Profile", url: `${SITE_ORIGIN}/ai-profile` },
+      { "@type": "WebPage", name: "Product Pages", url: `${SITE_ORIGIN}/products` },
       { "@type": "WebPage", name: "Request AI Profile Page", url: `${SITE_ORIGIN}/ai-profile/request` },
     ],
     significantLink: [
       `${SITE_ORIGIN}/diagnose`,
       `${SITE_ORIGIN}/ai-profile`,
+      `${SITE_ORIGIN}/products`,
       `${SITE_ORIGIN}/ai-profile/request`,
     ],
   };
@@ -209,6 +220,11 @@ function getEnSchemas() {
     operatingSystem: "Web",
     inLanguage: ["en"],
     datePublished: FOUNDING_YEAR,
+    knowsAbout: [
+      "AI delivery diagnosis",
+      "structural lint reports",
+      "AI Profile Page design and deployment",
+    ],
     sameAs: [
       AI_PROFILE_URL,
       LINKEDIN_COMPANY_URL,
