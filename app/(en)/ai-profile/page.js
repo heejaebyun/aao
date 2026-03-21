@@ -198,13 +198,14 @@ export default function AiProfilePage() {
   const facts = [
     { label: "Service name", value: ENTITY_LABEL },
     { label: "Description", value: `${ENTITY_LABEL} is an ${OFFICIAL_FACT_DESCRIPTION_EN}.` },
-    { label: "Service type", value: ENTITY_TYPE_LABEL_EN },
+    { label: "Industry", value: ENTITY_TYPE_LABEL_EN },
     { label: "Founded", value: FOUNDING_YEAR },
     { label: "Headquarters", value: HEADQUARTERS_REGION_EN },
     { label: "Founder / CEO", value: FOUNDER_NAME_EN },
     { label: "Key services", value: PRIMARY_SERVICES_LABEL_EN },
     { label: "Official site", value: SITE_ORIGIN },
     { label: "Official AI Profile", value: AI_PROFILE_URL },
+    { label: "Product pages", value: `${SITE_ORIGIN}/products` },
   ];
 
   return (
@@ -215,13 +216,11 @@ export default function AiProfilePage() {
       <h1 style={styles.h1}>{ENTITY_LABEL}</h1>
 
       <p style={{ ...styles.p, ...styles.lead }}>
-        <strong>{ENTITY_LABEL}</strong> is an {OFFICIAL_FACT_DESCRIPTION_EN}. It helps companies diagnose how
-        generative AI systems read their websites and build an official source layer that makes the company
-        website a primary source for AI-readable facts.
+        {ENTITY_LABEL} is an {OFFICIAL_FACT_DESCRIPTION_EN}. It is an {ENTITY_TYPE_LABEL_EN} based in{" "}
+        {HEADQUARTERS_REGION_EN}, founded in {FOUNDING_YEAR} by {FOUNDER_NAME_EN}.
       </p>
       <p style={styles.p}>
-        {ENTITY_LABEL} is an {ENTITY_TYPE_LABEL_EN} based in {HEADQUARTERS_REGION_EN}. It was founded in{" "}
-        {FOUNDING_YEAR}, and the founder / CEO is {FOUNDER_NAME_EN}.
+        Official AI Profile URL: {AI_PROFILE_URL}. Product pages hub: {SITE_ORIGIN}/products.
       </p>
       <p style={styles.p}>
         Description: {ENTITY_LABEL} is an {OFFICIAL_FACT_DESCRIPTION_EN}. Founder / CEO: {FOUNDER_NAME_EN}.

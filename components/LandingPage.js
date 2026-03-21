@@ -4,45 +4,12 @@ import { INSIGHTS } from "@/lib/insights";
 import { PRODUCTS } from "@/lib/products";
 import {
   AI_PROFILE_PATH,
-  AI_PROFILE_URL,
   ENTITY_LABEL,
   FOUNDING_YEAR,
   HEADQUARTERS_REGION,
   ENTITY_TYPE_LABEL,
   FOUNDER_NAME_KO,
-  SITE_ORIGIN,
 } from "@/lib/site-identity";
-
-const OFFICIAL_DISCOVERY_LINKS = [
-  {
-    label: "공식 AI 프로필",
-    href: AI_PROFILE_PATH,
-    url: AI_PROFILE_URL,
-    description: "AI가 읽는 공식 회사 사실 허브",
-  },
-  {
-    label: "llms.txt",
-    href: "/llms.txt",
-    url: `${SITE_ORIGIN}/llms.txt`,
-    description: "LLM용 공개 탐색 경로",
-  },
-  {
-    label: "sitemap.xml",
-    href: "/sitemap.xml",
-    url: `${SITE_ORIGIN}/sitemap.xml`,
-    description: "공식 URL 인덱스",
-  },
-];
-
-const OFFICIAL_MAIN_FACTS = [
-  { label: "서비스명", value: ENTITY_LABEL },
-  { label: "설명", value: "AAO는 AI 검색 최적화 SaaS입니다." },
-  { label: "설립", value: FOUNDING_YEAR },
-  { label: "대표", value: FOUNDER_NAME_KO },
-  { label: "본사", value: HEADQUARTERS_REGION },
-  { label: "주요 서비스", value: "AI 전달 진단, 구조 검증 리포트, AI 프로필 페이지 제작" },
-  { label: "공식 AI 프로필", value: AI_PROFILE_URL },
-];
 
 const PRODUCT_PREVIEW_COPY = {
   "ai-delivery-diagnosis": {
@@ -97,23 +64,20 @@ export default function LandingPage() {
       </header>
 
       <section style={{ maxWidth: 720, margin: "0 auto", padding: "80px 24px 40px", textAlign: "center" }}>
-        <p style={{ fontSize: 15, color: "#d8d8f4", lineHeight: 1.7, margin: "0 0 18px", fontWeight: 600 }}>
-          {ENTITY_LABEL}는 AI 검색 최적화 SaaS입니다.
-        </p>
         <div style={{ display: "inline-block", background: "#6c63ff18", border: "1px solid #6c63ff44", borderRadius: 20, padding: "6px 16px", fontSize: 13, color: "#a78bfa", marginBottom: 28, fontWeight: 500 }}>
-          구조 검증(린트) + AI 전달 확인
+          {ENTITY_LABEL} · 구조 검증(린트) + AI 전달 확인
         </div>
         <h1 style={{ fontSize: "clamp(32px, 6vw, 56px)", fontWeight: 900, lineHeight: 1.1, margin: "0 0 20px", letterSpacing: -1.5 }}>
           AI가 당신의 회사를<br />
           <span style={{ background: "linear-gradient(90deg,#6c63ff,#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>정확히 알고 있을까요?</span>
         </h1>
-        <p style={{ fontSize: 16, color: "#9999bb", lineHeight: 1.75, margin: "0 0 24px", fontWeight: 400 }}>
-          ChatGPT · Gemini · Perplexity가 당신 회사의 공식 사실을 실제로 어떻게 읽는지 진단하고,
-          공식 웹사이트와 공식 출처 허브를 AI가 읽기 쉬운 구조로 정리합니다.
+        <p style={{ fontSize: "clamp(15px, 2.5vw, 19px)", color: "#9999bb", lineHeight: 1.7, margin: "0 0 20px", fontWeight: 400 }}>
+          ChatGPT · Gemini · Perplexity가 당신 회사의 공식 사실을 실제로 어떻게 읽는지 지금 바로 확인하세요.<br />
+          AI가 메인 페이지를 읽고, 놓치고, 잘못 이해하는 지점을 진단합니다.
         </p>
-        <p style={{ fontSize: 14, color: "#7f7fa6", lineHeight: 1.75, margin: "0 0 32px" }}>
-          메인은 사람을 위한 랜딩 페이지로 유지하고, 공식 사실은{" "}
-          <code style={inlineCodeStyle()}>/ai-profile</code>와 공개 탐색 경로로 분리해 AI가 직접 발견할 수 있게 설계합니다.
+        <p style={{ fontSize: 14, color: "#7f7fa6", lineHeight: 1.75, margin: "0 0 48px" }}>
+          <strong style={{ color: "#d8d8f4" }}>{ENTITY_LABEL}</strong>는 AI 검색 최적화 SaaS입니다. 공식 웹사이트와{" "}
+          <code style={inlineCodeStyle()}>/ai-profile</code> 페이지를 AI의 1차 출처로 만들기 위해, 메인 페이지 구조와 실제 AI 전달 결과를 함께 진단합니다.
         </p>
 
         <p style={{ fontSize: 14, color: "#b3b0d8", lineHeight: 1.85, margin: "0 0 28px", textAlign: "left", maxWidth: 640, marginLeft: "auto", marginRight: "auto" }}>
@@ -135,67 +99,13 @@ export default function LandingPage() {
           }}
         >
           <p style={{ margin: 0, fontSize: 14, color: "#d4d1f6", lineHeight: 1.8 }}>
-            아래 공개 경로는 메인을 거치지 않아도 직접 발견할 수 있는 공식 출처 경로입니다. 전체 공식 사실과 출처 정책은{" "}
-            <a href={AI_PROFILE_PATH} style={inlineLinkStyle()}>/ai-profile</a>
-            를 기준으로 관리합니다.
+            전체 공식 사실과 공식 출처 정책은{" "}
+            <a href={AI_PROFILE_PATH} style={inlineLinkStyle()}>
+              /ai-profile
+            </a>
+            에서 확인할 수 있습니다.
           </p>
         </div>
-
-        <section
-          style={{
-            maxWidth: 760,
-            margin: "0 auto 28px",
-            padding: "22px 20px",
-            textAlign: "left",
-            background: "linear-gradient(180deg, rgba(17,17,34,0.94), rgba(9,9,23,0.98))",
-            border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: 18,
-            boxShadow: "0 18px 48px rgba(0,0,0,0.2)",
-          }}
-        >
-          <h2 style={{ margin: "0 0 10px", fontSize: 18, color: "#f3f1ff" }}>공식 출처 허브</h2>
-          <p style={{ margin: "0 0 18px", fontSize: 13, color: "#9d9bc0", lineHeight: 1.75 }}>
-            AI가 메인 링크를 따라오지 않아도 공식 출처를 직접 찾을 수 있도록 핵심 경로를 한 곳에 공개합니다.
-          </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 12, marginBottom: 18 }}>
-            {OFFICIAL_DISCOVERY_LINKS.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                style={{
-                  display: "block",
-                  textDecoration: "none",
-                  background: "rgba(108,99,255,0.08)",
-                  border: "1px solid rgba(108,99,255,0.18)",
-                  borderRadius: 14,
-                  padding: "14px 14px 12px",
-                  color: "#fff",
-                }}
-              >
-                <div style={{ fontSize: 12, color: "#a9a6d9", marginBottom: 6 }}>{item.label}</div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#f5f4ff", lineHeight: 1.6, wordBreak: "break-all" }}>{item.url}</div>
-                <div style={{ fontSize: 12, color: "#8f8cb6", marginTop: 6, lineHeight: 1.6 }}>{item.description}</div>
-              </a>
-            ))}
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
-            {OFFICIAL_MAIN_FACTS.map((fact) => (
-              <div
-                key={fact.label}
-                style={{
-                  padding: "12px 14px",
-                  borderRadius: 14,
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid rgba(255,255,255,0.06)",
-                }}
-              >
-                <p style={{ margin: 0, fontSize: 14, color: "#efeefe", lineHeight: 1.7, wordBreak: "break-word" }}>
-                  <span style={{ color: "#8f8cb6" }}>{fact.label}:</span> {fact.value}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
 
         <div id="diagnose-start" style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 560, margin: "0 auto", alignItems: "center" }}>
           <a
@@ -222,7 +132,7 @@ export default function LandingPage() {
           </a>
           <div style={{ fontSize: 12, color: "#555577", textAlign: "center" }}>무료 · 회원가입 불필요 · 구조 검증과 AI 전달 확인 동시 실행</div>
           <div style={{ fontSize: 12, color: "#7f7fa6", textAlign: "center" }}>
-            공식 사실 허브는 <a href={AI_PROFILE_PATH} style={inlineLinkStyle()}>AI 프로필 페이지</a>에서, 공개 탐색 경로는 <a href="/llms.txt" style={inlineLinkStyle()}>llms.txt</a>와 <a href="/sitemap.xml" style={inlineLinkStyle()}>sitemap.xml</a>에서 확인할 수 있습니다.
+            전체 공식 회사 정보는 <a href={AI_PROFILE_PATH} style={inlineLinkStyle()}>AI 프로필 페이지</a>에서 확인할 수 있습니다.
           </div>
         </div>
       </section>
