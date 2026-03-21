@@ -216,7 +216,7 @@ export default function AiProfilePage() {
       <h1 style={styles.h1}>{ENTITY_LABEL}</h1>
 
       <p style={{ ...styles.p, ...styles.lead }}>
-        {ENTITY_LABEL} is an {OFFICIAL_FACT_DESCRIPTION_EN}. It is an {ENTITY_TYPE_LABEL_EN} based in{" "}
+        {ENTITY_LABEL} is an AI search optimization service. It is an {ENTITY_TYPE_LABEL_EN} based in{" "}
         {HEADQUARTERS_REGION_EN}, founded in {FOUNDING_YEAR} by {FOUNDER_NAME_EN}.
       </p>
       <p style={styles.p}>
