@@ -160,6 +160,8 @@ function EngineDeliveryCard({ engineId, data }) {
   const missedFields = data?.missedFields || [];
   const deliveryRate = data?.deliveryRate;
   const totalFields = data?.totalDeclaredFields || 0;
+  const engineFailed = data?.status && data.status !== "success";
+  const hasFieldRows = deliveredFields.length > 0 || missedFields.length > 0;
 
   const rateColor = deliveryRate === null ? C.textDim
     : deliveryRate >= 0.8 ? C.success
@@ -187,9 +189,42 @@ function EngineDeliveryCard({ engineId, data }) {
         )}
       </div>
 
-      {totalFields === 0 ? (
+      {engineFailed ? (
+        <div style={{
+          display: "grid",
+          gap: 6,
+          padding: "10px 12px",
+          borderRadius: 8,
+          background: C.dangerBg,
+          border: `1px solid ${C.danger}25`,
+        }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: C.danger }}>
+            AI 응답 확인 실패
+          </div>
+          <div style={{ fontSize: 11, color: C.textMuted, lineHeight: 1.6 }}>
+            {friendlyError(data?.error || `${engine.name} 응답을 가져오지 못했습니다.`)}
+          </div>
+          {data?.latencyMs ? (
+            <div style={{ fontSize: 10, color: C.textDim }}>
+              요청 시간: {data.latencyMs}ms
+            </div>
+          ) : null}
+        </div>
+      ) : totalFields === 0 ? (
         <div style={{ fontSize: 12, color: C.textDim, padding: "8px 0" }}>
           선언된 사실이 없어 전달 확인을 수행할 수 없습니다.
+        </div>
+      ) : !hasFieldRows ? (
+        <div style={{
+          fontSize: 12,
+          color: C.textMuted,
+          padding: "10px 12px",
+          borderRadius: 8,
+          background: C.surface,
+          border: `1px solid ${C.border}`,
+          lineHeight: 1.6,
+        }}>
+          AI 응답은 받았지만 필드별 전달 결과를 아직 표시하지 못했습니다. 다시 시도해주세요.
         </div>
       ) : (
         <div style={{ display: "grid", gap: 4 }}>
