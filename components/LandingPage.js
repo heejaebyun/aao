@@ -132,7 +132,7 @@ export default function LandingPage() {
           </a>
           <div style={{ fontSize: 12, color: "#555577", textAlign: "center" }}>무료 · 회원가입 불필요 · 구조 검증과 AI 전달 확인 동시 실행</div>
           <div style={{ fontSize: 12, color: "#7f7fa6", textAlign: "center" }}>
-            공식 구조 설명이 필요하면 <a href={AI_PROFILE_PATH} style={inlineLinkStyle()}>AI 프로필 페이지</a>를 바로 확인할 수 있습니다.
+            전체 공식 회사 정보는 <a href={AI_PROFILE_PATH} style={inlineLinkStyle()}>AI 프로필 페이지</a>에서 확인할 수 있습니다.
           </div>
         </div>
       </section>
