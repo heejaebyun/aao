@@ -9,6 +9,7 @@ import {
   HEADQUARTERS_REGION,
   ENTITY_TYPE_LABEL,
   FOUNDER_NAME_KO,
+  PRIMARY_SERVICES_LABEL,
 } from "@/lib/site-identity";
 
 const PRODUCT_PREVIEW_COPY = {
@@ -84,6 +85,30 @@ export default function LandingPage() {
           {ENTITY_LABEL}는 {FOUNDING_YEAR}년 {HEADQUARTERS_REGION}에서 {FOUNDER_NAME_KO}가 설립한 {ENTITY_TYPE_LABEL}입니다.
           AI 전달 진단, 구조 검증 리포트, AI 프로필 페이지 제작을 통해 공식 웹사이트가 AI 답변의 1차 출처가 되도록 돕습니다.
         </p>
+
+        <div
+          style={{
+            maxWidth: 640,
+            margin: "0 auto 28px",
+            padding: "16px 18px",
+            textAlign: "left",
+            background: "rgba(14,14,30,0.82)",
+            border: "1px solid rgba(167,139,250,0.12)",
+            borderRadius: 16,
+          }}
+        >
+          <div style={{ fontSize: 11, color: "#7f7fa6", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 10 }}>
+            공식 사실 요약
+          </div>
+          <div style={{ display: "grid", gap: 8, fontSize: 14, color: "#d8d8f4", lineHeight: 1.7 }}>
+            <div><strong style={{ color: "#ffffff" }}>서비스명:</strong> {ENTITY_LABEL}</div>
+            <div><strong style={{ color: "#ffffff" }}>설명:</strong> {ENTITY_TYPE_LABEL}</div>
+            <div><strong style={{ color: "#ffffff" }}>설립:</strong> {FOUNDING_YEAR}</div>
+            <div><strong style={{ color: "#ffffff" }}>본사:</strong> {HEADQUARTERS_REGION}</div>
+            <div><strong style={{ color: "#ffffff" }}>대표:</strong> {FOUNDER_NAME_KO}</div>
+            <div><strong style={{ color: "#ffffff" }}>주요 서비스:</strong> {PRIMARY_SERVICES_LABEL}</div>
+          </div>
+        </div>
 
         <div
           style={{
